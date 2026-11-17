@@ -1,5 +1,6 @@
 import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv } from './journal.js';
 import { todayISO, formatDate, dayNumber } from './dates.js';
+import { getAppLayout } from './layout.js';
 
 export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate }) {
   const $ = selector => document.querySelector(selector);
@@ -9,13 +10,13 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   let rows = [];
   let dirty = false;
   let filtered = [];
-  const mobile = matchMedia('(max-width: 760px)');
+  const mobile = getAppLayout();
   const arrangePanels = () => {
     $('#journal-filter-panel').open = !mobile.matches;
     $('#journal-trend-panel').open = !mobile.matches;
   };
   arrangePanels();
-  mobile.addEventListener('change', arrangePanels);
+  mobile.subscribe(arrangePanels);
   $('#journal-reset').addEventListener('click', () => {
     for (const id of ['journal-search', 'journal-tag', 'journal-from', 'journal-to']) $('#' + id).value = '';
     $('#journal-archived').checked = false;

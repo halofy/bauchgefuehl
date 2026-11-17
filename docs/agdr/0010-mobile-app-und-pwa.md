@@ -8,6 +8,8 @@
 
 ## Kontext und Herkunft
 
+**Fortschreibung vom 17.11.2026:** [AgDR-0013](0013-app-layout-erkennung.md) ersetzt die bisherige alleinige 760-Pixel-Grenze durch eine gemeinsame Erkennung für schmale Ansichten, breitere Touch-Geräte und installierte PWAs. Die übrige PWA- und Navigationsentscheidung bleibt bestehen. Die folgenden Angaben und Prüfnachweise dokumentieren die Erstimplementierung.
+
 Der Nutzer verlangt ausdrücklich, dass sich die Webapp stärker wie eine App anfühlt, mobile first ist und als PWA installiert werden kann. Er hat anschließend beauftragt, die App-Optimierung fortzusetzen. Die konkrete Aufteilung in fünf Bereiche, die Bildschirmgrenze von 760 Pixeln, einklappbare Journalwerkzeuge und die Cache-Strategie sind Agentenentscheidungen. „Umgesetzt“ beschreibt diese Implementierung und behauptet keine gesonderte Nutzerfreigabe.
 
 ## Entscheidung

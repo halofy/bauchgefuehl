@@ -1,5 +1,7 @@
+import { getAppLayout } from './layout.js';
+
 const sections = ['ueberblick', 'wochenreise', 'journal', 'vorsorge', 'wissen'];
-const mobile = matchMedia('(max-width: 760px)');
+const mobile = getAppLayout();
 let active = 'ueberblick';
 const positions = new Map();
 
@@ -51,7 +53,7 @@ export function setupAppNavigation() {
       pending = false;
     });
   }, { passive: true });
-  mobile.addEventListener('change', () => {
+  mobile.subscribe(() => {
     paint();
     if (mobile.matches) window.scrollTo({ top: 0, behavior: 'instant' });
     else document.getElementById(active).scrollIntoView({ behavior: 'instant' });

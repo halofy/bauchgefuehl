@@ -57,6 +57,8 @@ npm run build
 
 Die App über HTTPS öffnen; lokal funktionieren auch `localhost` und `127.0.0.1`. Das **Info-Symbol oben rechts** öffnet Installationshinweise und den Offline-Status.
 
+Das App-Layout mit fester Navigation unten gilt bis **900 CSS-Pixel Breite**, auf Geräten mit primärer Touch-Eingabe ohne Hover bis **1200 CSS-Pixel**. Als **Standalone-PWA gestartet** gilt das App-Layout unabhängig von der Breite, einschließlich Safari-Erkennung. Ein breiter normaler Desktop-Tab verwendet weiterhin die Seitenansicht.
+
 - **Android/Chrome oder Desktop/Chromium:** „App installieren“ wählen, wenn angeboten, oder die Installationsfunktion im Browsermenü nutzen.
 - **iPhone/iPad:** in Safari **Teilen → Zum Home-Bildschirm** wählen und, falls angeboten, **Als Web-App öffnen** aktivieren.
 
@@ -109,6 +111,7 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0010: Mobile App-Navigation und PWA](docs/agdr/0010-mobile-app-und-pwa.md)
 - [AgDR-0011: Persönliche Berechnungserklärung](docs/agdr/0011-persoenliche-berechnungserklaerung.md)
 - [AgDR-0012: Feature-Backlog und abgeschlossene SSW-Prüfung](docs/agdr/0012-roadmap-und-ssw-pruefung.md)
+- [AgDR-0013: App-Layout für große Smartphones und installierte PWAs](docs/agdr/0013-app-layout-erkennung.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -126,10 +129,10 @@ Der separate **Geräte-Link** gewährt laufende Leserechte auf den verschlüssel
 - `src/qr.js`, `src/vendor/qrcodegen.js`: vollständig lokale QR-Erzeugung mit Nayuki v1.8.0 (MIT-Lizenz im Quelltext).
 - `sync-server/local.js`, `sync-server/sqlite-storage.js`: lokaler Server und dauerhafter SQLite-Speicher.
 - `sync-server/worker.js`, `sync-server/wrangler.jsonc`: gemeinsames Protokoll und optionaler Cloudflare-Adapter.
-- `styles.css`, `src/navigation.js`: Responsive Gestaltung und mobile App-Navigation.
+- `styles.css`, `src/layout.js`, `src/navigation.js`: Responsive Gestaltung, gemeinsame Layout-Erkennung und mobile App-Navigation.
 - `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
 - `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
-- `tests/`: insgesamt **78 Tests** für Berechnung, persönliche Erklärung, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `tests/`: insgesamt **82 Tests** für Berechnung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
 - `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.
