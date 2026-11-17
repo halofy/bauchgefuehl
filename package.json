@@ -1,0 +1,13 @@
+{
+  "name": "bauchgefuehl",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Ein privater Schwangerschaftsbegleiter für GitHub Pages.",
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --bind 127.0.0.1",
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.js"
+  },
+  "engines": { "node": ">=22" }
+}

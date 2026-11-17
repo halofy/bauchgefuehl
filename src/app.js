@@ -1,0 +1,527 @@
+import { STORAGE_KEY, HISTORY_KEY, todayISO, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, encodeShare, decodeShare, readLocal, writeLocal } from './pregnancy.js';
+import { getWeekContent, milestones } from './content.js';
+import { createQrSvg } from './qr.js';
+import { setupSync } from './sync-ui.js';
+
+const $ = selector => document.querySelector(selector);
+const $$ = selector => [...document.querySelectorAll(selector)];
+const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
+let storage;
+try { storage = window.localStorage; } catch { storage = { getItem() { throw new Error(); }, setItem() { throw new Error(); }, removeItem() { throw new Error(); } }; }
+let today = todayISO();
+let local = readLocal(storage, today);
+let state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+let selectedWeek;
+let toastTimer;
+let syncUi = null;
+
+function announce(message) {
+  $('#notice').textContent = message;
+  $('#notice').hidden = !message;
+}
+
+function toast(message) {
+  clearTimeout(toastTimer);
+  $('#toast').textContent = message;
+  $('#toast').hidden = false;
+  toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 4500);
+}
+
+function clearShareHash() {
+  if (location.hash.startsWith('#s=')) {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch { /* The current session still remains usable. */ }
+  }
+}
+
+function currentWeek() {
+  return Math.max(1, Math.min(42, calculatePregnancy(state.profile, today).weekNumber));
+}
+
+function readIncomingLink() {
+  if (syncUi?.connection && location.hash.startsWith('#s=')) {
+    announce('Ein einzelner Teilen-Link ersetzt keine verbundene Reise. Trenne die Geräteverbindung bewusst, bevor du einen anderen Datenstand übernimmst.');
+    selectedWeek = currentWeek();
+    return;
+  }
+  try {
+    const profile = decodeShare(location.hash, today);
+    if (profile) state = { profile, checks: {}, mode: 'shared' };
+  } catch (error) { announce(error.message); }
+  selectedWeek = currentWeek();
+}
+
+function renderMode() {
+  const banner = $('#mode-banner');
+  banner.hidden = state.mode === 'local';
+  const actions = $('#mode-actions');
+  actions.replaceChildren();
+  const addAction = (label, handler, primary = false) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `button ${primary ? 'button-primary' : 'button-light'}`;
+    button.textContent = label;
+    button.addEventListener('click', handler);
+    actions.append(button);
+  };
+  if (state.mode === 'demo') {
+    $('#mode-title').textContent = 'Ein kleiner Einblick · du siehst Beispieldaten';
+    $('#mode-description').textContent = 'Mit deiner Periode und Zykluslänge oder deinem ET wird dieser Begleiter ganz deiner.';
+    addAction('Meine Daten eintragen', openProfile, true);
+  } else if (state.mode === 'shared') {
+    $('#mode-title').textContent = 'Eine Reise, die mit dir geteilt wurde';
+    $('#mode-description').textContent = local.profile
+      ? 'Geteilte Ansicht. Speichern ersetzt deine bisherigen lokalen Angaben und Merkhäkchen.'
+      : 'Geteilte Ansicht. Die Daten werden erst gespeichert, wenn du sie bewusst übernimmst.';
+    addAction('Auf diesem Gerät speichern', () => saveProfile(state.profile, {}), true);
+    addAction('Verwerfen', discardShared);
+  } else if (state.mode === 'session') {
+    $('#mode-title').textContent = 'Deine Reise · nur für diese Sitzung';
+    $('#mode-description').textContent = 'Lokales Speichern ist gerade nicht möglich. Sichere dir bei Bedarf deinen Teilen-Link.';
+    addAction('Speichern erneut versuchen', () => saveProfile(state.profile, state.checks));
+  }
+}
+
+function renderSummary() {
+  const data = calculatePregnancy(state.profile, today);
+  const fromDueDate = data.method === 'due-date';
+  $('#estimate-label-text').textContent = fromDueDate ? 'Vom ET zurückgerechnet · 28-Tage-Basis' : 'Zyklusangepasste Schätzung';
+  $('#profile-method').textContent = fromDueDate ? 'ET · 28-Tage-Basis' : 'Periode & Zyklus';
+  $('#profile-date-label').textContent = fromDueDate ? 'Eingetragener ET' : 'Letzte Periode';
+  $('#due-date-label').textContent = fromDueDate ? 'EINGETRAGENER ET' : 'VORAUSSICHTLICHER ET';
+  $('#today-date').textContent = formatDate(today, { weekday: 'long', year: undefined });
+  $('#trimester').textContent = data.status === 'before' ? 'Vor dem rechnerischen Beginn' : `${data.trimester}. Trimester`;
+  $('#ssw-weeks').textContent = data.status === 'before' ? '–' : data.weeks;
+  $('#ssw-days').textContent = data.status === 'before' ? '–' : data.days;
+  $('#week-explanation').textContent = data.status === 'before' ? 'Noch keine sinnvolle SSW-Schätzung' : `${data.weeks} Wochen und ${data.days} ${data.days === 1 ? 'Tag' : 'Tage'} · in der ${data.weekNumber}. SSW`;
+  $('#due-date').textContent = formatDate(data.dueDate);
+  const remaining = data.daysUntilDue;
+  $('#due-countdown').textContent = remaining > 0 ? `Noch ungefähr ${remaining} Tage bis zum ET` : remaining === 0 ? 'Heute ist der errechnete Termin' : `Der errechnete Termin war vor ${Math.abs(remaining)} ${remaining === -1 ? 'Tag' : 'Tagen'}`;
+  const percent = Math.round(data.progress);
+  $('#progress-percent').textContent = `${percent} %`;
+  $('#progress-fill').style.width = `${data.progress}%`;
+  $('#pregnancy-progressbar').setAttribute('aria-valuenow', percent);
+  $('#profile-lmp').textContent = formatDate(fromDueDate ? state.profile.dueDate : state.profile.lmp, { month: 'short' });
+  $('#profile-cycle-row').hidden = fromDueDate;
+  $('#profile-cycle').textContent = fromDueDate ? '' : `${state.profile.cycle} Tage${state.profile.irregular ? ' · unregelmäßig' : ''}`;
+  const messages = [];
+  if (data.status === 'before') messages.push('Die Zyklusanpassung ergibt derzeit ein Alter vor 0+0. Eine aktuelle SSW lässt sich damit noch nicht sinnvoll anzeigen. Prüfe das Datum und besprich die Datierung mit deiner Praxis.');
+  if (data.status === 'beyond') messages.push('Die Berechnung liegt bei 42+0 oder später und damit außerhalb der Wocheninfos. Bitte prüfe deine Angaben. Wenn die Schwangerschaft noch besteht, kontaktiere dein Geburtsteam für das weitere Vorgehen.');
+  if (data.uncertain) messages.push('Bei unregelmäßigen Zyklen oder einer Zykluslänge außerhalb von 21–35 Tagen ist diese Schätzung besonders unsicher. Die ärztliche Datierung ist für deine Betreuung maßgeblich.');
+  $('#medical-status').textContent = messages.join(' ');
+  $('#medical-status').hidden = !messages.length;
+  const correction = data.correction === 0 ? 'Keine Zyklusanpassung.' : `${Math.abs(data.correction)} ${Math.abs(data.correction) === 1 ? 'Tag' : 'Tage'} werden ${data.correction > 0 ? 'abgezogen' : 'addiert'}.`;
+  $('#calculation-example').textContent = fromDueDate
+    ? `Deine gewählte Methode: Rückrechnung vom ET (${formatDate(data.dueDate)}). 280 − (${data.daysUntilDue}) = ${data.gestationalDays} SSW-Tage = ${data.weeks}+${data.days}. Es wird keine zusätzliche Zyklusanpassung vorgenommen.`
+    : `Mit deinen ${state.profile.cycle} Zyklustagen: ${data.elapsedDays} Tage seit Periodenbeginn. ${correction} ${data.status === 'before' ? 'Das rechnerische Ergebnis liegt noch vor 0+0.' : `Ergebnis: ${data.gestationalDays} SSW-Tage = ${data.weeks}+${data.days}. Ohne Zyklusanpassung wären es ${data.calendarWeeks}+${data.calendarDays}.`}`;
+}
+
+function renderWeeks(center = false) {
+  const actual = currentWeek();
+  const calculated = calculatePregnancy(state.profile, today);
+  const isActual = calculated.status === 'ongoing' && selectedWeek === actual;
+  if (!$('#week-list').children.length) {
+    for (let week = 1; week <= 42; week++) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'week-button';
+      button.dataset.week = week;
+      button.innerHTML = `<small>SSW</small><span>${week}</span>`;
+      button.addEventListener('click', () => selectWeek(week));
+      $('#week-list').append(button);
+    }
+  }
+  for (const button of $$('.week-button')) {
+    const week = Number(button.dataset.week);
+    button.classList.toggle('selected', week === selectedWeek);
+    button.classList.toggle('is-current', week === actual && calculated.status === 'ongoing');
+    button.setAttribute('aria-pressed', String(week === selectedWeek));
+    button.setAttribute('aria-label', `${week}. Schwangerschaftswoche${week === actual && calculated.status === 'ongoing' ? ', deine aktuelle Woche' : ''}`);
+  }
+  $('#week-prev').disabled = selectedWeek <= 1;
+  $('#week-next').disabled = selectedWeek >= 42;
+  $('#selected-week-label').textContent = `${selectedWeek}. SSW`;
+  $('#selected-current').textContent = isActual ? (state.mode === 'demo' ? 'Aktuelle Woche im Beispiel' : 'Deine aktuelle Woche') : `Wochenvorschau · ${selectedWeek - 1}+0 bis ${selectedWeek - 1}+6`;
+  $('#today-week').textContent = calculated.status === 'ongoing' ? 'Zur aktuellen Woche →' : calculated.status === 'before' ? 'Zum Anfang der Wochenreise →' : 'Zur letzten Wocheninfo →';
+  const content = getWeekContent(selectedWeek);
+  $('#development-title').textContent = content.title;
+  $('#baby-description').textContent = content.baby;
+  $('#body-description').textContent = content.body;
+  $('#week-tip').textContent = content.tip;
+  $('#phase-size').textContent = content.size;
+  $('#phase-comparison').textContent = content.comparison;
+  $('#development-source').href = content.source;
+  $('#development-source').textContent = `Entwicklung in dieser Phase · ${selectedWeek <= 40 ? 'BIÖG' : 'NHS'} ↗`;
+  if (center) {
+    const chosen = $(`.week-button[data-week="${selectedWeek}"]`);
+    const list = $('#week-list');
+    // Scroll only the week strip; never move the document during data entry.
+    list.scrollTo({ left: chosen.offsetLeft - list.offsetLeft - list.clientWidth / 2 + chosen.clientWidth / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }
+}
+
+function selectWeek(week) {
+  selectedWeek = Math.max(1, Math.min(42, week));
+  renderWeeks(true);
+}
+
+function milestoneCard(item, suffix, gestationalDays) {
+  const article = document.createElement('article');
+  article.className = 'milestone';
+  if (gestationalDays >= item.start && gestationalDays <= item.end) {
+    const marker = document.createElement('span');
+    marker.className = 'milestone-current';
+    marker.title = 'Im aktuellen rechnerischen Zeitraum';
+    article.append(marker);
+  }
+  const time = document.createElement('div');
+  time.className = 'milestone-time';
+  time.textContent = item.label + (gestationalDays > item.end ? ' · Zeitraum vergangen' : '');
+  const title = document.createElement('h3');
+  title.textContent = item.title;
+  const text = document.createElement('p');
+  text.textContent = item.text;
+  const source = document.createElement('a');
+  source.className = 'source-link';
+  source.href = item.source;
+  source.target = '_blank';
+  source.rel = 'noopener noreferrer';
+  source.textContent = 'Informationen zur Vorsorge ↗';
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.id = `${item.id}-${suffix}`;
+  input.checked = state.checks[item.id] === true;
+  input.disabled = state.mode === 'demo' || state.mode === 'shared' || syncUi?.readOnly;
+  const labelText = document.createElement('span');
+  labelText.textContent = 'Für mich geklärt';
+  label.append(input, labelText);
+  input.addEventListener('change', () => {
+    if (syncUi?.readOnly) return;
+    state.checks[item.id] = input.checked;
+    if (!input.checked) delete state.checks[item.id];
+    persistChecks();
+    // Update the duplicate checkbox without removing the focused control.
+    for (const other of $$(`input[id^="${item.id}-"]`)) other.checked = input.checked;
+  });
+  article.append(time, title, text, source, label);
+  return article;
+}
+
+function renderCare() {
+  const days = calculatePregnancy(state.profile, today).gestationalDays;
+  const upcoming = milestones.filter(item => item.end >= days).slice(0, 3);
+  $('#milestones').replaceChildren(...upcoming.map(item => milestoneCard(item, 'next', days)));
+  $('#all-milestones').replaceChildren(...milestones.map(item => milestoneCard(item, 'all', days)));
+  $('#checklist-note').textContent = state.mode === 'demo' ? 'In der Vorschau sind die Merkhäkchen deaktiviert. Trage deine Daten ein, um sie lokal zu nutzen.' : state.mode === 'shared' ? 'Übernimm die Daten auf diesem Gerät, um eigene Merkhäkchen zu setzen. Häkchen werden nicht geteilt.' : 'Deine Häkchen sind persönliche Merkhilfen, keine medizinische Dokumentation. Sie werden nicht geteilt.';
+  if (syncUi?.connection) $('#checklist-note').textContent = syncUi.readOnly ? 'Merkhäkchen kommen automatisch vom Master. Änderungen sind nur dort möglich.' : 'Merkhäkchen werden wie deine Berechnungsgrundlage an verbundene Geräte synchronisiert.';
+}
+
+function render(center = false) {
+  renderMode();
+  renderSummary();
+  renderWeeks(center);
+  renderCare();
+}
+
+function persistChecks() {
+  if (state.mode === 'local' || state.mode === 'session') {
+    try {
+      writeLocal(storage, state.profile, state.checks, today);
+      state.mode = 'local';
+      local = { profile: { ...state.profile }, checks: { ...state.checks }, error: null };
+      syncUi?.queue({ profile: state.profile, checks: state.checks });
+    } catch {
+      state.mode = 'session';
+      announce('Deine Änderungen konnten nicht lokal gespeichert werden. Sie bleiben nur für diese Sitzung erhalten.');
+    }
+    renderMode();
+  }
+}
+
+function saveProfile(profile, checks) {
+  if (syncUi?.readOnly) throw new Error('Dieses Gerät liest nur mit. Bitte ändere die Angaben auf dem Master.');
+  state = { profile: validateProfile(profile, today), checks: { ...checks }, mode: 'local' };
+  announce('');
+  try {
+    writeLocal(storage, state.profile, state.checks, today);
+    local = { profile: { ...state.profile }, checks: { ...state.checks }, error: null };
+    syncUi?.queue({ profile: state.profile, checks: state.checks });
+    toast('Deine Angaben sind in diesem Browser gespeichert.');
+  } catch {
+    state.mode = 'session';
+    announce('Deine Angaben konnten nicht lokal gespeichert werden. Sie bleiben nur für diese Sitzung erhalten. Du kannst dir einen Teilen-Link sichern.');
+  }
+  clearShareHash();
+  selectedWeek = currentWeek();
+  render(true);
+}
+
+function discardShared() {
+  clearShareHash();
+  local = readLocal(storage, today);
+  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+  selectedWeek = currentWeek();
+  announce(local.error || '');
+  render(true);
+}
+
+function openProfile() {
+  if (syncUi?.readOnly) { toast('Änderungen sind nur am Master möglich.'); return; }
+  const isDemo = state.mode === 'demo';
+  $('#method').value = isDemo ? 'period' : state.profile.method;
+  $('#lmp').value = isDemo ? '' : state.profile.lmp || '';
+  $('#lmp').max = today;
+  $('#lmp').min = addDays(today, -366);
+  $('#cycle').value = isDemo ? '' : state.profile.cycle || '';
+  $('#irregular').checked = !isDemo && state.profile.irregular;
+  $('#due-date-input').value = isDemo ? '' : state.profile.dueDate || '';
+  $('#due-date-input').min = addDays(today, -86);
+  $('#due-date-input').max = addDays(today, 280);
+  $('#form-error').hidden = true;
+  $('#lmp').removeAttribute('aria-invalid');
+  $('#cycle').removeAttribute('aria-invalid');
+  $('#due-date-input').removeAttribute('aria-invalid');
+  updateMethodFields();
+  $('#profile-dialog').showModal();
+}
+
+function formProfile() {
+  return validateProfile($('#method').value === 'due-date'
+    ? { method: 'due-date', dueDate: $('#due-date-input').value }
+    : { method: 'period', lmp: $('#lmp').value, cycle: Number($('#cycle').value), irregular: $('#irregular').checked }, today);
+}
+
+function updateMethodFields() {
+  const fromDueDate = $('#method').value === 'due-date';
+  $('#period-fields').hidden = fromDueDate;
+  $('#due-date-fields').hidden = !fromDueDate;
+  for (const input of $$('#period-fields input')) input.disabled = fromDueDate;
+  $('#due-date-input').disabled = !fromDueDate;
+  $('#lmp').required = !fromDueDate;
+  $('#cycle').required = !fromDueDate;
+  $('#due-date-input').required = fromDueDate;
+  $('#method-hint').textContent = fromDueDate
+    ? 'Dein ET entspricht 40+0. Die SSW wird mit 280 Tagen auf der Standardbasis von 28 Zyklustagen zurückgerechnet.'
+    : 'Deine SSW wird aus Periodenbeginn und persönlicher Zykluslänge geschätzt.';
+  $('#form-error').hidden = true;
+  for (const input of $$('#profile-form input')) input.removeAttribute('aria-invalid');
+  updateFormPreview();
+}
+
+$('#method').addEventListener('change', () => {
+  if ($('#method').value === 'due-date' && !$('#due-date-input').value) {
+    try {
+      const period = validateProfile({ lmp: $('#lmp').value, cycle: Number($('#cycle').value), irregular: $('#irregular').checked }, today);
+      $('#due-date-input').value = calculatePregnancy(period, today).dueDate;
+    } catch { /* With no valid period draft, the ET must be entered explicitly. */ }
+  }
+  updateMethodFields();
+});
+
+function updateFormPreview() {
+  try {
+    const data = calculatePregnancy(formProfile(), today);
+    $('#form-preview').textContent = data.status === 'before' ? 'Die Berechnung liegt noch vor 0+0. Bitte prüfe deine Angaben.' : `${data.weeks}+${data.days} · ${data.weekNumber}. SSW · ${data.method === 'due-date' ? 'Eingetragener' : 'Geschätzter'} ET: ${formatDate(data.dueDate)}`;
+  } catch {
+    $('#form-preview').textContent = $('#method').value === 'due-date' ? 'Trage einen gültigen ET ein, um die Rückrechnung zu sehen.' : 'Trage ein gültiges Datum und deine Zykluslänge ein, um die Schätzung zu sehen.';
+  }
+}
+
+$('#profile-form').addEventListener('input', updateFormPreview);
+$('#profile-form').addEventListener('submit', event => {
+  event.preventDefault();
+  $('#form-error').hidden = true;
+  $('#lmp').removeAttribute('aria-invalid');
+  $('#cycle').removeAttribute('aria-invalid');
+  $('#due-date-input').removeAttribute('aria-invalid');
+  try {
+    const profile = formProfile();
+    const unchanged = calculatePregnancy(profile, today).dueDate === calculatePregnancy(state.profile, today).dueDate;
+    const checks = unchanged && ['local', 'session'].includes(state.mode) ? state.checks : {};
+    saveProfile(profile, checks);
+    $('#profile-dialog').close();
+  } catch (error) {
+    $('#form-error').textContent = error.message;
+    $('#form-error').hidden = false;
+    const target = $('#method').value === 'due-date' ? $('#due-date-input') : error.message.includes('Zykluslänge') ? $('#cycle') : $('#lmp');
+    target.setAttribute('aria-invalid', 'true');
+    target.focus();
+  }
+});
+
+function openShare() {
+  if (state.mode === 'demo') {
+    openProfile();
+    toast('Trage zuerst deine Daten ein, um deine Reise zu teilen.');
+    return;
+  }
+  const url = new URL(location.href);
+  url.search = '';
+  url.hash = `s=${encodeShare(state.profile, today)}`;
+  $('#share-url').value = url.href;
+  $('#share-qr-code').replaceChildren();
+  $('#share-qr-error').hidden = true;
+  try { $('#share-qr-code').innerHTML = createQrSvg(url.href); }
+  catch {
+    $('#share-qr-error').textContent = 'Für diese Adresse konnte kein QR-Code erstellt werden. Du kannst stattdessen den Link kopieren.';
+    $('#share-qr-error').hidden = false;
+  }
+  $('#share-local-warning').hidden = !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+  $('#share-description').textContent = state.profile.method === 'due-date'
+    ? `Enthalten sind die Methode „ET · 28-Tage-Basis“ und dein eingetragener ET (${formatDate(state.profile.dueDate)}). Perioden- und Zyklusangaben werden bei dieser Methode nicht geteilt. Merkhäkchen bleiben bei dir.`
+    : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(state.profile.lmp)}), die durchschnittliche Zykluslänge (${state.profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist. Merkhäkchen bleiben bei dir.`;
+  $('#copy-status').textContent = '';
+  $('#copy-link').innerHTML = `${icon('share')}Link kopieren`;
+  $('#share-dialog').showModal();
+}
+
+$('#share-url').addEventListener('click', event => event.target.select());
+$('#copy-link').addEventListener('click', async () => {
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error();
+    await navigator.clipboard.writeText($('#share-url').value);
+    $('#copy-link').innerHTML = `${icon('check')}Link kopiert`;
+    $('#copy-status').textContent = 'Kopiert. Du kannst den Link jetzt selbst an eine vertraute Person senden.';
+  } catch {
+    $('#share-url').focus();
+    $('#share-url').select();
+    $('#copy-status').textContent = 'Automatisches Kopieren ist hier nicht möglich. Der Link ist markiert: Kopiere ihn mit Strg+C oder ⌘C oder über das Kontextmenü.';
+  }
+});
+
+function openDetail(selector) {
+  const detail = $(selector);
+  detail.open = true;
+  detail.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+  detail.querySelector('summary').focus({ preventScroll: true });
+}
+
+const actions = {
+  edit: openProfile,
+  share: openShare,
+  calculation: () => openDetail('#calculation-details'),
+  privacy: () => openDetail('.accordions details:nth-child(4)'),
+  sources: () => openDetail('#sources-details'),
+};
+for (const element of $$('[data-action]')) element.addEventListener('click', () => actions[element.dataset.action]());
+for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
+for (const dialog of $$('dialog')) {
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  });
+}
+
+$('#delete-data').addEventListener('click', () => { $('#delete-error').hidden = true; $('#delete-dialog').showModal(); });
+$('#confirm-delete').addEventListener('click', () => {
+  try {
+    if (syncUi?.connection) throw new Error('Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen.');
+    storage.removeItem(HISTORY_KEY);
+    storage.removeItem(STORAGE_KEY);
+    clearShareHash();
+    local = { profile: null, checks: {}, error: null };
+    state = { profile: demoProfile(today), checks: {}, mode: 'demo' };
+    selectedWeek = currentWeek();
+    $('#delete-dialog').close();
+    render(true);
+    announce('');
+    toast('Deine lokalen Angaben und Merkhäkchen wurden gelöscht.');
+  } catch {
+    $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen. Serverstände bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
+    $('#delete-error').hidden = false;
+  }
+});
+
+$('#week-prev').addEventListener('click', () => selectWeek(selectedWeek - 1));
+$('#week-next').addEventListener('click', () => selectWeek(selectedWeek + 1));
+$('#today-week').addEventListener('click', () => selectWeek(currentWeek()));
+$('#week-list').addEventListener('keydown', event => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const target = event.key === 'Home' ? 1 : event.key === 'End' ? 42 : selectedWeek + (event.key === 'ArrowRight' ? 1 : -1);
+  selectWeek(target);
+  $(`.week-button[data-week="${selectedWeek}"]`).focus({ preventScroll: true });
+});
+for (const button of $$('[data-scroll]')) button.addEventListener('click', () => {
+  $(`#${button.dataset.scroll}`).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+});
+
+// Scroll navigation without replacing the fragment that carries a shared profile.
+function updateNavigation() {
+  const sections = ['ueberblick', 'wochenreise', 'wissen'];
+  let active = sections[0];
+  for (const id of sections) if ($(`#${id}`).getBoundingClientRect().top <= 190) active = id;
+  for (const button of $$('[data-scroll]')) {
+    button.classList.toggle('active', button.dataset.scroll === active);
+    if (button.dataset.scroll === active) button.setAttribute('aria-current', 'location');
+    else button.removeAttribute('aria-current');
+  }
+}
+let scrollPending = false;
+window.addEventListener('scroll', () => {
+  if (scrollPending) return;
+  scrollPending = true;
+  requestAnimationFrame(() => { updateNavigation(); scrollPending = false; });
+}, { passive: true });
+
+function refreshDate() {
+  const fresh = todayISO();
+  if (fresh === today) return;
+  const wasCurrent = selectedWeek === currentWeek();
+  today = fresh;
+  if (state.mode === 'demo') state.profile = demoProfile(today);
+  try {
+    validateProfile(state.profile, today);
+    if (wasCurrent) selectedWeek = currentWeek();
+    render(wasCurrent);
+  } catch {
+    local = readLocal(storage, today);
+    state = { profile: demoProfile(today), checks: {}, mode: 'demo' };
+    selectedWeek = currentWeek();
+    render(true);
+    announce('Deine gespeicherten Angaben liegen inzwischen außerhalb des unterstützten Zeitraums. Bitte prüfe und aktualisiere sie.');
+  }
+}
+setInterval(refreshDate, 60_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshDate(); });
+window.addEventListener('hashchange', () => {
+  if (location.hash.startsWith('#s=')) {
+    readIncomingLink();
+    render(true);
+  } else if (state.mode === 'shared') discardShared();
+});
+window.addEventListener('storage', event => {
+  if (event.key !== STORAGE_KEY && event.key !== null) return;
+  local = readLocal(storage, today);
+  if (state.mode === 'shared') { renderMode(); return; }
+  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+  selectedWeek = currentWeek();
+  announce(local.error || '');
+  render(true);
+});
+
+announce(local.error || '');
+let lastSyncRole = '';
+syncUi = setupSync({
+  storage,
+  getSnapshot() {
+    if (state.mode === 'demo' || state.mode === 'shared') throw new Error('Bitte zuerst eigene Angaben auf diesem Gerät speichern.');
+    return { profile: state.profile, checks: state.checks };
+  },
+  applySnapshot(value) {
+    writeLocal(storage, value.profile, value.checks, today);
+    local = { profile: value.profile, checks: value.checks, error: null };
+    state = { profile: value.profile, checks: { ...value.checks }, mode: 'local' };
+    selectedWeek = currentWeek();
+    render(true);
+  },
+  notify: toast,
+  onConnection(connection, readOnly) {
+    const role = `${connection?.role || ''}:${readOnly}`;
+    for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); }
+  },
+});
+readIncomingLink();
+render(true);
