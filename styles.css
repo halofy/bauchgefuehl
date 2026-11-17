@@ -320,3 +320,79 @@ textarea{resize:vertical;line-height:1.8;min-height:110px;margin-bottom:18px}
 #entry-add-metric{margin-top:12px;font-size:11px}
 @media(max-width:900px){.journal-layout{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}.journal-filters{grid-template-columns:1.5fr 1fr}.journal-entry-header{flex-wrap:wrap}.journal-entry-actions{justify-content:flex-start}}
 @media(max-width:760px){.main-nav{gap:clamp(12px,4vw,26px)}.journal-section .section-heading{flex-wrap:wrap}.journal-section .section-heading .button{margin-top:3px;font-size:11px}.journal-layout{grid-template-columns:1fr}.journal-trend{grid-row:1}.journal-filters{padding:16px;gap:12px}.journal-search-label{grid-column:1/-1}.journal-filters{grid-template-columns:1fr 1fr}.journal-filters>label:nth-child(2){grid-column:1/-1}.journal-toolbar{align-items:flex-start;font-size:10px}.journal-toolbar .text-link{font-size:10px;max-width:180px;text-align:right}.journal-entry{padding:20px}.journal-entry h3{font-size:22px}.journal-note{font-size:13px}.journal-dialog{padding:22px}.metric-input-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 25px;gap:7px}.journal-metric-fieldset{padding:10px 12px 14px}}
+
+/* App shell: compact navigation and comfortable controls on phones. */
+.main-nav .nav-link>svg{display:none}
+.app-settings{margin-left:auto;position:relative;flex-shrink:0}
+.app-settings.update-ready:after{content:'';position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#a66c40;border:2px solid var(--paper)}
+.header-inner{gap:16px}
+.main-nav{gap:22px;margin-left:0}
+.app-status-box{padding:16px;background:var(--sage);border-radius:12px;margin:20px 0;font-size:13px}
+#app-dialog .app-status-box p{font-size:12px;color:var(--muted);margin-top:5px}
+@media(max-width:760px){
+  html{scroll-padding-top:88px}
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom));font-size:16px}
+  .site-header{margin-bottom:0;padding-top:env(safe-area-inset-top);backdrop-filter:none}
+  .header-inner{height:64px;flex-wrap:nowrap;gap:8px;padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  .brand{font-size:25px}.brand-mark{width:26px}.brand-mark svg{width:25px}
+  .header-share{width:44px;height:44px;padding:10px;margin:0;flex-shrink:0}.header-share span{display:none}.header-share svg{width:19px;height:19px}
+  .app-settings{width:44px;height:44px}
+  .main-nav{position:fixed;top:auto;bottom:0;left:0;right:0;height:calc(72px + env(safe-area-inset-bottom));padding:5px max(5px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(5px,env(safe-area-inset-left));gap:0;justify-content:space-around;border-top:1px solid var(--line);border-bottom:0;background:rgba(248,247,242,.98);box-shadow:0 -4px 24px #283c3308}
+  .nav-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:1;min-width:0;min-height:56px;font-size:10px;padding:4px 1px;border-radius:13px;line-height:1.4}
+  .main-nav .nav-link>svg{display:block;width:22px;height:22px}
+  .nav-link.active{background:var(--sage);font-weight:650}.nav-link.active:after{display:none}
+  .page-shell{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  .app-navigation .mobile-inactive{display:none!important}
+  .app-navigation .section{margin-top:0;padding-top:25px}
+  .app-navigation .site-footer{display:none}
+  .page-intro{padding:24px 0 20px}.page-intro .eyebrow{display:none}
+  h1{font-size:34px;letter-spacing:-1px}h1 br{display:none}.intro-copy{max-width:none;font-size:13px;margin-top:8px}
+  .section-heading h2{font-size:29px;line-height:1.2}.section-heading .eyebrow{font-size:10px}
+  .section-description,.content-note{font-size:12px}
+  .card,.pregnancy-card,.mode-banner,.journal-entry,.wellbeing-card{border-radius:18px}
+  .pregnancy-card{min-height:300px}.ssw-number{font-size:76px}.baby-art>svg{height:205px}
+  #mode-actions{width:100%}#mode-actions .button{min-height:44px;font-size:13px;padding:10px 14px}
+  .banner-copy strong{font-size:13px}.banner-copy p{font-size:12px;max-width:none}
+  .due-note,.data-card dl>div,.data-card dd{font-size:12px}.data-card dl>div{margin-bottom:10px}.data-card .card-heading h2{font-size:13px}
+  .data-card .text-link{font-size:12px;min-height:44px}
+  .text-link{min-height:44px}.icon-button{min-width:44px;min-height:44px}
+  .sync-strip{padding:16px;border-radius:18px}.sync-strip strong{font-size:14px}.sync-strip p{font-size:12px}.sync-strip .button{min-height:44px;font-size:12px}
+  .section-heading .text-link{font-size:12px;max-width:115px;margin-top:0}
+  .week-arrow{width:44px}.week-browser{gap:2px}.week-button{min-height:60px}
+  .milestone label{min-height:44px;font-size:13px}.milestone p,.milestone .source-link{font-size:13px}
+  .accordions summary{font-size:14px;min-height:64px}.detail-content,.detail-content a{font-size:13px}
+  .journal-section .section-heading .button{width:100%;font-size:14px;min-height:48px}
+  .journal-filters label,.journal-toolbar,.journal-entry-meta,.journal-entry-actions .text-link{font-size:12px}
+  .journal-entry-actions{gap:16px}.journal-note{font-size:14px}
+  input:not([type=checkbox]):not([type=file]),select,textarea,.journal-filters input,.journal-filters select,.metric-input-row input,.metric-input-row select,.journal-date-row input{font-size:16px;min-height:48px}
+  label{font-size:14px}.field-hint{font-size:12px}.checkbox-label{font-size:13px;min-height:44px}
+  dialog,dialog.journal-dialog{position:fixed;inset:auto 0 0;margin:0;width:100%;max-width:none;max-height:calc(100dvh - env(safe-area-inset-top) - 12px);border-radius:24px 24px 0 0;padding:24px max(22px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));overscroll-behavior:contain}
+  dialog>p,#sync-dialog p{font-size:14px}dialog .button{min-height:48px;font-size:14px}
+  .toast{bottom:calc(88px + env(safe-area-inset-bottom));font-size:14px}
+}
+@media(max-width:360px){.brand{font-size:23px}.header-inner{gap:4px}.page-shell{padding-left:14px;padding-right:14px}.side-summary{grid-template-columns:1fr}.baby-art>svg{height:175px}.ssw-number{font-size:64px}.pregnancy-card{padding:20px 16px}.baby-art>span{font-size:8px}.nav-link{font-size:9px}}
+.calculation-example{background:var(--sage);border:1px solid #d5decc;border-radius:12px;padding:18px;margin:18px 0;color:var(--ink)}
+.calculation-example h3{font:600 14px/1.5 var(--sans);margin-bottom:12px}
+.calculation-example ol{padding-left:22px;margin:0}
+.calculation-example li{padding-left:3px;margin:9px 0;font-size:13px}
+.calculation-example .calculation-result{font-weight:600;margin:15px 0 0;padding-top:12px;border-top:1px solid #d5decc}
+.journal-filter-panel{margin-top:20px;overflow:hidden}
+.journal-filter-panel>summary,.journal-trend-panel>summary{display:flex;align-items:center;gap:8px;cursor:pointer;min-height:54px;padding:14px 20px;font-size:13px;font-weight:600}
+.journal-filter-panel .detail-plus,.journal-trend-panel>summary .detail-plus{margin-left:auto}
+.journal-filter-panel .journal-filters{margin-top:0;border-top:1px solid var(--line);border-radius:0}
+#journal-filter-count{font-size:11px;color:var(--muted);font-weight:400}
+#journal-reset{justify-self:start;grid-column:1/-1}
+.journal-trend-panel{overflow:hidden;background:#edf1e7;min-width:0}
+.journal-trend-panel[open]>summary{border-bottom:1px solid #d4ddc9}
+@media(max-width:760px){
+ .journal-trend-panel{grid-row:auto}
+ .journal-filter-panel>summary,.journal-trend-panel>summary{font-size:14px;min-height:56px}
+ .journal-filter-panel .journal-filters{padding-top:16px}
+ .journal-empty{font-size:14px;padding:22px}
+ .journal-toolbar{align-items:center;gap:10px}
+ .journal-toolbar .text-link{max-width:155px;font-size:11px;line-height:1.6}
+ .symptom-chip{min-height:44px;font-size:13px}
+ .metric-input-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 44px}
+ .metric-remove{width:44px;min-height:48px}
+ #entry-save{position:sticky;bottom:0;box-shadow:0 -8px 18px var(--white)}
+}

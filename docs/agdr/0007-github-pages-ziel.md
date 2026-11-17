@@ -1,6 +1,7 @@
 # AgDR-0007: Konkretes GitHub-Pages-Ziel
 
 - **Status:** Umgesetzt, Veröffentlichung offen
+- **Teilweise abgelöst durch:** [AgDR-0010](0010-mobile-app-und-pwa.md) – auch bei Branch-Veröffentlichung den vollständigen Build ausliefern, nicht den Quellverzeichnis-Stamm.
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Nutzer für das Repository; Agent für den bestehenden Pages-Veröffentlichungsweg
 - **Betroffene Dateien:** [README](../../README.md), [Pages-Workflow](../../.github/workflows/pages.yml), [AgDR-Index](README.md)

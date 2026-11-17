@@ -64,7 +64,7 @@ const env = { ADMIN_TOKEN: admin, ALLOWED_ORIGINS: [...origins].join(','), ROOMS
     return rooms.get(name);
   },
 } };
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8' };
+const types = { '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8' };
 async function handler(req, res) {
   try {
     // Reject unexpected Host headers; do not trust arbitrary DNS-rebinding hosts.

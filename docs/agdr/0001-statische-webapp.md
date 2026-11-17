@@ -1,6 +1,7 @@
 # AgDR-0001: Statische Webapp für GitHub Pages
 
 - **Status:** Umgesetzt
+- **Teilweise abgelöst durch:** [AgDR-0010](0010-mobile-app-und-pwa.md) – der Build erzeugt zusätzlich einen versionierten Service Worker; die statische Architektur bleibt bestehen.
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Agent; Hostingziel ausdrücklich vom Nutzer vorgegeben
 - **Betroffene Dateien:** [index.html](../../index.html), [package.json](../../package.json), [Build](../../scripts/build.js), [Pages-Workflow](../../.github/workflows/pages.yml)

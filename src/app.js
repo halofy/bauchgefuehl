@@ -1,3 +1,6 @@
+import { explainCalculation } from './calculation-explanation.js';
+import { setupAppNavigation, showAppPanel } from './navigation.js';
+import { setupPwa } from './pwa.js';
 import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, encodeShare, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
@@ -113,10 +116,19 @@ function renderSummary() {
   if (data.uncertain) messages.push('Bei unregelmäßigen Zyklen oder einer Zykluslänge außerhalb von 21–35 Tagen ist diese Schätzung besonders unsicher. Die ärztliche Datierung ist für deine Betreuung maßgeblich.');
   $('#medical-status').textContent = messages.join(' ');
   $('#medical-status').hidden = !messages.length;
-  const correction = data.correction === 0 ? 'Keine Zyklusanpassung.' : `${Math.abs(data.correction)} ${Math.abs(data.correction) === 1 ? 'Tag' : 'Tage'} werden ${data.correction > 0 ? 'abgezogen' : 'addiert'}.`;
-  $('#calculation-example').textContent = fromDueDate
-    ? `Deine gewählte Methode: Rückrechnung vom ET (${formatDate(data.dueDate)}). 280 − (${data.daysUntilDue}) = ${data.gestationalDays} SSW-Tage = ${data.weeks}+${data.days}. Es wird keine zusätzliche Zyklusanpassung vorgenommen.`
-    : `Mit deinen ${state.profile.cycle} Zyklustagen: ${data.elapsedDays} Tage seit Periodenbeginn. ${correction} ${data.status === 'before' ? 'Das rechnerische Ergebnis liegt noch vor 0+0.' : `Ergebnis: ${data.gestationalDays} SSW-Tage = ${data.weeks}+${data.days}. Ohne Zyklusanpassung wären es ${data.calendarWeeks}+${data.calendarDays}.`}`;
+  const explanation = explainCalculation(state.profile, today, state.mode);
+  const title = document.createElement('h3');
+  title.textContent = explanation.title;
+  const steps = document.createElement('ol');
+  for (const text of explanation.steps) {
+    const step = document.createElement('li');
+    step.textContent = text;
+    steps.append(step);
+  }
+  const result = document.createElement('p');
+  result.className = 'calculation-result';
+  result.textContent = explanation.result;
+  $('#calculation-example').replaceChildren(title, steps, result);
 }
 
 function renderWeeks(center = false) {
@@ -402,6 +414,7 @@ $('#copy-link').addEventListener('click', async () => {
 
 function openDetail(selector) {
   const detail = $(selector);
+  showAppPanel('wissen');
   detail.open = true;
   detail.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
   detail.querySelector('summary').focus({ preventScroll: true });
@@ -456,27 +469,8 @@ $('#week-list').addEventListener('keydown', event => {
   selectWeek(target);
   $(`.week-button[data-week="${selectedWeek}"]`).focus({ preventScroll: true });
 });
-for (const button of $$('[data-scroll]')) button.addEventListener('click', () => {
-  $(`#${button.dataset.scroll}`).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
-});
-
-// Scroll navigation without replacing the fragment that carries a shared profile.
-function updateNavigation() {
-  const sections = ['ueberblick', 'wochenreise', 'journal', 'wissen'];
-  let active = sections[0];
-  for (const id of sections) if ($(`#${id}`).getBoundingClientRect().top <= 190) active = id;
-  for (const button of $$('[data-scroll]')) {
-    button.classList.toggle('active', button.dataset.scroll === active);
-    if (button.dataset.scroll === active) button.setAttribute('aria-current', 'location');
-    else button.removeAttribute('aria-current');
-  }
-}
-let scrollPending = false;
-window.addEventListener('scroll', () => {
-  if (scrollPending) return;
-  scrollPending = true;
-  requestAnimationFrame(() => { updateNavigation(); scrollPending = false; });
-}, { passive: true });
+setupAppNavigation();
+setupPwa();
 
 function refreshDate() {
   const fresh = todayISO();

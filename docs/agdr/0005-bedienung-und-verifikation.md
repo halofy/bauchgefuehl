@@ -1,6 +1,7 @@
 # AgDR-0005: Ruhige Bedienung, klare Zustände und nachvollziehbare Prüfungen
 
 - **Status:** Umgesetzt; verbleibende Prüflücken dokumentiert
+- **Teilweise abgelöst durch:** [AgDR-0010](0010-mobile-app-und-pwa.md) – auf Smartphones einzelne App-Bereiche statt fortlaufender Seite; dort auch neuere Prüfnachweise.
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Agent innerhalb des beauftragten Umfangs
 - **Betroffene Dateien:** [Gestaltung](../../styles.css), [HTML](../../index.html), [Interaktionen](../../src/app.js), [Tests](../../tests/pregnancy.test.js)

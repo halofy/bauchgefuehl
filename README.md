@@ -1,10 +1,13 @@
 # bauchgefühl
 
-Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als statische Webapp, optional mit lokalem Sync-Dienst. Ohne Anmeldung, externe Schriften oder Tracking. Für Desktop und Smartphone gestaltet.
+Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA, optional mit lokalem Sync-Dienst. Ohne Anmeldung, externe Schriften oder Tracking. Mit App-Navigation für Smartphones und einer Übersicht für größere Bildschirme.
 
 ## Funktionen
 
+- **Mobile App-Ansicht:** fünf Bereiche über die feste untere Navigation, große Touch-Ziele, mobile Dialoge sowie kompakte Journalfilter und Messwertverläufe.
+- **Installierbar und offline nutzbar:** nach dem ersten vollständigen Laden auch ohne Netz starten; Updates bewusst übernehmen.
 - **Wählbare SSW-Methode:** aus Periodenbeginn und eigener durchschnittlicher Zykluslänge oder Rückrechnung vom ET auf 28-Tage-Basis, mit Wochen, Tagen und transparenter Erklärung.
+- Persönliche Rechenschritte mit den eingegebenen Daten unter **Wissen → Wie wird meine Schwangerschaftswoche berechnet?** oder direkt über **Deine Grundlage**.
 - Je nach Methode berechneter oder eingetragener ET, Trimester und Fortschritt.
 - Wochenreise für die **1. bis 42. SSW** mit Entwicklungsinfos, körperlichen Veränderungen und kleinen Impulsen.
 - Vorsorgethemen für Deutschland mit exakten Wochenfenstern, Quellen und lokalen Merkhäkchen.
@@ -32,10 +35,11 @@ Ausführliche Anleitung für Start, HTTPS im WLAN, Sicherungen und Wiederherstel
 
 **Nur die statische App, ohne laufenden Sync-Dienst:**
 
-Python 3 genügt für die App:
+Für die vollständige PWA zuerst bauen und anschließend die erzeugte App ausliefern:
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1
+npm run build
+python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
 ```
 
 Anschließend `http://localhost:4173` öffnen. Wegen der JavaScript-Module bitte über einen Webserver starten, nicht durch Doppelklick auf `index.html`.
@@ -48,6 +52,17 @@ npm run build
 ```
 
 `dist/` enthält die vollständige statische Website. Alle lokalen Ressourcen werden relativ eingebunden; dadurch funktioniert der GitHub-Pages-Projektpfad `/bauchgefuehl/` ohne Konfiguration.
+
+## Als App installieren und offline verwenden
+
+Die App über HTTPS öffnen; lokal funktionieren auch `localhost` und `127.0.0.1`. Das **Info-Symbol oben rechts** öffnet Installationshinweise und den Offline-Status.
+
+- **Android/Chrome oder Desktop/Chromium:** „App installieren“ wählen, wenn angeboten, oder die Installationsfunktion im Browsermenü nutzen.
+- **iPhone/iPad:** in Safari **Teilen → Zum Home-Bildschirm** wählen und, falls angeboten, **Als Web-App öffnen** aktivieren.
+
+Nach dem ersten vollständigen Laden meldet die App, dass ihre Dateien offline bereitstehen. Dann lassen sich gespeicherte Angaben, Wocheninfos und Journal auch ohne Verbindung öffnen und lokal bearbeiten. Geräte-Sync benötigt den verbundenen Dienst, externe Quellen benötigen Internet. Eine installierte App kann einen anderen Speicher als der Browser haben: Angaben nach der Installation prüfen und gegebenenfalls über **Geräte & Backup** koppeln oder wiederherstellen.
+
+Ein Punkt am Info-Symbol zeigt ein verfügbares Update. **Update laden** lädt die App nach Bestätigung neu; offene Eingaben vorher speichern. Bei Veröffentlichungen immer frisch bauen und den **vollständigen Inhalt von `dist/`** ausliefern, damit Cache und App-Dateien dieselbe Version verwenden. Die Workerquelle im Projektstamm dient nur der Entwicklung. Browser können lokale Daten und Offline-Dateien löschen; heruntergeladene Backups bleiben wichtig.
 
 ## Eigene Informationen erfassen
 
@@ -72,11 +87,13 @@ Ziel ist das Repository [halofy/bauchgefuehl](https://github.com/halofy/bauchgef
 
 Der Workflow führt die Tests aus, erstellt `dist/` und veröffentlicht das Pages-Artefakt. Falls dein Hauptbranch anders heißt, ändere `branches: [main]` in der Workflow-Datei. GitHub Pages muss für das Repository verfügbar sein und GitHub Actions aktiviert sein.
 
-Alternativ können `index.html`, `styles.css`, `favicon.svg`, `.nojekyll` und `src/` direkt über „Deploy from a branch“ aus dem Repository-Stamm veröffentlicht werden. Es gibt keine Server-Routen und keine Secrets.
+Alternativ den vollständigen Inhalt des frisch gebauten `dist/` auf einem Veröffentlichungsbranch ablegen und diesen über „Deploy from a branch“ ausliefern. Den Quellverzeichnis-Stamm nicht als Produktions-PWA veröffentlichen: Der Build erzeugt den versionierten Service Worker. Die statische Auslieferung enthält keine Secrets.
 
 Offizielle Anleitung: [GitHub Pages mit eigenem Workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
 
 ## Entscheidungen und technische Dokumentation
+
+Die priorisierte **[Feature-Liste zum Abarbeiten](docs/open.md)** enthält offene Erweiterungen mit Kennungen, Abhängigkeiten und Abschlusskriterien. Die SSW-Berechnungsfrage ist geklärt und wird dort als abgeschlossen geführt.
 
 Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](docs/agdr/README.md) ist die maßgebliche Stelle für Entscheidungsbegründungen, Alternativen, Folgen und Prüfnachweise:
 
@@ -89,6 +106,9 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0007: Konkretes GitHub-Pages-Ziel](docs/agdr/0007-github-pages-ziel.md)
 - [AgDR-0008: Master-Sync, QR und lokaler Betrieb](docs/agdr/0008-master-sync-und-lokaler-betrieb.md)
 - [AgDR-0009: Persönliches Journal und Messwerte](docs/agdr/0009-persoenliches-journal.md)
+- [AgDR-0010: Mobile App-Navigation und PWA](docs/agdr/0010-mobile-app-und-pwa.md)
+- [AgDR-0011: Persönliche Berechnungserklärung](docs/agdr/0011-persoenliche-berechnungserklaerung.md)
+- [AgDR-0012: Feature-Backlog und abgeschlossene SSW-Prüfung](docs/agdr/0012-roadmap-und-ssw-pruefung.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -106,8 +126,10 @@ Der separate **Geräte-Link** gewährt laufende Leserechte auf den verschlüssel
 - `src/qr.js`, `src/vendor/qrcodegen.js`: vollständig lokale QR-Erzeugung mit Nayuki v1.8.0 (MIT-Lizenz im Quelltext).
 - `sync-server/local.js`, `sync-server/sqlite-storage.js`: lokaler Server und dauerhafter SQLite-Speicher.
 - `sync-server/worker.js`, `sync-server/wrangler.jsonc`: gemeinsames Protokoll und optionaler Cloudflare-Adapter.
-- `styles.css`: Responsive Gestaltung.
-- `tests/pregnancy.test.js`, `tests/journal.test.js`, `tests/sync.test.js`, `tests/sqlite-storage.test.js`, `tests/qr.test.js`: insgesamt **69 Tests** für Berechnung, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
-- `scripts/build.js`: Erstellt die statische Auslieferung in `dist/`.
+- `styles.css`, `src/navigation.js`: Responsive Gestaltung und mobile App-Navigation.
+- `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
+- `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
+- `tests/`: insgesamt **78 Tests** für Berechnung, persönliche Erklärung, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.

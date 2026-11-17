@@ -9,6 +9,18 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   let rows = [];
   let dirty = false;
   let filtered = [];
+  const mobile = matchMedia('(max-width: 760px)');
+  const arrangePanels = () => {
+    $('#journal-filter-panel').open = !mobile.matches;
+    $('#journal-trend-panel').open = !mobile.matches;
+  };
+  arrangePanels();
+  mobile.addEventListener('change', arrangePanels);
+  $('#journal-reset').addEventListener('click', () => {
+    for (const id of ['journal-search', 'journal-tag', 'journal-from', 'journal-to']) $('#' + id).value = '';
+    $('#journal-archived').checked = false;
+    render();
+  });
 
   function refreshSymptoms() {
     const selected = parseLabels($('#entry-symptoms').value).map(s => s.toLocaleLowerCase('de'));
@@ -147,6 +159,9 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     for (const tag of tags) { const option = document.createElement('option'); option.value = tag; option.textContent = tag; $('#journal-tag').append(option); }
     if (tags.includes(currentTag)) $('#journal-tag').value = currentTag;
     filtered = filterEntries(entries, { search: $('#journal-search').value, tag: $('#journal-tag').value, from: $('#journal-from').value, to: $('#journal-to').value, archived: $('#journal-archived').checked });
+    const filterCount = ['journal-search', 'journal-tag', 'journal-from', 'journal-to'].filter(id => $('#' + id).value.trim()).length + Number($('#journal-archived').checked);
+    $('#journal-filter-count').textContent = filterCount ? String(filterCount) + " aktiv" : '';
+    $('#journal-reset').disabled = !filterCount;
     $('#journal-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'Eintrag' : 'Einträge'}`;
     $('#journal-permission').textContent = canEdit() ? 'Deine Beobachtungen, ohne Bewertung. Verbundene Geräte lesen deine Einträge mit.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls den aktiven Master. Vorhandene Einträge bleiben lesbar.';
     $('#entry-save').disabled = !canEdit();
