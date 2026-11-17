@@ -6,12 +6,14 @@ Stand: **17.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von ba
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0018 abgeglichen:** F12–F14 sind umgesetzt. F03 und F07 sind teilweise umgesetzt und bleiben offen. F01, F02, F04–F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+
 ## Geklärt und bereits vorhanden
 
 - [x] **SSW-Berechnungsfrage geklärt.** Der Nutzer hat die Erklärung zur Zyklusanpassung bestätigt. Keine offene Aufgabe zur Änderung der Formel oder zur zusätzlichen Gegenüberstellung. Die persönliche Rechenerklärung ist bereits umgesetzt; siehe [AgDR-0011](agdr/0011-persoenliche-berechnungserklaerung.md).
 - [x] **Bestehende Grundlage:** Journal mit Symptomen, Text, Tags und Messwerten, Archivierung/Wiederherstellung, einfache Verläufe, Filter und CSV; lokale Speicherung, Backups und Master-Sync. Diese Funktionen werden durch die folgenden Features erweitert.
 - [x] **F12 · Kalender, SSW-Vorausblick und Journal** — am 17.11.2026 zusätzlich vom Nutzer gewünscht und umgesetzt. Monatsansicht mit SSW je Datum, Datum-/SSW-Suche, 42 Wochen mit Datumsbereichen, Vorsorgefenster und Meilensteine; bestehende Journaleinträge direkt am Tag lesen, bearbeiten oder ergänzen. [Umfang und Prüfnachweise: AgDR-0014](agdr/0014-kalender-und-journal.md).
-- [x] **F13 · Offline-Suche zu Lebensmitteln und Aktivitäten** — 26 redaktionell belegte Einträge mit Suchbegriffen, Bereichs-/Ampelfilter, Zubereitungswahl, Bedingungen, Quellen und Prüfdatum. Kalender-Tagesbezug mit derselben Datierung; keine Freigabe für unbekannte Produkte oder allein durch einen SSW-Wechsel. [AgDR-0017](agdr/0017-lebensmittel-und-aktivitaeten.md). Der Katalog ist eine erweiterbare Auswahl.
+- [x] **F13 · Offline-Suche zu Lebensmitteln und Aktivitäten** — 26 redaktionell belegte Einträge mit Suchbegriffen, Bereichs-/Ampelfilter, Zubereitungswahl, Bedingungen, Quellen und Prüfdatum. Kalender-Tagesbezug mit derselben Datierung; keine Freigabe für unbekannte Produkte oder allein durch einen SSW-Wechsel. [AgDR-0017](agdr/0017-lebensmittel-und-aktivitaeten.md). NDR „Tatsächlich schwanger“ ist ergänzend im Quellenbereich und mit dem geprüften Ernährungsartikel bei sechs passenden Karten verlinkt ([AgDR-0018](agdr/0018-ndr-als-ergaenzende-quelle.md)). Der Katalog ist eine erweiterbare Auswahl.
 - [x] **F14 · Datensparsame Weitergabe** — Reise-Link standardmäßig nur mit ET, vollständige Grundlage bewusst wählbar. Journalauszug mit Zeitraum, Bereichsauswahl, einzelnen ausgelassenen Einträgen, Vorschau und offline lesbarer HTML-Datei. Keine Sync-Schlüssel im Bericht. Vollständiger Geräte-Sync bleibt ausdrücklich als solcher gekennzeichnet. [AgDR-0016](agdr/0016-kostenlos-offline-und-selektives-teilen.md).
 
 ## P1 – Mutterbezogenen Alltag verbessern
@@ -93,4 +95,4 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 Die frühere Kennzeichnung als „Premium-Kandidat“ wurde durch die ausdrückliche Nutzerentscheidung abgelöst: **Alle heutigen und zukünftigen Funktionen sind kostenlos für alle.** Die Prioritäten bestimmen nur die Umsetzungsreihenfolge.
 
-**Empfohlener Start:** F01 und F02, danach F03. F04 und F05 können unabhängig von diesen beiden umgesetzt werden.
+**Empfohlene nächste Schritte:** F02 umsetzen und damit die offenen Check-in-Anteile von F03 ergänzen. F01, F04 und F05 können unabhängig davon weiterentwickelt werden; F02 und F05 liefern später weitere Daten für F07. Begrenzter automatischer Geräte-Sync bleibt ebenfalls offen; F14 bietet bereits begrenzte Weitergabe als Datei, aber keine eingeschränkten Sync-Leserechte.

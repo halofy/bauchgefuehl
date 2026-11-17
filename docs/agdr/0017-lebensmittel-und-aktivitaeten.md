@@ -11,6 +11,8 @@
 
 **Fortschreibung vom 17.11.2026:** Der Nutzer wünscht zusätzlich NDR „Tatsächlich schwanger“ als Quelle. [AgDR-0018](0018-ndr-als-ergaenzende-quelle.md) dokumentiert den geprüften Ernährungsbeitrag und seine ergänzende Zuordnung zu sechs vorhandenen Karten. Die ursprünglichen Detailregeln und Ampelstufen dieses Records bleiben unverändert.
 
+**Layoutkorrektur vom 17.11.2026:** Nach einem Nutzerhinweis wurde das zusätzliche Label „Alle Funktionen kostenlos“ aus der Katalogüberschrift entfernt. Es erbte die allgemeine mobile `.small-label`-Formatierung mit höchstens 90 Pixel Breite, rechtsbündigem Text und 23 Pixel oberem Innenabstand und wirkte dadurch versetzt. Die kostenlose Produktgrundlage gilt unverändert; sie steht weiterhin in README und Feature-Liste. Reine HTML-Korrektur, keine medizinische oder Berechnungsänderung. Statischer Build, HTML-Struktur, Entfernung des Labels in Quelle/Auslieferung und `git diff --check` geprüft; keine erneute manuelle Geräteprüfung oder Testsuite für diese kleine Änderung.
+
 **Ausdrücklich vom Nutzer:** Suchmöglichkeit nach Lebensmitteln mit Ampel, außerdem Aktivitäten wie Sport und Sauna, gegebenenfalls im Zusammenhang mit dem Kalender. Nicht alles sei immer verboten. Offline-Nutzung, Datenschutz und Quellenangaben sind Anforderungen.
 
 **Agentenentscheidung:** Ein redaktionell begrenzter, lokal ausgelieferter Katalog bildet konkrete Bedingungen und Zubereitungsvarianten ab. Keine Live-Websuche, Fremd-API oder automatische Bewertung unbekannter Produkte. Die Darstellung vermeidet absolute Aussagen allein aufgrund eines Suchbegriffs oder Datums.
