@@ -8,6 +8,8 @@
 
 ## Kontext und Herkunft
 
+**Ergänzung vom 17.11.2026:** [AgDR-0014](0014-kalender-und-journal.md) führt eine gemeinsame Kalender-/Journalansicht ein. Die bestehende Journalliste, Speicherung und Datenvalidierung bleiben erhalten; die Hauptnavigation nennt den gemeinsamen Bereich jetzt „Kalender“.
+
 Der Nutzer möchte eigene Informationen erfassen: Symptome, Text, Tags und relevante Maße wie Umfang und Gewicht. Die früheren Anforderungen an lokale Speicherung, einen schreibenden Master, automatischen Sync und Schutz vor Datenverlust gelten weiterhin.
 
 **Agentenfestlegungen:** Diese Angaben bilden ein gemeinsames datiertes Journal. Suche, Zeit-/Tagfilter, Messwertverlauf, CSV-Export und wiederherstellbare Archivierung machen die erfassten Daten nutzbar. Eine freie Messgröße mit eigener Einheit ergänzt die vorgegebenen Maße. Diese Detailentscheidungen sind keine zusätzliche ausdrückliche Nutzerfreigabe.

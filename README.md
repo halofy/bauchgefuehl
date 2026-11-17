@@ -2,6 +2,8 @@
 
 Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA, optional mit lokalem Sync-Dienst. Ohne Anmeldung, externe Schriften oder Tracking. Mit App-Navigation für Smartphones und einer Übersicht für größere Bildschirme.
 
+**Alle Funktionen sind kostenlos für alle.** Es gibt keine Premium-Stufen. Die App verarbeitet Angaben und Suchanfragen lokal und bleibt nach dem ersten vollständigen Laden offline nutzbar. Nur der bewusst gekoppelte Geräte-Sync und das Öffnen externer Originalquellen benötigen eine Verbindung.
+
 ## Funktionen
 
 - **Mobile App-Ansicht:** fünf Bereiche über die feste untere Navigation, große Touch-Ziele, mobile Dialoge sowie kompakte Journalfilter und Messwertverläufe.
@@ -12,9 +14,13 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA,
 - Wochenreise für die **1. bis 42. SSW** mit Entwicklungsinfos, körperlichen Veränderungen und kleinen Impulsen.
 - Vorsorgethemen für Deutschland mit exakten Wochenfenstern, Quellen und lokalen Merkhäkchen.
 - **Persönliches Journal:** datierte Notizen, auswählbare und eigene Symptome, freie Tags sowie Gewicht, Bauch-/Brust-/Hüftumfang, Temperatur und eigene Messgrößen mit Einheit.
-- Einträge bearbeiten, archivieren und wiederherstellen; Suche und Filter nach Tag oder Zeitraum, Messwertverlauf mit Tabelle sowie CSV-Export der gefilterten Einträge.
+- **Kalender & Vorausblick:** SSW an jedem Datum, Suche in beide Richtungen, alle 42 Wochen mit Datumsbereichen sowie markierte Vorsorgefenster, Trimesterwechsel, Halbzeit und ET. Journaleinträge erscheinen an ihrem Datum im Kalender.
+- **Symptomkalender & Wochenrückblick:** einzelne Symptome hervorheben; Beobachtungen, erfasste Tage und Messwerte einer Kalenderwoche überblicken und passende Originaleinträge öffnen.
+- **Lebensmittel & Aktivitäten:** offline in 26 geprüften Einträgen suchen, Zubereitung beziehungsweise Sorte wählen und Bedingungen, Ampel, Quellen und Prüfstand nachlesen. Auch mit einem Tag aus dem Kalender verknüpft.
+- **Ausgewählte Journalbereiche weitergeben:** Zeitraum, Notizen, Symptome, Tags, Messwerte und Uhrzeiten einzeln wählen, einzelne Einträge auslassen und den tatsächlichen Dateiinhalt vorab ansehen. Selbstständige HTML-Datei ohne Upload; über den Browser druckbar.
+- Einträge bearbeiten, archivieren und wiederherstellen; Suche und Filter nach Tag, Symptom oder Zeitraum, Messwertverlauf mit Tabelle sowie CSV-Export der gefilterten Einträge.
 - Lokale Speicherung mit verständlichen Hinweisen bei gesperrtem Browser-Speicher; Löschen der eigenen Daten.
-- Teilen-Link als Kopie der Berechnungsgrundlage. Empfangene Daten werden zunächst nur angezeigt und können ausdrücklich lokal übernommen werden.
+- Teilen-Link standardmäßig nur mit ET; vollständige Berechnungsgrundlage bewusst wählbar. Empfangene Daten werden zunächst nur angezeigt und können ausdrücklich lokal übernommen werden.
 - Klar markierte Beispieldaten, bis eigene Angaben eingetragen sind.
 - **Master und mitlesendes Gerät:** QR-Kopplung, automatische verschlüsselte Übertragung von Basisdaten, Journal und Merkhäkchen, Offline-Ausgang und Versionsprüfung gegen versehentliches Überschreiben.
 - Lokale Sicherungsstände, dauerhafte SQLite-Datei des lokalen Dienstes und herunterladbare Master-Backups mit Wiederherstellung.
@@ -66,17 +72,51 @@ Nach dem ersten vollständigen Laden meldet die App, dass ihre Dateien offline b
 
 Ein Punkt am Info-Symbol zeigt ein verfügbares Update. **Update laden** lädt die App nach Bestätigung neu; offene Eingaben vorher speichern. Bei Veröffentlichungen immer frisch bauen und den **vollständigen Inhalt von `dist/`** ausliefern, damit Cache und App-Dateien dieselbe Version verwenden. Die Workerquelle im Projektstamm dient nur der Entwicklung. Browser können lokale Daten und Offline-Dateien löschen; heruntergeladene Backups bleiben wichtig.
 
+## Kalender und Vorausblick
+
+Unter **Kalender → Kalender & Vorausblick** steht die SSW unter jedem Datum. Wähle einen Tag, um passende Vorsorgefenster, Meilensteine und deine Journaleinträge zu sehen. Mit den Pfeilen oder der Monatsauswahl blättern; **Heute** und **Zum ET** springen direkt zum entsprechenden Tag.
+
+Über **Datum oder SSW nachschlagen** kannst du ein Datum wählen oder volle Wochen und Tage eingeben, zum Beispiel `24+0`. Die aufklappbare Übersicht **Alle 42 SSW mit Datumsbereichen ansehen** zeigt für jede laufende Woche deren Zeitraum. Der Vorausblick darunter gilt ab dem ausgewählten Tag und enthält auch bereits laufende Vorsorgefenster.
+
+Vorsorgefenster sind Orientierung, keine vereinbarten Termine. Eigene zukünftige Termine bleiben als Erweiterung in F05 der Feature-Liste offen. Die gewählte Datierung bestimmt alle SSW und Zeitfenster. Bei einer Änderung werden die Kalenderangaben neu berechnet; gespeicherte Journalbeobachtungen behalten ihr Datum.
+
+Über **Symptom im Kalender hervorheben** wählst du alle erfassten Symptome oder ein bestimmtes Symptom. Die zusätzliche Markierung zählt Journaleinträge mit einer entsprechenden Nennung. Ein Symptom zählt pro Eintrag höchstens einmal; mehrere Einträge am selben Tag bleiben mehrere Beobachtungen.
+
+Der **Wochenrückblick** zeigt die Kalenderwoche von Montag bis Sonntag, in der der ausgewählte Tag liegt. Über seine Pfeile wechselst du wochenweise; die Tageskarten öffnen den jeweiligen Kalendertag. Erfasste Tage, Tage ohne Eintrag und zukünftige Tage werden getrennt angezeigt. Fehlende Angaben bedeuten keine Beschwerdefreiheit. Archivierte Einträge sind ausgeblendet.
+
+Tippe auf ein Symptom, um die Originaleinträge dieser Woche mit genau dieser Symptomangabe zu öffnen. Der allgemeine Link zeigt alle Einträge der Woche. Die Messwertübersicht enthält jeweils den letzten Wert, die Anzahl der Messungen sowie bei mehreren Messungen den ersten Wert und die Spanne. Unterschiedliche Einheiten bleiben getrennt. Strukturierte Angaben zu Stimmung, Energie, Schlaf und Symptomstärke folgen mit F02; sie werden nicht aus Notizen abgeleitet.
+
 ## Eigene Informationen erfassen
 
-Nach dem Speichern deiner Basisdaten **Journal → Eintrag hinzufügen** öffnen. Datum, optionale Uhrzeit, Symptome, Notiz, Tags und Messwerte lassen sich kombinieren oder einzeln erfassen. Symptome und Tags mit Kommas trennen. Messwerte akzeptieren Dezimalkomma oder Punkt; unter **Weitere oder eigene Messgröße** sind Bezeichnung und Einheit frei wählbar.
+Nach dem Speichern deiner Basisdaten **Kalender → Eintrag hinzufügen** öffnen oder einen vergangenen/heutigen Kalendertag wählen und **Eintrag für diesen Tag** nutzen. Datum, optionale Uhrzeit, Symptome, Notiz, Tags und Messwerte lassen sich kombinieren oder einzeln erfassen. Symptome und Tags mit Kommas trennen. Messwerte akzeptieren Dezimalkomma oder Punkt; unter **Weitere oder eigene Messgröße** sind Bezeichnung und Einheit frei wählbar.
 
-Im Journal kannst du suchen und nach Tag und Zeitraum filtern. Der Verlauf und die aufklappbare Tabelle folgen diesen Filtern. Unterschiedliche Einheiten bleiben getrennte Messreihen. Die angezeigte SSW folgt deiner aktuellen Berechnungsgrundlage; Messwerte werden nicht medizinisch bewertet.
+Unter **Journalliste & Verlauf** kannst du suchen und nach Tag, Symptom und Zeitraum filtern. Der Symptomfilter berücksichtigt ausdrücklich erfasste Symptome, unabhängig von Groß-/Kleinschreibung; die Suche findet zusätzlich Text in Notizen. Der Verlauf und die aufklappbare Tabelle folgen diesen Filtern. **In der Journalliste öffnen** in den Kalenderdetails grenzt die Liste auf diesen Tag ein. Unterschiedliche Einheiten bleiben getrennte Messreihen. Die angezeigte SSW folgt deiner aktuellen Berechnungsgrundlage; Messwerte werden nicht medizinisch bewertet.
 
 **Archivieren** blendet einen Eintrag aus. Über **Archivierte anzeigen → Wiederherstellen** kommt er zurück. CSV exportiert die aktuell gefilterten Einträge; ein vollständiges JSON-Backup inklusive Journal gibt es unter **Geräte & Backup**. Der einfache Reise-Link enthält weiterhin nur die Berechnungsgrundlage. Bereits gekoppelte Mitleser erhalten auch Journaleinträge; Änderungen erfolgen am Master.
 
 Für die Journal-Version den lokalen Dienst mit `./start-local.command` neu starten und die App auf beiden Clients neu laden. Den bestehenden `.local-sync/`-Ordner beibehalten. Alte Profile und Serverstände bleiben lesbar; ein altes App-Format darf einen bereits aktualisierten Serverstand nicht überschreiben.
 
 Unterstützt werden bis zu 1.000 Einträge und insgesamt ungefähr 512 KiB pro Datenstand; vorher kann der Browser-Speicher voll sein. Ein Speicherversuch bricht dann mit einem Hinweis ab, ohne vorhandene Einträge zu kürzen. Der lokale Sicherungsverlauf ist auf 20 Stände und ungefähr 2 MiB begrenzt. Backups deshalb zusätzlich aufbewahren.
+
+## Lebensmittel und Aktivitäten offline nachschlagen
+
+Unter **Wissen → Was passt gerade zu mir?** nach Begriffen wie Lachs, Kaffee, Sauna oder Joggen suchen. Bereich und Ampel lassen sich filtern. Karten öffnen, gegebenenfalls Zubereitung beziehungsweise Sorte wählen und die Bedingungen lesen. **Grün** heißt „OK unter Bedingungen“, **Gelb** „Anpassen / abklären“, **Rot** „Vermeiden“. Ein unbekannter Begriff erhält keine Freigabe. Keine individuelle Gesundheitsprüfung, keine vollständige Produktdatenbank und keine aktuellen Produktrückrufe.
+
+Jede Karte nennt verlinkte Quellen und das redaktionelle Prüfdatum. Zusammenfassungen und Suchindex werden lokal ausgeliefert, die Suchbegriffe werden von der App weder gespeichert noch versendet. Neue Erkenntnisse werden über ein bewusstes App-Update übernommen; die Originalseiten benötigen Internet. Der erste Katalog wurde am **17.11.2026** anhand von BIÖG, BfR, Netzwerk Gesund ins Leben und gesund.bund.de geprüft; Quellen und Zuordnung stehen in [AgDR-0017](docs/agdr/0017-lebensmittel-und-aktivitaeten.md) und den Karten.
+
+Auf ausdrücklichen Nutzerwunsch ergänzt der NDR-Bereich [„Tatsächlich schwanger“](https://www.ndr.de/ratgeber/gesundheit/Tatsaechlich-schwanger-Alles-rund-um-die-Geburt-und-die-erste-Zeit-mit-Baby,tatsaechlichschwanger100.html) die Quellenbasis. Der am **17.11.2026** gelesene [Ernährungsartikel](https://www.ndr.de/ratgeber/gesundheit/Ernaehrung-in-der-Schwangerschaft-Was-ist-erlaubt-was-eher-nicht,ernaehrung676.html) ist bei rohem Fisch, Fleisch, Eiern, Tiefkühlbeeren, Sprossen und Alkohol zusätzlich verlinkt. Der Artikelstand ist **10.09.2024**; unser Prüftag ist davon zu unterscheiden. NDR liefert ergänzende redaktionelle Informationen; Detailbedingungen werden mit Fachquellen abgeglichen. Keine eingebetteten Player oder automatischen externen Aufrufe. [Quellenentscheidung: AgDR-0018](docs/agdr/0018-ndr-als-ergaenzende-quelle.md).
+
+Im Kalender öffnet **Lebensmittel & Aktivitäten an diesem Tag** die Suche mit dem gewählten Datum und der passenden SSW. Der Bezugstag kann auch direkt geändert werden. Datierung, Bedingungen und Phasenhinweise werden angezeigt; ein Wochenwechsel erteilt keine automatische Freigabe. Beispieldaten und unsichere Schätzungen sind gekennzeichnet.
+
+## Bewusst nur ausgewählte Angaben teilen
+
+**Reise teilen** startet mit **Nur ET und Zeitachse**: Periodenbeginn, Zykluslänge und Unregelmäßigkeit fehlen im erzeugten Link. Die SSW bleibt rechnerisch gleich; ein geschätzter ET bleibt eine Schätzung. Zyklusbezogene Unsicherheitshinweise werden nicht übertragen. Aus dem ET lässt sich die zeitliche Einordnung weiterhin ableiten. Wer die vollständige Grundlage weitergeben möchte, wählt dies ausdrücklich im Dialog. Beide Linkvarianten enthalten weder Journal noch Merkhäkchen, sind unverschlüsselt und lassen sich nicht zurückrufen. Alte Links behalten ihren damaligen Inhalt.
+
+Unter **Kalender → Journalliste & Verlauf → Ausgewählte Bereiche teilen** oder aus dem Teilen-Dialog öffnet sich der **Journalauszug**. Zunächst ist kein Bereich ausgewählt. Zeitraum und Bereiche wählen, unter **Einzelne Einträge auslassen** bei Bedarf Einträge abwählen und die Vorschau prüfen. Enthaltene Einträge haben immer ein Datum; Uhrzeiten sind separat wählbar. Archivierte Einträge bleiben ausgeschlossen. Ausgelassene Inhalte und interne IDs beziehungsweise Änderungsmetadaten stehen auch nicht versteckt in der Datei.
+
+**Auszug als HTML-Datei herunterladen** erzeugt die Datei vollständig lokal. Sie enthält keine Scripts, externen Ressourcen, Basisdaten, SSW oder Sync-Schlüssel. Sie ist offline lesbar; für ein PDF die Datei öffnen und im Browser-Druckdialog „Als PDF speichern“ wählen, sofern verfügbar. Die Klartextdatei wird erst weitergegeben, wenn du das selbst tust. Sie ist kein wiederherstellbares Backup. Messwerte und Angaben sind als persönliche Journalquelle bezeichnet, ohne medizinische Bewertung.
+
+**Geräte-Sync bleibt eine vollständige Freigabe** für den verschlüsselten Raum einschließlich Journal und archivierter Einträge. Eine Bereichsauswahl im Bericht oder ein Ansichtsfilter beschränkt diesen Zugriff nicht. Für begrenzte Weitergabe den Auszug verwenden. Ein begrenzter automatischer Sync ist noch nicht umgesetzt; bereits übertragene Kopien lassen sich nicht zurückholen. Vollständige Sicherungen einschließlich Schlüsseln bleiben separat unter **Geräte & Backup**.
 
 ## Auf GitHub Pages veröffentlichen
 
@@ -112,6 +152,11 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0011: Persönliche Berechnungserklärung](docs/agdr/0011-persoenliche-berechnungserklaerung.md)
 - [AgDR-0012: Feature-Backlog und abgeschlossene SSW-Prüfung](docs/agdr/0012-roadmap-und-ssw-pruefung.md)
 - [AgDR-0013: App-Layout für große Smartphones und installierte PWAs](docs/agdr/0013-app-layout-erkennung.md)
+- [AgDR-0014: Kalender, SSW-Vorausblick und Journal](docs/agdr/0014-kalender-und-journal.md)
+- [AgDR-0015: F03 – Symptomkalender und Wochenrückblick](docs/agdr/0015-f03-symptomkalender-und-wochenrueckblick.md)
+- [AgDR-0016: Kostenlos, offline und selektiv teilen](docs/agdr/0016-kostenlos-offline-und-selektives-teilen.md)
+- [AgDR-0017: Lebensmittel- und Aktivitätensuche mit Quellen](docs/agdr/0017-lebensmittel-und-aktivitaeten.md)
+- [AgDR-0018: NDR „Tatsächlich schwanger“ als ergänzende Quelle](docs/agdr/0018-ndr-als-ergaenzende-quelle.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -123,6 +168,10 @@ Der separate **Geräte-Link** gewährt laufende Leserechte auf den verschlüssel
 
 - `src/dates.js`, `src/pregnancy.js`: Datumsarithmetik, Berechnung, Validierung, Teilen-Format und Speicher.
 - `src/journal.js`, `src/journal-ui.js`: Journaleinträge, Messreihen, Filter, CSV und Erfassungsdialog.
+- `src/calendar.js`, `src/calendar-ui.js`: Datum-/SSW-Zuordnung, Monatsansicht, Vorsorgefenster und Journalintegration.
+- `src/reflection.js`, `src/reflection-ui.js`: Kalenderwochen, Symptomnennungen, Erfassungslücken und Messwertübersicht aus bestehenden Journaleinträgen.
+- `src/guide-data.js`, `src/guide.js`, `src/guide-ui.js`: redaktioneller Offline-Katalog, Quellen, Zubereitungswahl, Suche und Kalenderbezug.
+- `src/report.js`, `src/report-ui.js`: Datenprojektion, ET-only-Link, Bereichs-/Eintragsauswahl und eigenständiger HTML-Auszug.
 - `src/content.js`: Wocheninfos und Vorsorgethemen mit Quellen.
 - `src/app.js`: Oberfläche und Interaktionen.
 - `src/sync.js`, `src/sync-ui.js`: Verschlüsselung, Geräteverbindung und Wiederherstellung.
@@ -132,7 +181,7 @@ Der separate **Geräte-Link** gewährt laufende Leserechte auf den verschlüssel
 - `styles.css`, `src/layout.js`, `src/navigation.js`: Responsive Gestaltung, gemeinsame Layout-Erkennung und mobile App-Navigation.
 - `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
 - `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
-- `tests/`: insgesamt **82 Tests** für Berechnung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `tests/`: insgesamt **122 Tests** für Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
 - `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.

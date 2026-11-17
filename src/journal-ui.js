@@ -1,8 +1,8 @@
-import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv } from './journal.js';
+import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv, symptomOptions } from './journal.js';
 import { todayISO, formatDate, dayNumber } from './dates.js';
 import { getAppLayout } from './layout.js';
 
-export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate }) {
+export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate, onOpen = () => {} }) {
   const $ = selector => document.querySelector(selector);
   const node = (tag, className = '', text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
   const number = value => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(value);
@@ -18,7 +18,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   arrangePanels();
   mobile.subscribe(arrangePanels);
   $('#journal-reset').addEventListener('click', () => {
-    for (const id of ['journal-search', 'journal-tag', 'journal-from', 'journal-to']) $('#' + id).value = '';
+    for (const id of ['journal-search', 'journal-tag', 'journal-symptom', 'journal-from', 'journal-to']) $('#' + id).value = '';
     $('#journal-archived').checked = false;
     render();
   });
@@ -61,12 +61,12 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     remove.addEventListener('click', () => { rows = rows.filter(item => item !== record); row.remove(); dirty = true; });
     row.append(selectLabel, valueLabel, remove, customFields); rows.push(record); $('#entry-metrics').append(row); update();
   }
-  function open(entry = null) {
+  function open(entry = null, date = todayISO()) {
     if (!canEdit()) { onSetup(); return; }
     editing = entry;
     const now = new Date();
     $('#entry-title').textContent = entry ? 'Dein Eintrag. Weitergedacht.' : 'Ein Moment für dich.';
-    $('#entry-date').value = entry?.date || todayISO(); $('#entry-date').max = todayISO();
+    $('#entry-date').value = entry?.date || date; $('#entry-date').max = todayISO();
     $('#entry-time').value = entry?.time ?? `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     $('#entry-text').value = entry?.text || ''; $('#entry-symptoms').value = entry?.symptoms.join(', ') || ''; $('#entry-tags').value = entry?.tags.join(', ') || '';
     $('#entry-error').hidden = true;
@@ -80,7 +80,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     if (dirty && !window.confirm('Ungespeicherten Entwurf verwerfen?')) return;
     dirty = false; $('#journal-dialog').close();
   }
-  $('#journal-new').addEventListener('click', () => open());
+  $('#journal-new').addEventListener('click', () => { onOpen(); open(); });
   $('#journal-close').addEventListener('click', close);
   $('#journal-dialog').addEventListener('cancel', event => { event.preventDefault(); close(); });
   $('#journal-dialog').addEventListener('click', event => {
@@ -159,8 +159,16 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     const all = document.createElement('option'); all.value = ''; all.textContent = 'Alle Tags'; $('#journal-tag').append(all);
     for (const tag of tags) { const option = document.createElement('option'); option.value = tag; option.textContent = tag; $('#journal-tag').append(option); }
     if (tags.includes(currentTag)) $('#journal-tag').value = currentTag;
-    filtered = filterEntries(entries, { search: $('#journal-search').value, tag: $('#journal-tag').value, from: $('#journal-from').value, to: $('#journal-to').value, archived: $('#journal-archived').checked });
-    const filterCount = ['journal-search', 'journal-tag', 'journal-from', 'journal-to'].filter(id => $('#' + id).value.trim()).length + Number($('#journal-archived').checked);
+    const currentSymptom = $('#journal-symptom').value;
+    const currentLabel = $('#journal-symptom').selectedOptions[0]?.textContent || currentSymptom;
+    const options = symptomOptions(entries, $('#journal-archived').checked);
+    if (currentSymptom && !options.some(option => option.key === currentSymptom)) options.push({ key: currentSymptom, label: currentLabel });
+    $('#journal-symptom').replaceChildren();
+    const allSymptoms = document.createElement('option'); allSymptoms.value = ''; allSymptoms.textContent = 'Alle Symptome'; $('#journal-symptom').append(allSymptoms);
+    for (const option of options) { const item = document.createElement('option'); item.value = option.key; item.textContent = option.label; $('#journal-symptom').append(item); }
+    $('#journal-symptom').value = currentSymptom;
+    filtered = filterEntries(entries, { search: $('#journal-search').value, tag: $('#journal-tag').value, symptom: currentSymptom, from: $('#journal-from').value, to: $('#journal-to').value, archived: $('#journal-archived').checked });
+    const filterCount = ['journal-search', 'journal-tag', 'journal-symptom', 'journal-from', 'journal-to'].filter(id => $('#' + id).value.trim()).length + Number($('#journal-archived').checked);
     $('#journal-filter-count').textContent = filterCount ? String(filterCount) + " aktiv" : '';
     $('#journal-reset').disabled = !filterCount;
     $('#journal-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'Eintrag' : 'Einträge'}`;
@@ -192,11 +200,25 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     }
     renderChart();
   }
-  for (const id of ['journal-search', 'journal-tag', 'journal-from', 'journal-to', 'journal-archived']) $( '#' + id).addEventListener('input', render);
+  for (const id of ['journal-search', 'journal-tag', 'journal-symptom', 'journal-from', 'journal-to', 'journal-archived']) $( '#' + id).addEventListener('input', render);
   $('#journal-metric').addEventListener('change', renderChart);
   $('#journal-export').addEventListener('click', () => {
     const url = URL.createObjectURL(new Blob([journalCsv(filtered)], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = `bauchgefuehl-journal-${todayISO()}.csv`; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
-  return { render };
+  function filterRange(from, to, symptom = '') {
+    $('#journal-search').value = ''; $('#journal-tag').value = ''; $('#journal-archived').checked = false;
+    if (symptom && ![...$('#journal-symptom').options].some(option => option.value === symptom)) {
+      const option = document.createElement('option'); option.value = symptom; option.textContent = symptom; $('#journal-symptom').append(option);
+    }
+    $('#journal-symptom').value = symptom;
+    $('#journal-from').value = from; $('#journal-to').value = to; $('#journal-filter-panel').open = true; render();
+  }
+  return {
+    render,
+    openForDate: date => open(null, date),
+    editEntry: id => { const entry = getJournal().find(item => item.id === id && !item.deletedAt); if (entry) open(entry); },
+    filterDate: date => filterRange(date, date),
+    filterRange,
+  };
 }

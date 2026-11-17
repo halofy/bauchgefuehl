@@ -8,7 +8,7 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | --- | --- | --- |
 | [AgDR-0001](0001-statische-webapp.md) | Statische Webapp ohne Laufzeitabhängigkeiten für GitHub Pages | Teilweise abgelöst durch AgDR-0010 |
 | [AgDR-0002](0002-ssw-aus-periode-und-zyklus.md) | SSW direkt aus Periodenbeginn und individueller Zykluslänge | Teilweise abgelöst durch AgDR-0006 |
-| [AgDR-0003](0003-lokale-daten-und-teilen.md) | Lokaler Speicher und ausdrücklich übernommene Teilen-Links | Umgesetzt |
+| [AgDR-0003](0003-lokale-daten-und-teilen.md) | Lokaler Speicher und ausdrücklich übernommene Teilen-Links | Teilen-Standard teilweise abgelöst durch AgDR-0016 |
 | [AgDR-0004](0004-medizinische-inhalte.md) | Quellenbasierte Phaseninfos und deutsche Vorsorgefenster | Umgesetzt |
 | [AgDR-0005](0005-bedienung-und-verifikation.md) | Bedienung, Beispieldaten und gestufte Verifikation | Teilweise abgelöst durch AgDR-0010 |
 | [AgDR-0006](0006-waehlbare-berechnungsmethode.md) | Wählbare Berechnung aus Periode/Zyklus oder ET mit 28-Tage-Basis | Umgesetzt |
@@ -17,8 +17,13 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0009](0009-persoenliches-journal.md) | Persönliches Journal, Messwertverläufe und Datenmigration | Umgesetzt, lokal geprüft |
 | [AgDR-0010](0010-mobile-app-und-pwa.md) | Mobile App-Navigation, Installation, Offline-Dateien und bewusste Updates | Layout-Erkennung teilweise abgelöst durch AgDR-0013; Geräteinstallation offen |
 | [AgDR-0011](0011-persoenliche-berechnungserklaerung.md) | Persönliche Rechenschritte mit den aktuellen Angaben | Umgesetzt, lokal geprüft |
-| [AgDR-0012](0012-roadmap-und-ssw-pruefung.md) | Mutterbezogener Feature-Backlog und abgeschlossene SSW-Prüfung | Backlog erstellt; Features vorgeschlagen, SSW-Frage geklärt |
+| [AgDR-0012](0012-roadmap-und-ssw-pruefung.md) | Mutterbezogener Feature-Backlog und abgeschlossene SSW-Prüfung | Premium-Vorschläge abgelöst durch AgDR-0016; SSW-Frage geklärt |
 | [AgDR-0013](0013-app-layout-erkennung.md) | App-Layout auf großen Smartphones und installierten PWAs | Umgesetzt, Safari-Prüfung; physisches Smartphone offen |
+| [AgDR-0014](0014-kalender-und-journal.md) | Kalender mit Datum/SSW, Vorsorgefenstern, Meilensteinen und Journal | Umgesetzt, automatisiert und lokal geprüft |
+| [AgDR-0015](0015-f03-symptomkalender-und-wochenrueckblick.md) | F03: Symptomnennungen und Wochenrückblick aus dem bestehenden Journal | Journal-Grundlage umgesetzt und geprüft; strukturierte Check-ins aus F02 offen |
+| [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md) | Alle Funktionen kostenlos; ET-only-Link und ausgewählter Journalauszug ohne Upload | Umgesetzt; begrenzter Geräte-Sync weiterhin offen |
+| [AgDR-0017](0017-lebensmittel-und-aktivitaeten.md) | Quellenbasierte Offline-Suche mit bedingter Ampel und Kalenderbezug | Redaktionelle Auswahl umgesetzt; keine individuelle medizinische Prüfung |
+| [AgDR-0018](0018-ndr-als-ergaenzende-quelle.md) | NDR „Tatsächlich schwanger“ als geprüfte ergänzende redaktionelle Quelle | Quellen ergänzt; medizinische Regeln unverändert |
 
 ## Fortschreiben
 

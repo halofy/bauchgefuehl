@@ -1,12 +1,14 @@
 # AgDR-0012: Mutterbezogene Roadmap und Prüfung der SSW-Darstellung
 
-- **Status:** Feature-Backlog erstellt; Funktionsumfang und Prioritäten vorgeschlagen; SSW-Frage durch Nutzer als geklärt bestätigt
+- **Status:** Feature-Backlog erstellt; SSW-Frage durch Nutzer als geklärt bestätigt. Premium-Einordnung teilweise abgelöst durch AgDR-0016.
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Nutzer fragt nach Premium-Funktionen, mutterbezogenen Inhalten und einer abweichenden eigenen SSW-Zählung; folgende Prioritäten sind Empfehlungen des Agenten
 - **Betroffene Dateien:** [Berechnung](../../src/pregnancy.js), [Rechenerklärung](../../src/calculation-explanation.js), [Tests](../../tests/pregnancy.test.js); zukünftige Oberfläche und Inhalte
 - **Bezug:** [AgDR-0002](0002-ssw-aus-periode-und-zyklus.md), [AgDR-0006](0006-waehlbare-berechnungsmethode.md), [AgDR-0009](0009-persoenliches-journal.md)
 
 ## Kontext und Herkunft
+
+**Fortschreibung vom 17.11.2026:** Der Nutzer legt ausdrücklich fest, dass alle Funktionen für alle kostenlos sind und es kein Bezahl-Premium gibt. Damit sind die unten historisch dokumentierten Premium-Vorschläge und die offene Bezahlmodellfrage abgelöst. Die Feature-Kennungen bleiben erhalten; [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md) dokumentiert die neue Grundlage und [docs/open.md](../open.md) den aktuellen Arbeitsstand.
 
 **Redaktionelle Korrektur vom 17.11.2026:** Dieser Record trug zunächst ebenfalls die Nummer 0010. Da diese Nummer parallel für die mobile App/PWA vergeben wurde, wird die Roadmap unter der nächsten freien Nummer 0012 fortgeführt. Der PWA-Record 0010 und Record 0011 bleiben unverändert nummeriert.
 

@@ -42,6 +42,9 @@ test('offline navigation and modules work at a Pages subpath', async () => {
   const w = worker(); await w.install();
   assert.equal((await w.fetch('./', { mode: 'navigate' })).url, 'https://example.test/bauchgefuehl/index.html');
   assert.equal((await w.fetch('./src/journal-ui.js')).url, 'https://example.test/bauchgefuehl/src/journal-ui.js');
+  for (const name of ['guide-data.js', 'guide.js', 'guide-ui.js', 'report.js', 'report-ui.js']) {
+    assert.equal((await w.fetch(`./src/${name}`)).url, `https://example.test/bauchgefuehl/src/${name}`);
+  }
   assert.match(w.opened[0], /bauchgefuehl:\/bauchgefuehl\/:/);
 });
 test('sync, credentials in query URLs, third-party and mutation requests bypass the cache', async () => {

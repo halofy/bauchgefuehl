@@ -9,6 +9,15 @@ export const METRICS = {
   temperature: { label: 'Körpertemperatur', unit: '°C' },
 };
 export const SYMPTOMS = ['Müdigkeit', 'Übelkeit', 'Sodbrennen', 'Rückenschmerzen', 'Kopfschmerzen', 'Schlafprobleme'];
+export const symptomKey = value => value.trim().toLocaleLowerCase('de');
+export function symptomOptions(entries, includeArchived = false) {
+  const labels = new Map();
+  for (const entry of entries) if (includeArchived || !entry.deletedAt) for (const label of entry.symptoms) {
+    const key = symptomKey(label);
+    if (!labels.has(key)) labels.set(key, label);
+  }
+  return [...labels].map(([key, label]) => ({ key, label })).sort((a, b) => a.label.localeCompare(b.label, 'de'));
+}
 
 export function parseLabels(text) {
   const seen = new Set();
@@ -88,9 +97,9 @@ export function archiveEntry(entries, id, archived, now = new Date().toISOString
   if (!entries.some(entry => entry.id === id)) throw new Error('Dieser Eintrag ist nicht mehr vorhanden.');
   return normalizeJournal(entries.map(entry => entry.id === id ? { ...entry, deletedAt: archived ? now : null, updatedAt: now } : entry));
 }
-export function filterEntries(entries, { search = '', tag = '', from = '', to = '', archived = false } = {}) {
+export function filterEntries(entries, { search = '', tag = '', symptom = '', from = '', to = '', archived = false } = {}) {
   const query = search.trim().toLocaleLowerCase('de');
-  return entries.filter(entry => (archived || !entry.deletedAt) && (!from || entry.date >= from) && (!to || entry.date <= to) && (!tag || entry.tags.includes(tag)) && (!query || [entry.text, ...entry.tags, ...entry.symptoms, ...entry.metrics.map(m => `${m.label} ${m.value} ${m.unit}`)].join(' ').toLocaleLowerCase('de').includes(query)))
+  return entries.filter(entry => (archived || !entry.deletedAt) && (!from || entry.date >= from) && (!to || entry.date <= to) && (!tag || entry.tags.includes(tag)) && (!symptom || entry.symptoms.some(label => symptomKey(label) === symptomKey(symptom))) && (!query || [entry.text, ...entry.tags, ...entry.symptoms, ...entry.metrics.map(m => `${m.label} ${m.value} ${m.unit}`)].join(' ').toLocaleLowerCase('de').includes(query)))
     .sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time) || b.createdAt.localeCompare(a.createdAt));
 }
 export function metricSeries(entries, key) {

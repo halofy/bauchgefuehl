@@ -1,13 +1,17 @@
 import { explainCalculation } from './calculation-explanation.js';
 import { setupAppNavigation, showAppPanel } from './navigation.js';
 import { setupPwa } from './pwa.js';
-import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, encodeShare, decodeShare, readLocal, writeLocal } from './pregnancy.js';
+import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
 import { setupSync } from './sync-ui.js';
 import { setupJournal } from './journal-ui.js';
+import { setupCalendar } from './calendar-ui.js';
 import { normalizeJournal } from './journal.js';
 import { SYNC_KEY } from './sync.js';
+import { setupGuide } from './guide-ui.js';
+import { setupReport } from './report-ui.js';
+import { makeShareLink, shareProfile } from './report.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -21,6 +25,9 @@ let selectedWeek;
 let toastTimer;
 let syncUi = null;
 let journalUi = null;
+let calendarUi = null;
+let guideUi = null;
+let reportUi = null;
 
 function announce(message) {
   $('#notice').textContent = message;
@@ -238,6 +245,9 @@ function render(center = false) {
   renderWeeks(center);
   renderCare();
   journalUi?.render();
+  calendarUi?.render();
+  guideUi?.render();
+  reportUi?.refreshIfOpen();
 }
 
 function queueSync() {
@@ -257,6 +267,7 @@ function persistChecks() {
       announce('Deine Änderungen konnten nicht lokal gespeichert werden. Sie bleiben nur für diese Sitzung erhalten.');
     }
     renderMode();
+    calendarUi?.render();
   }
 }
 
@@ -372,32 +383,37 @@ $('#profile-form').addEventListener('submit', event => {
   }
 });
 
-function openShare() {
-  if (state.mode === 'demo') {
-    openProfile();
-    toast('Trage zuerst deine Daten ein, um deine Reise zu teilen.');
-    return;
-  }
-  const url = new URL(location.href);
-  url.search = '';
-  url.hash = `s=${encodeShare(state.profile, today)}`;
-  $('#share-url').value = url.href;
+function renderShare() {
   $('#share-qr-code').replaceChildren();
   $('#share-qr-error').hidden = true;
-  try { $('#share-qr-code').innerHTML = createQrSvg(url.href); }
-  catch {
-    $('#share-qr-error').textContent = 'Für diese Adresse konnte kein QR-Code erstellt werden. Du kannst stattdessen den Link kopieren.';
-    $('#share-qr-error').hidden = false;
+  try {
+    const mode = $('#share-scope').value;
+    const profile = shareProfile(state.profile, mode, today);
+    const url = new URL(makeShareLink(state.profile, mode, location.href, today));
+    $('#share-url').value = url.href; $('#copy-link').disabled = false;
+    try { $('#share-qr-code').innerHTML = createQrSvg(url.href); }
+    catch {
+      $('#share-qr-error').textContent = 'Für diese Adresse konnte kein QR-Code erstellt werden. Du kannst stattdessen den Link kopieren.';
+      $('#share-qr-error').hidden = false;
+    }
+    $('#share-local-warning').hidden = !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    $('#share-description').textContent = profile.method === 'due-date'
+      ? `Enthalten sind nur der ${state.profile.method === 'period' ? 'aus deinen Angaben geschätzte' : 'eingetragene'} ET (${formatDate(profile.dueDate)}) und die Methode „ET · 28-Tage-Basis“. Damit bleiben SSW und Zeitachse gleich. Periodenbeginn, Zykluslänge und Unregelmäßigkeit werden ausgelassen; aus dem ET ist die zeitliche Einordnung der Schwangerschaft weiterhin ableitbar. Ein geschätzter ET bleibt eine Schätzung; zyklusbezogene Unsicherheitshinweise werden nicht übertragen.`
+      : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(profile.lmp)}), die durchschnittliche Zykluslänge (${profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist.`;
+  } catch (cause) {
+    $('#share-url').value = ''; $('#copy-link').disabled = true;
+    $('#share-description').textContent = `Dieser Umfang kann gerade nicht geteilt werden: ${cause.message} Prüfe deine Angaben oder wähle bewusst die vollständige Berechnungsgrundlage.`;
   }
-  $('#share-local-warning').hidden = !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
-  $('#share-description').textContent = state.profile.method === 'due-date'
-    ? `Enthalten sind die Methode „ET · 28-Tage-Basis“ und dein eingetragener ET (${formatDate(state.profile.dueDate)}). Perioden- und Zyklusangaben werden bei dieser Methode nicht geteilt. Merkhäkchen und Journal bleiben bei dir.`
-    : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(state.profile.lmp)}), die durchschnittliche Zykluslänge (${state.profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist. Merkhäkchen und Journal bleiben bei dir.`;
   $('#copy-status').textContent = '';
   $('#copy-link').innerHTML = `${icon('share')}Link kopieren`;
+}
+function openShare() {
+  if (state.mode === 'demo') { openProfile(); toast('Trage zuerst deine Daten ein, um deine Reise zu teilen.'); return; }
+  $('#share-scope').value = 'due-date'; renderShare();
   $('#share-dialog').showModal();
 }
 
+$('#share-scope').addEventListener('change', renderShare);
 $('#share-url').addEventListener('click', event => event.target.select());
 $('#copy-link').addEventListener('click', async () => {
   try {
@@ -426,6 +442,7 @@ const actions = {
   calculation: () => openDetail('#calculation-details'),
   privacy: () => openDetail('.accordions details:nth-child(4)'),
   sources: () => openDetail('#sources-details'),
+  report: () => reportUi?.open(),
 };
 for (const element of $$('[data-action]')) element.addEventListener('click', () => actions[element.dataset.action]());
 for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
@@ -509,8 +526,11 @@ window.addEventListener('storage', event => {
 });
 
 announce(local.error || '');
+guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mode, getToday: () => today });
+reportUi = setupReport({ getJournal: () => state.journal, getToday: () => today, notify: toast });
 journalUi = setupJournal({
   getJournal: () => state.journal,
+  onOpen: () => calendarUi?.showJournal(),
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
   saveJournal(entries) {
@@ -523,12 +543,35 @@ journalUi = setupJournal({
     local = { profile: state.profile, checks: { ...state.checks }, journal, error: null };
     queueSync();
     renderMode();
+    calendarUi?.render();
+    reportUi?.refreshIfOpen();
   },
   notify: toast,
   weekOnDate(date) {
     if (state.mode === 'demo' || state.mode === 'shared') return null;
     const age = calculatePregnancy(state.profile, today).gestationalDays + dayNumber(date) - dayNumber(today);
     return age >= 0 ? `SSW ${Math.floor(age / 7)}+${age % 7}` : 'Vor rechnerischem Beginn';
+  },
+});
+calendarUi = setupCalendar({
+  getProfile: () => state.profile,
+  getToday: () => today,
+  getMode: () => state.mode,
+  getJournal: () => state.journal,
+  getChecks: () => state.checks,
+  canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
+  addEntry: date => journalUi.openForDate(date),
+  editEntry: id => journalUi.editEntry(id),
+  showEntries: date => journalUi.filterDate(date),
+  showEntriesRange: (from, to, symptom) => journalUi.filterRange(from, to, symptom),
+  showGuide(date) {
+    guideUi.setDate(date); showAppPanel('wissen', true);
+    $('#everyday-guide').scrollIntoView({ behavior: 'instant', block: 'start' });
+    $('#guide-search').focus({ preventScroll: true });
+  },
+  showWeek(week) {
+    showAppPanel('wochenreise', true); selectWeek(week);
+    $('#wochenreise').scrollIntoView({ behavior: 'instant', block: 'start' });
   },
 });
 let lastSyncRole = '';
@@ -549,7 +592,7 @@ syncUi = setupSync({
   onConnection(connection, readOnly) {
     const role = `${connection?.role || ''}:${readOnly}`;
     for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
-    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); }
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); }
   },
 });
 readIncomingLink();

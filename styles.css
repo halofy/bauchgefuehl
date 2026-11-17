@@ -347,7 +347,7 @@ input[type=file]{font-size:11px;width:100%}
 
 /* Personal journal */
 .journal-section{padding-top:7px}
-.journal-filters{display:grid;grid-template-columns:2fr 1.1fr 1fr 1fr;gap:14px;padding:19px 21px;margin-top:20px}
+.journal-filters{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;gap:14px;padding:19px 21px;margin-top:20px}
 .journal-filters label{font-size:11px;margin:0;font-weight:500}
 .journal-filters input,.journal-filters select{margin-top:6px;font-size:12px;min-height:42px;padding:9px 10px}
 input[type=search],input[type=time],textarea{border:1px solid #d9dfce;background:#fbfcf7;border-radius:7px;color:var(--ink);width:100%;padding:12px 14px;min-height:46px;min-width:0}
@@ -522,3 +522,194 @@ html:where(.app-layout){scroll-padding-top:88px}
 :where(.app-layout) .metric-input-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 44px}
 :where(.app-layout) .metric-remove{width:44px;min-height:48px}
 :where(.app-layout) #entry-save{position:sticky;bottom:0;box-shadow:0 -8px 18px var(--white)}
+
+/* Calendar and journal share one navigation area and the same dated entries. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.journal-view-switch{display:flex;gap:6px;background:#e9eee2;padding:5px;border-radius:12px;margin:20px 0 15px;width:fit-content;max-width:100%}
+.journal-view-switch button{font-size:12px;font-weight:550;min-height:44px;padding:9px 15px;border-radius:9px}
+.journal-view-switch .selected{background:var(--white);box-shadow:0 2px 7px #284d4010}
+.calendar-lookup-panel{margin:18px 0;overflow:hidden}
+.calendar-lookup-panel>summary{padding:15px 20px;font-size:13px;cursor:pointer;min-height:50px}
+.calendar-lookups{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:20px;border-top:1px solid var(--line)}
+.calendar-lookups form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:end}
+.calendar-lookups label{margin:0;font-size:11px;min-width:0}
+.calendar-lookups input{display:block;margin-top:6px}
+.calendar-lookups .field-hint{grid-column:1/-1;margin:0;font-size:10px}
+.calendar-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:start}
+.calendar-month-card{padding:20px;min-width:0}
+.calendar-month-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.calendar-month-header h3{font:26px/1.25 var(--serif)}
+.calendar-month-header .icon-button{font:30px/1 var(--serif);min-height:44px;min-width:44px}
+.calendar-month-actions{display:flex;align-items:center;gap:16px;margin:13px 0 18px;flex-wrap:wrap}
+.calendar-month-actions input{width:auto;max-width:100%;min-width:130px;border:1px solid var(--line);border-radius:7px;background:#fbfcf7;padding:7px;font:12px var(--sans);color:var(--ink);min-height:44px}
+.calendar-month-actions .text-link{font-size:12px;min-height:44px}
+.calendar-weekdays,.calendar-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.calendar-weekdays{text-align:center;font-size:11px;color:var(--muted);padding:0 0 10px}
+.calendar-day{min-width:0;min-height:83px;padding:7px 2px 5px;border:1px solid var(--line);border-radius:9px;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--white);position:relative}
+.calendar-day:hover{background:#f0f3e9}
+.calendar-day.has-care{border-bottom:3px solid #c39a76}
+.calendar-day.other-month{background:#f1f2eb;color:#8a9185}
+.calendar-day.is-today .calendar-day-number{background:var(--sage);border-radius:50%;min-width:25px}
+.calendar-day.selected{border:2px solid var(--green);background:#e9eee2}
+.calendar-day-number{font-size:14px;line-height:25px}
+.calendar-day-ssw{font-size:10px;line-height:15px;white-space:nowrap}
+.calendar-markers{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px;min-height:16px;max-width:100%}
+.calendar-mark{font-size:10px;line-height:14px}
+.calendar-mark-care{color:#956546}.calendar-mark-point{color:#42664d}
+.calendar-mark-journal{color:#284d40;background:#d8e7df;border-radius:10px;padding:0 4px;font-size:10px}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:17px;font-size:10px;color:var(--muted)}
+.calendar-legend span{display:flex;align-items:center;gap:5px}
+.calendar-selected{padding:24px;min-width:0;overflow-wrap:anywhere}
+.calendar-selected>h3{font:25px/1.25 var(--serif);margin-top:10px}
+.calendar-selected-ssw{font-size:14px;color:var(--green);margin-top:8px;font-weight:550}
+.calendar-selected>.text-link{margin:8px 0;font-size:12px}
+.calendar-event{padding:17px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.calendar-event h4{font:400 20px/1.3 var(--serif);margin:6px 0 8px}
+.calendar-event p:not(.eyebrow){font-size:12px;color:var(--muted)}
+.calendar-event .calendar-event-date{font-size:11px;margin-bottom:7px;color:var(--green)}
+.calendar-event .source-link{font-size:10px;display:block;margin:8px 0 0}
+.calendar-event .text-link{font-size:11px;margin-top:8px}
+.calendar-week-start{font-size:12px;color:var(--green);background:var(--sage);border-radius:8px;padding:12px;margin-top:10px}
+.calendar-empty{font-size:12px;color:var(--muted);margin:15px 0;line-height:1.8}
+.calendar-journal-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:space-between;margin:20px 0 7px}
+.calendar-journal-heading h4{font-size:12px;font-weight:550;margin:0}
+.calendar-journal-heading .button{font-size:11px}
+.calendar-journal-entry{padding:15px;background:#f2f4eb;border:1px solid var(--line);border-radius:10px;margin:12px 0}
+.calendar-journal-entry .journal-note{margin-top:6px}
+.calendar-entry-time,.calendar-entry-tags{font-size:10px;color:var(--muted)}
+.calendar-entry-symptoms,.calendar-entry-metrics{font-size:12px;color:var(--green);margin:6px 0;white-space:pre-wrap}
+.calendar-journal-entry .text-link{font-size:11px;margin-top:10px}
+.calendar-all-weeks{margin-top:22px;overflow:hidden}
+.calendar-all-weeks summary{padding:17px 20px;font-size:13px;cursor:pointer}
+.calendar-week-row{display:grid;grid-template-columns:80px 90px minmax(0,1fr);gap:12px;text-align:left;padding:12px 20px;width:100%;min-height:48px;border-top:1px solid var(--line);font-size:12px;align-items:center}
+.calendar-week-row:hover{background:var(--sage)}
+.calendar-week-row strong{font-weight:550}
+.calendar-upcoming-heading{margin-top:25px}.calendar-upcoming-heading h3{font:26px var(--serif);margin-top:8px}
+.calendar-upcoming{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:15px}
+.calendar-upcoming .calendar-event{border:1px solid var(--line);border-radius:12px;background:var(--white);padding:20px}
+@media(max-width:1050px){.calendar-lookups{grid-template-columns:1fr;gap:18px}.calendar-layout{grid-template-columns:1fr}.calendar-upcoming{grid-template-columns:repeat(2,minmax(0,1fr))}}
+:where(.app-layout) .calendar-lookups{padding:17px;gap:19px;grid-template-columns:1fr}
+:where(.app-layout) .calendar-lookups form{grid-template-columns:1fr}
+:where(.app-layout) .calendar-lookups label{font-size:13px}
+:where(.app-layout) .calendar-lookups .field-hint{font-size:12px}
+:where(.app-layout) .calendar-layout{grid-template-columns:1fr;gap:16px}
+:where(.app-layout) .calendar-month-card{padding:15px 10px}
+:where(.app-layout) .calendar-month-header h3{font-size:25px}
+:where(.app-layout) .calendar-days,:where(.app-layout) .calendar-weekdays{gap:3px}
+:where(.app-layout) .calendar-day{min-height:77px;border-radius:7px}
+:where(.app-layout) .calendar-selected{padding:20px}
+:where(.app-layout) .calendar-selected>h3{font-size:25px}
+:where(.app-layout) .calendar-selected-ssw{font-size:16px}
+:where(.app-layout) .calendar-event p:not(.eyebrow),:where(.app-layout) .calendar-empty{font-size:13px}
+:where(.app-layout) .calendar-entry-symptoms,:where(.app-layout) .calendar-entry-metrics{font-size:13px}
+:where(.app-layout) .calendar-upcoming{grid-template-columns:1fr}
+:where(.app-layout) .journal-view-switch{width:100%}
+:where(.app-layout) .journal-view-switch button{flex:1;font-size:12px;padding:9px 7px}
+:where(.app-layout) .calendar-week-row{grid-template-columns:65px minmax(0,1fr);gap:4px 10px;padding:12px 15px;font-size:12px}
+:where(.app-layout) .calendar-week-row span:last-child{grid-column:1/-1;color:var(--muted)}
+
+.calendar-symptom-control{border-top:1px solid var(--line);padding:14px 0 17px}
+.calendar-symptom-control label{display:block;font-size:11px;margin:0}
+.calendar-symptom-control select{display:block;margin-top:6px;min-height:44px}
+.calendar-symptom-control .field-hint{font-size:10px;margin-top:7px}
+.calendar-mark-symptom{color:#735a89;font-weight:700}
+.calendar-day.has-symptom .calendar-day-number{color:#65467d;font-weight:650}
+.reflection{margin-top:23px;padding:24px;min-width:0}
+.reflection-header{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.reflection-header>div{flex:1;text-align:center;min-width:0}
+.reflection-header h3{font:24px/1.3 var(--serif);margin-top:8px;overflow-wrap:anywhere}
+.reflection-header .icon-button{font:30px/1 var(--serif);min-height:44px;min-width:44px}
+.reflection-coverage{font-size:12px;color:var(--muted);margin:18px 0 14px}
+.reflection-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+.reflection-day{display:flex;flex-direction:column;gap:7px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:12px 10px;min-width:0;min-height:115px;text-align:left;background:#f7f8f2;overflow-wrap:anywhere}
+.reflection-day strong{font-size:12px;font-weight:550}.reflection-day span{font-size:10px;color:var(--muted)}
+.reflection-day .reflection-day-date{font-size:11px;color:var(--ink)}
+.reflection-day.has-symptom{background:#efeaf3;border-color:#ded2e6}
+.reflection-day.selected{border:2px solid var(--green)}
+.reflection-day:hover{border-color:var(--green)}
+.reflection-missing{border-style:dashed;background:transparent}
+.reflection-future{background:#eeeee9}
+.reflection-columns{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:24px;min-width:0}
+.reflection-columns>div{min-width:0}
+.reflection-columns h4{font:22px var(--serif);margin:0}
+.reflection-columns .content-note{margin-top:8px}
+.reflection-symptom-row{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin:12px 0;overflow-wrap:anywhere}
+.reflection-symptom-row:hover{background:var(--sage)}
+.reflection-symptom-row strong{font-size:13px;font-weight:550}.reflection-symptom-row span{font-size:11px;color:var(--muted)}
+.reflection-symptom-row .reflection-source{color:var(--green);font-size:10px}
+.reflection-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.reflection-metric{padding:15px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere;min-width:0}
+.reflection-metric h5{font-size:12px;font-weight:550;margin:0 0 8px}.reflection-metric>strong{font:24px var(--serif)}
+.reflection-metric p{font-size:10px;color:var(--muted);margin-top:7px}
+#reflection-open-entries{font-size:12px;min-height:44px;margin-top:20px;text-align:left}
+@media(max-width:1100px){.reflection-days{grid-template-columns:repeat(4,minmax(0,1fr))}}
+:where(.app-layout) .reflection{padding:20px 16px}
+:where(.app-layout) .reflection-header{gap:5px}
+:where(.app-layout) .reflection-header h3{font-size:21px}
+:where(.app-layout) .reflection-header .eyebrow{font-size:8px;letter-spacing:1px}
+:where(.app-layout) .reflection-days{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+:where(.app-layout) .reflection-day{min-height:104px;padding:12px}
+:where(.app-layout) .reflection-day strong{font-size:13px}
+:where(.app-layout) .reflection-day span{font-size:12px}
+:where(.app-layout) .reflection-columns{grid-template-columns:1fr;gap:20px}
+:where(.app-layout) .reflection-coverage{font-size:13px}
+:where(.app-layout) .calendar-symptom-control label{font-size:13px}
+:where(.app-layout) .calendar-symptom-control .field-hint{font-size:12px}
+
+/* Local knowledge catalogue and selective, explicitly projected journal reports. */
+.everyday-guide{margin:28px 0 36px;min-width:0}
+.guide-heading{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.guide-heading h3{font:32px/1.25 var(--serif);margin-top:8px}
+.guide-filters{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:14px;padding:20px;margin-top:20px;align-items:end}
+.guide-filters label{font-size:12px;margin:0;min-width:0}
+.guide-filters input,.guide-filters select{display:block;margin-top:7px;min-height:46px;width:100%;min-width:0}
+.guide-filters .text-link{min-height:46px;text-align:left}
+.guide-context{font-size:12px;color:var(--muted);margin:14px 0}
+.guide-legend{display:flex;flex-wrap:wrap;gap:8px}
+.guide-badge{font-size:11px;font-weight:550;border-radius:20px;padding:5px 10px;display:inline-block;line-height:1.5}
+.guide-ok{background:#dfece1;color:#234b32}.guide-caution{background:#f6e9cb;color:#684d1c}.guide-avoid{background:#f5dedb;color:#7c302b}
+.guide-count{font-size:12px;color:var(--muted);margin:22px 0 12px}
+.guide-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.guide-item{min-width:0;overflow:hidden;overflow-wrap:anywhere}
+.guide-item>summary{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;padding:18px;min-height:70px}
+.guide-item>summary strong{font-size:14px;font-weight:550;flex:1;min-width:140px}
+.guide-item>summary:after{content:'+';font-size:20px}.guide-item[open]>summary:after{content:'−'}
+.guide-item-content{padding:0 18px 18px;font-size:13px}
+.guide-item-content label{font-size:12px;display:block;margin:0 0 15px}
+.guide-item-content select{margin-top:6px;min-height:46px}
+.guide-phase-note{font-size:11px;color:var(--muted);margin-top:12px}
+.guide-sources{border-top:1px solid var(--line);margin-top:15px;padding-top:12px}
+.guide-sources a{display:block;margin:8px 0;overflow-wrap:anywhere}
+.guide-review-date{font-size:10px;color:var(--muted);margin-top:10px}
+.journal-export-actions{display:flex;gap:10px 20px;flex-wrap:wrap;justify-content:flex-end}
+.sync-scope-warning{padding:14px;background:var(--sage);border-radius:9px;font-size:12px;margin:14px 0}
+#share-scope{margin:7px 0 15px;max-width:100%}
+#report-dialog{width:min(850px,calc(100% - 30px));max-width:850px}
+.report-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:20px 0}
+.report-dates label{min-width:0;margin:0}.report-dates input{margin-top:7px;min-width:0;width:100%}
+#report-fields{border:1px solid var(--line);border-radius:10px;padding:10px 16px 16px;display:flex;gap:4px 20px;flex-wrap:wrap;margin:18px 0}
+#report-fields legend{font-size:13px;padding:0 6px}
+#report-fields .checkbox-label{margin:0;min-height:44px}
+#report-entry-panel{padding:12px;border:1px solid var(--line);border-radius:10px;margin:18px 0}
+#report-entry-panel summary{cursor:pointer;min-height:44px;padding:7px 0;font-size:13px}
+.report-entry-option{font-size:12px;min-height:44px;overflow-wrap:anywhere}
+.report-preview-heading{font:24px var(--serif);margin:22px 0 12px}
+.report-preview{padding:20px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px;overflow-wrap:anywhere;max-height:420px;overflow:auto}
+.report-preview h1{font:26px/1.3 var(--serif);margin:12px 0}.report-preview h2{font:21px/1.3 var(--serif);margin:12px 0}.report-preview h3{font-size:13px;font-weight:600;margin:12px 0 5px}
+.report-preview .report-note{font-size:12px;background:var(--sage);padding:12px;margin:16px 0}
+.report-entry{padding:12px 0;border-top:1px solid var(--line)}
+.report-text{white-space:pre-wrap}
+@media(max-width:1050px){.guide-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.guide-filters>label:first-child{grid-column:1/-1}.guide-results{grid-template-columns:1fr}}
+:where(.app-layout) .guide-heading h3{font-size:29px}
+:where(.app-layout) .guide-filters{grid-template-columns:1fr;padding:16px;gap:13px}
+:where(.app-layout) .guide-results{grid-template-columns:1fr}
+:where(.app-layout) .guide-filters label,:where(.app-layout) .guide-item-content label{font-size:13px}
+:where(.app-layout) .guide-context,:where(.app-layout) .guide-count{font-size:13px}
+:where(.app-layout) .guide-item-content select{font-size:16px}
+:where(.app-layout) .guide-item>summary{padding:17px 15px}
+:where(.app-layout) .guide-item-content{font-size:14px}
+:where(.app-layout) .guide-review-date{font-size:12px}
+:where(.app-layout) .journal-export-actions{justify-content:flex-start}
+:where(.app-layout) #report-dialog{width:100%;max-width:none}
+:where(.app-layout) .report-preview{padding:14px}
+:where(.app-layout) #report-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}

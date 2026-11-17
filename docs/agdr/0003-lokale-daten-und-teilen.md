@@ -1,11 +1,12 @@
 # AgDR-0003: Lokale Daten und bewusst übernommene Teilen-Links
 
-- **Status:** Umgesetzt
+- **Status:** Umgesetzt; Standardumfang neuer Teilen-Links teilweise abgelöst durch AgDR-0016
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Lokale Speicherung und Teilbarkeit vom Nutzer verlangt; Mechanismus vom Agenten gewählt
 - **Betroffene Dateien:** [Speicher und Codec](../../src/pregnancy.js), [Interaktionen](../../src/app.js), [Hinweise und Dialoge](../../index.html)
 - **Erweitert durch:** [AgDR-0006](0006-waehlbare-berechnungsmethode.md) – versionierte Methodenauswahl und ET-Payload; die folgende v1-Payload beschreibt den ursprünglichen Stand.
 - **Erweitert durch:** [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) – separater Geräte-Link mit laufendem Master-Sync und Merkhäkchen, lokaler Sicherungsverlauf und Backups. Der einfache Teilen-Link bleibt eine unabhängige Kopie.
+- **Teilweise abgelöst durch:** [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md) – neue Reise-Links starten nur mit ET; die vollständige Grundlage ist ausdrücklich wählbar. Ausgewählte Journalbereiche können separat als lokale Datei weitergegeben werden. Alte Links behalten ihren bisherigen Inhalt; die folgende Payload beschreibt den ursprünglichen Stand.
 
 ## Kontext und Herkunft
 
