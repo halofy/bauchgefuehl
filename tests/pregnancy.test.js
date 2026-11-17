@@ -152,9 +152,9 @@ test('malformed, overlong, unsupported and hostile links are safely rejected', (
 
 test('local persistence round-trips profile and checklist', () => {
   const storage = memory();
-  assert.deepEqual(readLocal(storage, now), { profile: null, checks: {}, error: null });
+  assert.deepEqual(readLocal(storage, now), { profile: null, checks: {}, journal: [], error: null });
   writeLocal(storage, profile, { 'scan-1': true }, now);
-  assert.deepEqual(readLocal(storage, now), { profile, checks: { 'scan-1': true }, error: null });
+  assert.deepEqual(readLocal(storage, now), { profile, checks: { 'scan-1': true }, journal: [], error: null });
   storage.removeItem(STORAGE_KEY);
   assert.equal(readLocal(storage, now).profile, null);
 });
@@ -256,17 +256,17 @@ test('existing v1 local profiles preserve dates and checks, and upgrade on expli
   const raw = JSON.stringify({ v: 1, profile: legacy, checks: { 'scan-1': true } });
   storage.setItem(STORAGE_KEY, raw);
   const loaded = readLocal(storage, now);
-  assert.deepEqual(loaded, { profile, checks: { 'scan-1': true }, error: null });
+  assert.deepEqual(loaded, { profile, checks: { 'scan-1': true }, journal: [], error: null });
   assert.equal(storage.getItem(STORAGE_KEY), raw, 'Reading must not mutate existing data');
   writeLocal(storage, loaded.profile, loaded.checks, now);
-  assert.equal(JSON.parse(storage.getItem(STORAGE_KEY)).v, 2);
+  assert.equal(JSON.parse(storage.getItem(STORAGE_KEY)).v, 3);
   assert.deepEqual(readLocal(storage, now), loaded);
 });
 
 test('ET method and checklist survive local persistence without keeping inactive inputs', () => {
   const storage = memory();
   writeLocal(storage, { ...dueProfile, lmp: profile.lmp, cycle: 30 }, { 'scan-1': true }, now);
-  assert.deepEqual(readLocal(storage, now), { profile: dueProfile, checks: { 'scan-1': true }, error: null });
+  assert.deepEqual(readLocal(storage, now), { profile: dueProfile, checks: { 'scan-1': true }, journal: [], error: null });
   assert.deepEqual(JSON.parse(storage.getItem(STORAGE_KEY)).profile, dueProfile);
 });
 

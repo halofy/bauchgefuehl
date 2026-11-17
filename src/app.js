@@ -1,7 +1,10 @@
-import { STORAGE_KEY, HISTORY_KEY, todayISO, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, encodeShare, decodeShare, readLocal, writeLocal } from './pregnancy.js';
+import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, encodeShare, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
 import { setupSync } from './sync-ui.js';
+import { setupJournal } from './journal-ui.js';
+import { normalizeJournal } from './journal.js';
+import { SYNC_KEY } from './sync.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -10,10 +13,11 @@ let storage;
 try { storage = window.localStorage; } catch { storage = { getItem() { throw new Error(); }, setItem() { throw new Error(); }, removeItem() { throw new Error(); } }; }
 let today = todayISO();
 let local = readLocal(storage, today);
-let state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+let state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, journal: local.journal || [], mode: local.profile ? 'local' : 'demo' };
 let selectedWeek;
 let toastTimer;
 let syncUi = null;
+let journalUi = null;
 
 function announce(message) {
   $('#notice').textContent = message;
@@ -45,7 +49,7 @@ function readIncomingLink() {
   }
   try {
     const profile = decodeShare(location.hash, today);
-    if (profile) state = { profile, checks: {}, mode: 'shared' };
+    if (profile) state = { profile, checks: {}, journal: [], mode: 'shared' };
   } catch (error) { announce(error.message); }
   selectedWeek = currentWeek();
 }
@@ -70,7 +74,7 @@ function renderMode() {
   } else if (state.mode === 'shared') {
     $('#mode-title').textContent = 'Eine Reise, die mit dir geteilt wurde';
     $('#mode-description').textContent = local.profile
-      ? 'Geteilte Ansicht. Speichern ersetzt deine bisherigen lokalen Angaben und Merkhäkchen.'
+      ? 'Geteilte Ansicht. Speichern ersetzt deine bisherigen lokalen Angaben. Dein bisheriges Journal wird zuvor im Sicherungsverlauf abgelegt.'
       : 'Geteilte Ansicht. Die Daten werden erst gespeichert, wenn du sie bewusst übernimmst.';
     addAction('Auf diesem Gerät speichern', () => saveProfile(state.profile, {}), true);
     addAction('Verwerfen', discardShared);
@@ -221,15 +225,21 @@ function render(center = false) {
   renderSummary();
   renderWeeks(center);
   renderCare();
+  journalUi?.render();
+}
+
+function queueSync() {
+  try { syncUi?.queue({ profile: state.profile, checks: state.checks, journal: state.journal }); }
+  catch (error) { announce(`Deine Angaben sind lokal gespeichert. Der Geräte-Sync konnte noch nicht vorgemerkt werden: ${error.message} Bitte sichere ein Backup.`); }
 }
 
 function persistChecks() {
   if (state.mode === 'local' || state.mode === 'session') {
     try {
-      writeLocal(storage, state.profile, state.checks, today);
+      writeLocal(storage, state.profile, state.checks, today, state.journal);
       state.mode = 'local';
-      local = { profile: { ...state.profile }, checks: { ...state.checks }, error: null };
-      syncUi?.queue({ profile: state.profile, checks: state.checks });
+      local = { profile: { ...state.profile }, checks: { ...state.checks }, journal: state.journal, error: null };
+      queueSync();
     } catch {
       state.mode = 'session';
       announce('Deine Änderungen konnten nicht lokal gespeichert werden. Sie bleiben nur für diese Sitzung erhalten.');
@@ -240,12 +250,13 @@ function persistChecks() {
 
 function saveProfile(profile, checks) {
   if (syncUi?.readOnly) throw new Error('Dieses Gerät liest nur mit. Bitte ändere die Angaben auf dem Master.');
-  state = { profile: validateProfile(profile, today), checks: { ...checks }, mode: 'local' };
+  const replacing = state.mode === 'shared';
+  state = { profile: validateProfile(profile, today), checks: { ...checks }, journal: replacing ? [] : state.journal, mode: 'local' };
   announce('');
   try {
-    writeLocal(storage, state.profile, state.checks, today);
-    local = { profile: { ...state.profile }, checks: { ...state.checks }, error: null };
-    syncUi?.queue({ profile: state.profile, checks: state.checks });
+    writeLocal(storage, state.profile, state.checks, today, state.journal, { replaceJournal: replacing });
+    local = { profile: { ...state.profile }, checks: { ...state.checks }, journal: state.journal, error: null };
+    queueSync();
     toast('Deine Angaben sind in diesem Browser gespeichert.');
   } catch {
     state.mode = 'session';
@@ -259,7 +270,7 @@ function saveProfile(profile, checks) {
 function discardShared() {
   clearShareHash();
   local = readLocal(storage, today);
-  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, journal: local.journal || [], mode: local.profile ? 'local' : 'demo' };
   selectedWeek = currentWeek();
   announce(local.error || '');
   render(true);
@@ -368,8 +379,8 @@ function openShare() {
   }
   $('#share-local-warning').hidden = !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   $('#share-description').textContent = state.profile.method === 'due-date'
-    ? `Enthalten sind die Methode „ET · 28-Tage-Basis“ und dein eingetragener ET (${formatDate(state.profile.dueDate)}). Perioden- und Zyklusangaben werden bei dieser Methode nicht geteilt. Merkhäkchen bleiben bei dir.`
-    : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(state.profile.lmp)}), die durchschnittliche Zykluslänge (${state.profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist. Merkhäkchen bleiben bei dir.`;
+    ? `Enthalten sind die Methode „ET · 28-Tage-Basis“ und dein eingetragener ET (${formatDate(state.profile.dueDate)}). Perioden- und Zyklusangaben werden bei dieser Methode nicht geteilt. Merkhäkchen und Journal bleiben bei dir.`
+    : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(state.profile.lmp)}), die durchschnittliche Zykluslänge (${state.profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist. Merkhäkchen und Journal bleiben bei dir.`;
   $('#copy-status').textContent = '';
   $('#copy-link').innerHTML = `${icon('share')}Link kopieren`;
   $('#share-dialog').showModal();
@@ -406,6 +417,7 @@ const actions = {
 for (const element of $$('[data-action]')) element.addEventListener('click', () => actions[element.dataset.action]());
 for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
 for (const dialog of $$('dialog')) {
+  if (dialog.id === 'journal-dialog') continue;
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
@@ -417,16 +429,17 @@ $('#delete-data').addEventListener('click', () => { $('#delete-error').hidden = 
 $('#confirm-delete').addEventListener('click', () => {
   try {
     if (syncUi?.connection) throw new Error('Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen.');
+    storage.removeItem(SYNC_KEY);
     storage.removeItem(HISTORY_KEY);
     storage.removeItem(STORAGE_KEY);
     clearShareHash();
     local = { profile: null, checks: {}, error: null };
-    state = { profile: demoProfile(today), checks: {}, mode: 'demo' };
+    state = { profile: demoProfile(today), checks: {}, journal: [], mode: 'demo' };
     selectedWeek = currentWeek();
     $('#delete-dialog').close();
     render(true);
     announce('');
-    toast('Deine lokalen Angaben und Merkhäkchen wurden gelöscht.');
+    toast('Deine lokalen Angaben, dein Journal und deine Merkhäkchen wurden gelöscht.');
   } catch {
     $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen. Serverstände bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
     $('#delete-error').hidden = false;
@@ -449,7 +462,7 @@ for (const button of $$('[data-scroll]')) button.addEventListener('click', () =>
 
 // Scroll navigation without replacing the fragment that carries a shared profile.
 function updateNavigation() {
-  const sections = ['ueberblick', 'wochenreise', 'wissen'];
+  const sections = ['ueberblick', 'wochenreise', 'journal', 'wissen'];
   let active = sections[0];
   for (const id of sections) if ($(`#${id}`).getBoundingClientRect().top <= 190) active = id;
   for (const button of $$('[data-scroll]')) {
@@ -477,7 +490,7 @@ function refreshDate() {
     render(wasCurrent);
   } catch {
     local = readLocal(storage, today);
-    state = { profile: demoProfile(today), checks: {}, mode: 'demo' };
+    state = { profile: demoProfile(today), checks: {}, journal: local.journal || state.journal, mode: 'demo' };
     selectedWeek = currentWeek();
     render(true);
     announce('Deine gespeicherten Angaben liegen inzwischen außerhalb des unterstützten Zeitraums. Bitte prüfe und aktualisiere sie.');
@@ -495,24 +508,46 @@ window.addEventListener('storage', event => {
   if (event.key !== STORAGE_KEY && event.key !== null) return;
   local = readLocal(storage, today);
   if (state.mode === 'shared') { renderMode(); return; }
-  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, mode: local.profile ? 'local' : 'demo' };
+  state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, journal: local.journal || [], mode: local.profile ? 'local' : 'demo' };
   selectedWeek = currentWeek();
   announce(local.error || '');
   render(true);
 });
 
 announce(local.error || '');
+journalUi = setupJournal({
+  getJournal: () => state.journal,
+  canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
+  onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
+  saveJournal(entries) {
+    if (syncUi?.readOnly || !['local', 'session'].includes(state.mode)) throw new Error('Bitte zuerst deine Angaben am Master speichern.');
+    const journal = normalizeJournal(entries, today);
+    // Commit durable data first; a failed save keeps the editor and its draft open.
+    writeLocal(storage, state.profile, state.checks, today, journal);
+    state.journal = journal;
+    state.mode = 'local';
+    local = { profile: state.profile, checks: { ...state.checks }, journal, error: null };
+    queueSync();
+    renderMode();
+  },
+  notify: toast,
+  weekOnDate(date) {
+    if (state.mode === 'demo' || state.mode === 'shared') return null;
+    const age = calculatePregnancy(state.profile, today).gestationalDays + dayNumber(date) - dayNumber(today);
+    return age >= 0 ? `SSW ${Math.floor(age / 7)}+${age % 7}` : 'Vor rechnerischem Beginn';
+  },
+});
 let lastSyncRole = '';
 syncUi = setupSync({
   storage,
   getSnapshot() {
     if (state.mode === 'demo' || state.mode === 'shared') throw new Error('Bitte zuerst eigene Angaben auf diesem Gerät speichern.');
-    return { profile: state.profile, checks: state.checks };
+    return { profile: state.profile, checks: state.checks, journal: state.journal };
   },
-  applySnapshot(value) {
-    writeLocal(storage, value.profile, value.checks, today);
-    local = { profile: value.profile, checks: value.checks, error: null };
-    state = { profile: value.profile, checks: { ...value.checks }, mode: 'local' };
+  applySnapshot(value, options = {}) {
+    writeLocal(storage, value.profile, value.checks, today, value.journal, options);
+    local = { profile: value.profile, checks: value.checks, journal: value.journal, error: null };
+    state = { profile: value.profile, checks: { ...value.checks }, journal: value.journal, mode: 'local' };
     selectedWeek = currentWeek();
     render(true);
   },
@@ -520,7 +555,7 @@ syncUi = setupSync({
   onConnection(connection, readOnly) {
     const role = `${connection?.role || ''}:${readOnly}`;
     for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
-    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); }
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); }
   },
 });
 readIncomingLink();

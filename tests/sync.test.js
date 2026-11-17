@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import worker, { SyncRoom } from '../sync-server/worker.js';
 import { SyncEngine, SYNC_KEY, snapshot, randomToken, invitation, parseInvitation, encryptSnapshot, decryptSnapshot, endpointURL } from '../src/sync.js';
 import { STORAGE_KEY, HISTORY_KEY, writeLocal } from '../src/pregnancy.js';
+import { normalizeEntry, archiveEntry } from '../src/journal.js';
 
 const initial = { profile: { method: 'period', lmp: '2026-07-09', cycle: 30, irregular: false }, checks: {} };
 const changed = { profile: { method: 'due-date', dueDate: '2027-04-17' }, checks: { 'scan-1': true } };
@@ -52,9 +53,9 @@ function service() {
 }
 function client(server, value = initial, storage = memory()) {
   const box = { value: structuredClone(value), updates: 0, statuses: [] };
-  if (!storage.getItem(STORAGE_KEY)) writeLocal(storage, box.value.profile, box.value.checks);
-  const make = () => new SyncEngine({ storage, fetcher: server.fetcher, getSnapshot: () => box.value, applySnapshot(value) {
-    writeLocal(storage, value.profile, value.checks);
+  if (!storage.getItem(STORAGE_KEY)) writeLocal(storage, box.value.profile, box.value.checks, undefined, box.value.journal);
+  const make = () => new SyncEngine({ storage, fetcher: server.fetcher, getSnapshot: () => box.value, applySnapshot(value, options = {}) {
+    writeLocal(storage, value.profile, value.checks, undefined, value.journal, options);
     box.value = structuredClone(value); box.updates++;
   }, onStatus: value => box.statuses.push(value) });
   return { box, storage, make, engine: make() };
@@ -67,7 +68,7 @@ const settled = async engine => {
 const create = async c => c.engine.create('https://sync.example', 'synthetic-test-admin-token');
 const followerConfig = c => parseInvitation(new URL(invitation(c.engine.connection, `${origin}/calculator/`)).hash);
 const edit = async (c, value) => {
-  writeLocal(c.storage, value.profile, value.checks);
+  writeLocal(c.storage, value.profile, value.checks, undefined, value.journal);
   c.box.value = structuredClone(value);
   c.engine.queue(value);
   await settled(c.engine);
@@ -247,4 +248,144 @@ test('room creation requires configured origin and admin authentication', async 
   const preflight = await worker.fetch(new Request(url, { method: 'OPTIONS', headers: { Origin: origin } }), server.env);
   assert.equal(preflight.status, 204);
   assert.equal(preflight.headers.get('Access-Control-Allow-Origin'), origin);
+});
+
+test('a second edit arriving during upload is retained and sent after the first acknowledgment', async () => {
+  const server = service(); const master = client(server); await create(master);
+  const original = master.engine.fetcher;
+  let release, started;
+  const waiting = new Promise(resolve => { started = resolve; });
+  const gate = new Promise(resolve => { release = resolve; });
+  let once = true;
+  master.engine.fetcher = async (url, init) => {
+    if (once && init.method === 'PUT') { once = false; started(); await gate; }
+    return original(url, init);
+  };
+  master.box.value = changed;
+  master.engine.queue(changed);
+  await waiting;
+  const newer = { ...changed, checks: { 'scan-1': true, 'scan-2': true } };
+  master.box.value = newer;
+  master.engine.queue(newer);
+  release(); await settled(master.engine);
+  assert.ok(master.engine.connection.pending);
+  await master.engine.tick();
+  assert.equal(master.engine.connection.revision, 3);
+  const remote = await master.engine.request(master.engine.connection, 'GET');
+  assert.deepEqual(await decryptSnapshot(remote.envelope, master.engine.connection), snapshot(newer));
+});
+
+test('missing durable credential storage prevents room creation before any network request', async () => {
+  const server = service(); const master = client(server);
+  master.storage.setItem = () => { throw new Error('Quota'); };
+  await assert.rejects(() => create(master), /Quota/);
+  assert.equal(server.rooms.size, 0);
+});
+
+test('tampered remote data never replaces an existing follower snapshot', async () => {
+  const server = service(); const master = client(server); await create(master);
+  const follower = client(server); await follower.engine.join(followerConfig(master));
+  await edit(master, changed);
+  const storage = [...server.rooms.values()][0].storage;
+  const blobKey = 'blob:000000000002:0';
+  const envelope = JSON.parse(storage.map.get(blobKey));
+  envelope.data = 'A'.repeat(envelope.data.length);
+  storage.map.set(blobKey, JSON.stringify(envelope));
+  const before = structuredClone(follower.box.value);
+  await follower.engine.tick();
+  assert.deepEqual(follower.box.value, before);
+  assert.equal(follower.engine.connection.revision, 1);
+  assert.match(follower.box.statuses.at(-1), /ausstehend/);
+});
+
+test('follower storage failure prevents connection adoption and revision advancement', async () => {
+  const server = service(); const master = client(server); await create(master);
+  const follower = client(server, changed);
+  const previous = follower.storage.getItem(STORAGE_KEY);
+  const set = follower.storage.setItem;
+  follower.storage.setItem = (key, value) => { if (key === HISTORY_KEY) throw new Error('Quota'); set(key, value); };
+  await assert.rejects(() => follower.engine.join(followerConfig(master)), /Quota/);
+  assert.equal(follower.engine.connection, null);
+  assert.equal(follower.storage.getItem(STORAGE_KEY), previous);
+});
+
+const journalEntry = (extra = {}) => normalizeEntry({ id: 'synthetic-entry-0001', date: '2026-11-16', time: '10:00', text: 'Synthetische Journalnotiz', symptoms: ['Müdigkeit'], tags: ['Test'], metrics: [{ kind: 'weight', value: 65.5 }, { kind: 'belly', value: 90 }], createdAt: '2026-11-16T10:00:00.000Z', updatedAt: '2026-11-16T10:00:00.000Z', ...extra });
+async function legacyEnvelope(value, config) {
+  const key = await crypto.subtle.importKey('raw', Buffer.from(config.key, 'base64url'), 'AES-GCM', false, ['encrypt']);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(`bauchgefuehl-sync-v1:${config.room}`) }, key, new TextEncoder().encode(JSON.stringify(value)));
+  return { v: 1, iv: Buffer.from(iv).toString('base64url'), data: Buffer.from(data).toString('base64url') };
+}
+
+test('journal sync preserves notes, symptoms, tags, measurements and reversible archives across an offline restart', async () => {
+  const server = service(); const master = client(server, { ...initial, journal: [journalEntry()] }); await create(master);
+  const prior = journalEntry({ id: 'synthetic-follower-0001', text: 'Vorheriger synthetischer Stand' });
+  const follower = client(server, { ...initial, journal: [prior] }); await follower.engine.join(followerConfig(master));
+  assert.deepEqual(follower.box.value.journal, [journalEntry()]);
+  assert.deepEqual(JSON.parse(JSON.parse(follower.storage.getItem(HISTORY_KEY))[0].raw).journal, [prior]);
+  server.transport.offline = true;
+  const archived = archiveEntry([journalEntry()], journalEntry().id, true, '2026-11-16T11:00:00.000Z');
+  await edit(master, { ...initial, journal: archived });
+  master.engine = master.make(); server.transport.offline = false; await master.engine.tick(); await follower.engine.tick();
+  assert.deepEqual(follower.box.value.journal, archived);
+  const restored = archiveEntry(archived, archived[0].id, false, '2026-11-16T12:00:00.000Z');
+  await edit(master, { ...initial, journal: restored }); await follower.engine.tick();
+  assert.deepEqual(follower.box.value.journal, restored);
+  assert.throws(() => master.engine.queue(initial), /verlieren/);
+  assert.throws(() => follower.engine.queue({ ...initial, journal: restored }), /Master/);
+});
+
+test('large journal snapshots encrypt, sync and store in bounded ciphertext chunks', async () => {
+  const journal = Array.from({ length: 30 }, (_, i) => journalEntry({ id: `synthetic-entry-${String(i).padStart(4, '0')}`, text: 'Ü'.repeat(3500) }));
+  const server = service(); const master = client(server, { ...initial, journal }); await create(master);
+  const follower = client(server); await follower.engine.join(followerConfig(master));
+  assert.deepEqual(follower.box.value.journal, journal);
+  const stored = [...server.rooms.values()][0].storage.map;
+  const blobs = [...stored].filter(([key]) => key.startsWith('blob:'));
+  assert.ok(blobs.length > 3);
+  assert.ok(blobs.every(([, value]) => value.length <= 60000));
+  assert.doesNotMatch(JSON.stringify([...stored]), /synthetic-entry|Müdigkeit|weight/);
+  const { versions } = await master.engine.history();
+  assert.deepEqual((await decryptSnapshot(versions[0].envelope, master.engine.connection)).journal, journal);
+});
+
+test('legacy encrypted rooms remain readable, upgrade to journal format, and then reject older writers', async () => {
+  const server = service(); const master = client(server); await create(master);
+  const c = master.engine.connection;
+  const storage = [...server.rooms.values()][0].storage;
+  const oldEnvelope = await legacyEnvelope(initial, c);
+  const oldVersion = { revision: 1, mutationId: randomToken(), envelope: oldEnvelope, savedAt: new Date().toISOString() };
+  const room = storage.map.get('room');
+  storage.map.set('room', { ...room, latest: oldVersion });
+  storage.map.set('version:000000000001', oldVersion);
+  const follower = client(server); await follower.engine.join(followerConfig(master));
+  assert.deepEqual(follower.box.value, snapshot(initial));
+  assert.deepEqual(await decryptSnapshot(oldEnvelope, c), snapshot(initial));
+  await edit(master, { ...initial, journal: [journalEntry()] });
+  await assert.rejects(() => master.engine.request(c, 'PUT', { mutationId: randomToken(), baseRevision: 2, envelope: oldEnvelope }), error => error.status === 426);
+  const remote = await master.engine.request(c, 'GET');
+  assert.equal(remote.revision, 2); assert.deepEqual((await decryptSnapshot(remote.envelope, c)).journal, [journalEntry()]);
+  // Altering the declared schema invalidates authentication or validation.
+  await assert.rejects(() => decryptSnapshot({ ...remote.envelope, v: 1, schema: undefined }, c));
+});
+
+test('ciphertext chunks and receipts expire together after twenty server revisions', async () => {
+  const server = service(); const master = client(server, { ...initial, journal: [journalEntry()] }); await create(master);
+  for (let i = 0; i < 21; i++) await edit(master, { ...initial, journal: [journalEntry({ text: `Synthetische Fassung ${i}` })] });
+  const stored = [...server.rooms.values()][0].storage.map;
+  assert.equal([...stored.keys()].filter(key => key.startsWith('version:')).length, 20);
+  assert.equal([...stored.keys()].filter(key => key.startsWith('mutation:')).length, 20);
+  assert.equal([...stored.keys()].some(key => key.startsWith('blob:000000000001:') || key.startsWith('blob:000000000002:')), false);
+});
+
+test('an old app that stripped journal metadata cannot erase the authority after upgrading again', async () => {
+  const server = service(); const master = client(server, { ...initial, journal: [journalEntry()] }); await create(master);
+  const storage = memory();
+  storage.setItem(SYNC_KEY, JSON.stringify({ ...master.engine.connection, published: initial }));
+  const oldCache = client(server, initial, storage);
+  await edit(oldCache, changed);
+  assert.equal(oldCache.engine.connection.conflict, true);
+  assert.ok(oldCache.engine.connection.inflight);
+  const remote = await master.engine.request(master.engine.connection, 'GET');
+  assert.equal(remote.revision, 1); assert.deepEqual((await decryptSnapshot(remote.envelope, master.engine.connection)).journal, [journalEntry()]);
 });

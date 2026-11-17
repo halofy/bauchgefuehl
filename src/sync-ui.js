@@ -4,6 +4,11 @@ import { createQrSvg } from './qr.js';
 
 export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConnection }) {
   const $ = selector => document.querySelector(selector);
+  const localEndpoint = document.querySelector('meta[name="local-sync-endpoint"]')?.content;
+  if (localEndpoint) {
+    $('#sync-endpoint').value = localEndpoint;
+    $('#sync-service-hint').textContent = 'Lokaler Sync-Dienst auf diesem Rechner. Den Einrichtungsschlüssel findest du im Datenordner des Servers in der Datei „admin-token“. Standard: .local-sync/admin-token.';
+  }
   let engine;
   let candidate = null;
   let recovery = null;
@@ -13,6 +18,7 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
   let releaseLease = null;
   let backupOffered = false;
   let backupSignature = null;
+  let loadProblem = false;
   let status = 'Nicht verbunden · deine Daten bleiben auf diesem Gerät.';
   function error(message) { $('#sync-error').textContent = message; $('#sync-error').hidden = !message; }
   function signature() {
@@ -58,8 +64,8 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
     $('#sync-pair').hidden = !c || c.role !== 'master' || !c.ready;
     $('#sync-use-server').hidden = !c || c.role !== 'master';
     $('#sync-manage-description').textContent = c?.role === 'master'
-      ? 'Dieses Gerät ist der Master. Nur hier werden Berechnung und Merkhäkchen geändert. Lade eine Master-Sicherung herunter: Sie enthält auch die Schlüssel für eine Wiederherstellung.'
-      : 'Dieses Gerät liest den Masterstand automatisch nach. Berechnung und Merkhäkchen können nur am Master geändert werden. Offline bleibt der zuletzt empfangene Stand sichtbar.';
+      ? 'Dieses Gerät ist der Master. Nur hier werden Berechnung, Journal und Merkhäkchen geändert. Lade eine Master-Sicherung herunter: Sie enthält auch die Schlüssel für eine Wiederherstellung.'
+      : 'Dieses Gerät liest den Masterstand automatisch nach. Berechnung, Journal und Merkhäkchen können nur am Master geändert werden. Offline bleibt der zuletzt empfangene Stand sichtbar.';
     if (c?.role === 'master' && c.ready) {
       const link = invitation(c, location.href);
       if ($('#sync-link').value !== link) {
@@ -74,8 +80,16 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
     engine = new SyncEngine({ storage, getSnapshot, applySnapshot, onStatus(message) { status = message; update(); } });
     if (engine.connection) status = engine.connection.role === 'master' ? 'Master · Verbindungsprüfung läuft.' : 'Mitlesend · Verbindungsprüfung läuft.';
   } catch (cause) {
+    loadProblem = true;
     status = 'Geräteverbindung konnte nicht geladen werden. Deine Angaben bleiben erhalten. Backup herunterladen.';
     error(cause.message);
+    // Keep the damaged raw record for export; only an explicit operation after
+    // a backup may replace it. Recovery must not require deleting browser data.
+    engine = new SyncEngine({
+      storage: { getItem: () => null, setItem: (key, value) => storage.setItem(key, value), removeItem: key => storage.removeItem(key) },
+      getSnapshot, applySnapshot,
+      onStatus(message) { status = message; update(); },
+    });
   }
   function open() {
     error(''); update();
@@ -92,10 +106,12 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
   $('#sync-create-form').addEventListener('submit', event => {
     event.preventDefault();
     void run(async () => {
+      if (loadProblem && !backupOffered) throw new Error('Bitte zuerst ein Backup mit dem noch vorhandenen Verbindungsdatensatz herunterladen.');
       snapshot(getSnapshot()); // Never create a room for an empty demo.
       const secret = $('#sync-admin').value;
       $('#sync-admin').value = '';
       await engine.create($('#sync-endpoint').value.trim(), secret);
+      loadProblem = false;
     });
   });
   $('#sync-join').addEventListener('click', () => void run(async () => {
@@ -138,7 +154,9 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
     }
     let value = null;
     try { value = snapshot(getSnapshot()); } catch { /* Demo or expired profile: retain raw storage below. */ }
-    const backup = { format: 'bauchgefuehl-backup', version: 1, createdAt: new Date().toISOString(), snapshot: value, connection: c, rawLocal: storage.getItem('bauchgefuehl.v1'), rawHistory: storage.getItem(HISTORY_KEY), rawSync: storage.getItem(SYNC_KEY), remoteHistory, remoteError };
+    const storageErrors = [];
+    const safeRead = key => { try { return storage.getItem(key); } catch { storageErrors.push(key); return null; } };
+    const backup = { format: 'bauchgefuehl-backup', version: 1, createdAt: new Date().toISOString(), snapshot: value, connection: c, rawLocal: safeRead('bauchgefuehl.v1'), rawHistory: safeRead(HISTORY_KEY), rawSync: safeRead(SYNC_KEY), storageErrors, remoteHistory, remoteError };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -149,13 +167,13 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
     backupOffered = true;
     backupSignature = signature();
     $('#sync-disconnect-backed-up').hidden = false;
-    notify(remoteError ? 'Lokales Backup heruntergeladen. Der Serververlauf war nicht erreichbar und fehlt in dieser Datei.' : 'Backup-Download gestartet. Master-Dateien enthalten geheime Schlüssel; bitte sicher aufbewahren.');
+    notify(storageErrors.length ? 'Sitzungsdaten als Backup heruntergeladen. Der Browser-Speicher war nicht lesbar; gespeicherte Altstände können fehlen.' : remoteError ? 'Lokales Backup heruntergeladen. Der Serververlauf war nicht erreichbar und fehlt in dieser Datei.' : 'Backup-Download gestartet. Master-Dateien enthalten geheime Schlüssel; bitte sicher aufbewahren.');
   }));
   $('#sync-backup-file').addEventListener('change', async event => {
     await run(async () => {
       const file = event.target.files?.[0];
       if (!file) return;
-      if (file.size > 1_000_000) throw new Error('Diese Backup-Datei ist zu groß.');
+      if (file.size > 64 * 1024 * 1024) throw new Error('Diese Backup-Datei ist zu groß (maximal 64 MiB).');
       const data = JSON.parse(await file.text());
       if (data?.format !== 'bauchgefuehl-backup' || data.version !== 1) throw new Error('Das ist keine unterstützte Backup-Datei.');
       recovery = { snapshot: snapshot(data.snapshot), connection: data.connection ? validateConnection(data.connection) : null };
@@ -164,9 +182,11 @@ export function setupSync({ storage, getSnapshot, applySnapshot, notify, onConne
     event.target.value = '';
   });
   $('#sync-restore').addEventListener('click', () => void run(async () => {
+    if (loadProblem && !backupOffered) throw new Error('Bitte zuerst den vorhandenen Stand als Backup herunterladen.');
     if (!recovery || engine.connection) throw new Error('Bitte zuerst eine bestehende Geräteverbindung trennen.');
-    await applySnapshot(recovery.snapshot);
+    await applySnapshot(recovery.snapshot, { replaceJournal: true });
     if (recovery.connection) { engine.connection = recovery.connection; engine.persist(); }
+    loadProblem = false;
     recovery = null;
     status = 'Backup lokal wiederhergestellt. Der Sync prüft den Serverstand; Konflikte werden nicht überschrieben.';
     void engine.tick();

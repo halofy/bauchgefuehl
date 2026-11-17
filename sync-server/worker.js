@@ -9,7 +9,28 @@ function equal(a, b) {
   return mismatch === 0;
 }
 function validEnvelope(e) {
-  return e?.v === 1 && typeof e.iv === 'string' && /^[A-Za-z0-9_-]{16}$/.test(e.iv) && typeof e.data === 'string' && /^[A-Za-z0-9_-]{22,12000}$/.test(e.data);
+  return (e?.v === 1 || (e?.v === 2 && e.schema === 3)) && typeof e.iv === 'string' && /^[A-Za-z0-9_-]{16}$/.test(e.iv) && typeof e.data === 'string' && /^[A-Za-z0-9_-]{22,720000}$/.test(e.data);
+}
+const revisionKey = revision => String(revision).padStart(12, '0');
+const schemaOf = envelope => envelope.v === 2 ? envelope.schema : 2;
+async function storeVersion(tx, version) {
+  const text = JSON.stringify(version.envelope);
+  const chunks = Math.ceil(text.length / 60000);
+  for (let i = 0; i < chunks; i++) await tx.put(`blob:${revisionKey(version.revision)}:${i}`, text.slice(i * 60000, (i + 1) * 60000));
+  const { envelope, ...metadata } = version;
+  const saved = { ...metadata, envelopeParts: chunks, schema: schemaOf(envelope) };
+  await tx.put(`version:${revisionKey(version.revision)}`, saved);
+  return saved;
+}
+async function loadVersion(tx, metadata) {
+  if (metadata.envelope) return metadata; // Existing rooms keep their saved data.
+  const parts = [];
+  for (let i = 0; i < metadata.envelopeParts; i++) {
+    const part = await tx.get(`blob:${revisionKey(metadata.revision)}:${i}`);
+    if (typeof part !== 'string') throw new Error('Unvollständiger Serverstand.');
+    parts.push(part);
+  }
+  return { revision: metadata.revision, mutationId: metadata.mutationId, savedAt: metadata.savedAt, envelope: JSON.parse(parts.join('')) };
 }
 async function body(request) {
   const reader = request.body?.getReader();
@@ -20,7 +41,7 @@ async function body(request) {
     const { value, done } = await reader.read();
     if (done) break;
     size += value.length;
-    if (size > 16000) { await reader.cancel(); throw new Error('size'); }
+    if (size > 750000) { await reader.cancel(); throw new Error('size'); }
     parts.push(value);
   }
   const bytes = new Uint8Array(size);
@@ -44,8 +65,8 @@ export class SyncRoom {
         if (room) return reply({ error: 'Dieser Raum existiert bereits.' }, 409);
         if (!TOKEN_HASH.test(input?.readHash) || !TOKEN_HASH.test(input?.writeHash) || !ID.test(input?.mutationId) || !validEnvelope(input?.envelope)) return reply({ error: 'Ungültiger Raum.' }, 400);
         const latest = { revision: 1, mutationId: input.mutationId, envelope: input.envelope, savedAt: new Date().toISOString() };
-        await tx.put('room', { readHash: input.readHash, writeHash: input.writeHash, latest });
-        await tx.put('version:000000000001', latest);
+        const metadata = await storeVersion(tx, latest);
+        await tx.put('room', { readHash: input.readHash, writeHash: input.writeHash, latest: metadata });
         await tx.put(`mutation:${input.mutationId}`, 1);
         return reply({ revision: 1 }, 201);
       }
@@ -58,10 +79,12 @@ export class SyncRoom {
       if (request.method === 'GET') {
         if (url.searchParams.has('history')) {
           if (!master) return reply({ error: 'Nur der Master darf den Verlauf laden.' }, 403);
-          return reply({ versions: [...(await tx.list({ prefix: 'version:' })).values()] });
+          const versions = [];
+          for (const version of (await tx.list({ prefix: 'version:' })).values()) versions.push(await loadVersion(tx, version));
+          return reply({ versions });
         }
         if (request.headers.get('If-None-Match') === `"${room.latest.revision}"`) return new Response(null, { status: 304, headers: { 'Cache-Control': 'no-store' } });
-        return reply(room.latest);
+        return reply(await loadVersion(tx, room.latest));
       }
       if (request.method !== 'PUT') return reply({ error: 'Methode nicht erlaubt.' }, 405);
       if (!master) return reply({ error: 'Dieses Gerät hat nur Leserechte.' }, 403);
@@ -69,15 +92,18 @@ export class SyncRoom {
       // Idempotent retry even when a save succeeded but its response was lost.
       const receipt = await tx.get(`mutation:${input.mutationId}`);
       if (receipt !== undefined) return reply({ revision: receipt });
+      const currentSchema = room.latest.schema ?? schemaOf(room.latest.envelope);
+      if (schemaOf(input.envelope) < currentSchema) return reply({ error: 'Bitte die App aktualisieren. Ein älteres Format darf das Journal nicht überschreiben.' }, 426);
       if (input.baseRevision !== room.latest.revision) return reply({ error: 'Versionskonflikt. Keine Daten wurden überschrieben.', revision: room.latest.revision }, 409);
       const revision = room.latest.revision + 1;
       const latest = { revision, mutationId: input.mutationId, envelope: input.envelope, savedAt: new Date().toISOString() };
-      await tx.put('room', { ...room, latest });
-      await tx.put(`version:${String(revision).padStart(12, '0')}`, latest);
+      const metadata = await storeVersion(tx, latest);
+      await tx.put('room', { ...room, latest: metadata });
       await tx.put(`mutation:${input.mutationId}`, revision);
       if (revision > 20) {
         const key = `version:${String(revision - 20).padStart(12, '0')}`;
         const old = await tx.get(key);
+        for (let i = 0; i < (old?.envelopeParts || 0); i++) await tx.delete(`blob:${revisionKey(revision - 20)}:${i}`);
         await tx.delete(key);
         if (old) await tx.delete(`mutation:${old.mutationId}`);
       }

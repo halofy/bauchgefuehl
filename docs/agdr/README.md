@@ -13,6 +13,8 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0005](0005-bedienung-und-verifikation.md) | Bedienung, Beispieldaten und gestufte Verifikation | Umgesetzt, Prüflücken dokumentiert |
 | [AgDR-0006](0006-waehlbare-berechnungsmethode.md) | Wählbare Berechnung aus Periode/Zyklus oder ET mit 28-Tage-Basis | Umgesetzt |
 | [AgDR-0007](0007-github-pages-ziel.md) | Repository und Projektpfad für GitHub Pages | Umgesetzt, Veröffentlichung offen |
+| [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) | Master, Geräte-QR, verschlüsselter Sync und lokaler SQLite-Dienst | Umgesetzt, lokal geprüft |
+| [AgDR-0009](0009-persoenliches-journal.md) | Persönliches Journal, Messwertverläufe und Datenmigration | Umgesetzt, lokal geprüft |
 
 ## Fortschreiben
 

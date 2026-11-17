@@ -3,14 +3,14 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:115px}
 body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 button,a,input,summary{-webkit-tap-highlight-color:transparent}
 button,a,summary{touch-action:manipulation}
 button{color:inherit;cursor:pointer}
 button:disabled{opacity:.35;cursor:default}
 a{color:inherit;text-underline-offset:4px}
 button{border:0;background:none}
-button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a66c40;outline-offset:4px}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #a66c40;outline-offset:4px}
 input:focus-visible{outline-offset:1px}
 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
 .svg-sprite{position:absolute;width:0;height:0;overflow:hidden}
@@ -257,3 +257,66 @@ input[type=file]{font-size:11px;width:100%}
 @media(max-width:760px){.header-inner{height:76px;flex-wrap:wrap;gap:0;position:relative}.brand{font-size:27px}.brand-mark svg{width:28px}.brand-mark{width:30px;margin-right:5px}.header-share{padding:9px 12px;min-height:38px;font-size:11px;margin-left:auto}.header-share svg{width:15px}.main-nav{position:absolute;left:0;right:0;top:76px;height:43px;justify-content:center;gap:39px;background:rgba(248,247,242,.97);border-bottom:1px solid var(--line)}.site-header{margin-bottom:43px}.nav-link{font-size:11px}.page-intro{padding-top:29px;padding-bottom:24px}h1{font-size:41px;line-height:1.12}h1 br{display:initial}.intro-copy{font-size:12px;max-width:300px;line-height:1.7;margin-top:13px}.page-intro .eyebrow{font-size:8px;letter-spacing:1.5px;margin-bottom:12px}.mode-banner{align-items:flex-start;flex-wrap:wrap;gap:11px;padding:14px 16px;margin-bottom:18px}.banner-copy strong{font-size:11px}.banner-copy p{font-size:10px;line-height:1.7;max-width:280px}.banner-icon{display:none}#mode-actions{margin-left:0}#mode-actions .button{min-height:34px;font-size:10px}.summary-grid{grid-template-columns:1fr}.pregnancy-card{min-height:335px;padding:25px}.ssw-number{font-size:87px}.baby-art{margin:-15px -7px 0 0}.baby-art>svg{height:235px}.baby-art>span{font-size:11px}.card-eyebrow{margin-top:24px}.week-explanation{font-size:11px}.side-summary{display:grid;grid-template-columns:1fr 1fr;gap:14px}.due-card{padding:20px;min-width:0}.due-card h2{font-size:24px;line-height:1.2}.due-card .icon-box{width:27px;height:27px;border-radius:7px}.due-card .icon-box svg{width:15px;height:15px}.card-topline{gap:8px}.card-topline .eyebrow{font-size:7px;letter-spacing:1px}.due-note{font-size:9px}.due-countdown{font-size:11px}.data-card{padding:17px}.data-card dl>div{font-size:10px;display:block;margin-bottom:8px}.data-card dd{margin-top:1px;font-size:11px}.data-card .text-link{font-size:9px;line-height:1.5;margin-top:0}.section{margin-top:35px}.section-heading{align-items:flex-start;gap:12px}.section-heading h2{font-size:27px}.section-heading .text-link{font-size:9px;white-space:normal;text-align:left;max-width:95px;margin-top:19px}.section-heading .text-link svg{width:13px}.section-heading .eyebrow{font-size:8px}.week-browser{gap:7px}.week-button{flex-basis:52px;height:58px;font-size:17px}.week-list{gap:7px}.week-arrow{width:27px}.journey-grid{grid-template-columns:1fr}.development{padding:23px}.development h3{font-size:26px}.baby-description{font-size:13px}.body-card{padding:23px}.body-card h3{font-size:25px}.body-card>p:not(.eyebrow){font-size:12px}.gentle-tip p{font-size:11px}.development-bottom p{font-size:10px}.source-link{font-size:10px}.current-label{font-size:10px}.content-note{font-size:9px}.milestones{grid-template-columns:1fr}.milestone{padding:20px 22px}.milestone h3{font-size:14px}.milestone p{font-size:12px}.milestone label{font-size:11px;min-height:28px}.milestone .source-link{font-size:10px;margin-bottom:12px}.milestone-time{font-size:10px}.all-milestones{grid-template-columns:1fr}.section-description{font-size:11px}.small-label{font-size:9px;max-width:90px;text-align:right;padding-top:23px}.knowledge-grid{grid-template-columns:1fr;gap:24px}.accordions summary{font-size:12px}.wellbeing-card{padding:25px}.wellbeing-card .small-label{text-align:left;max-width:none;padding:0}.help-note p{font-size:11px}.privacy-strip{align-items:flex-start;gap:10px;flex-wrap:wrap;padding:17px 0;margin-top:32px}.privacy-strip p{font-size:10px}.privacy-strip>svg{margin-top:4px}.privacy-strip .text-link{margin-left:29px;margin-top:-4px}.site-footer{flex-wrap:wrap;gap:5px 20px;padding:22px 0}.footer-brand{font-size:23px}.site-footer>p{flex:auto;font-size:9px}.site-footer .text-link{font-size:9px}.week-summary .estimate-label{font-size:8px}.pregnancy-progress>div:first-child{font-size:9px}}
 @media(max-width:420px){.page-shell,.header-inner{padding-left:18px;padding-right:18px}.header-share{font-size:10px;padding:8px 10px}.brand{font-size:25px}.main-nav{gap:35px}h1{font-size:38px}.summary-grid{gap:14px}.pregnancy-card{padding:23px 20px;grid-template-columns:1.05fr .95fr;min-height:310px}.ssw-number{font-size:75px}.ssw-plus{font-size:29px}.baby-art>svg{height:205px}.baby-art>span{font-size:9px;text-align:center}.week-explanation{font-size:10px;max-width:155px}.card-eyebrow{font-size:8px;letter-spacing:1.4px}.pregnancy-progress{margin-top:20px}.pregnancy-progress>div:first-child{font-size:8px}.due-card{padding:17px 14px}.due-card h2{font-size:22px}.card-topline .eyebrow{font-size:7px;letter-spacing:.8px}.data-card{padding:13px 14px}.data-card .card-heading h2{font-size:11px}.side-summary{gap:12px;grid-template-columns:1.1fr 1fr}.section-heading h2{font-size:25px}.development h3{font-size:24px}.development-bottom{padding:12px}.development-bottom p{font-size:9px}.section-heading .text-link{max-width:83px}.current-label{font-size:9px;margin-left:8px}dialog{padding:23px;max-height:calc(100dvh - 24px)}dialog h2{font-size:30px}.dialog-heading{margin-bottom:17px}}
 @media(prefers-reduced-motion:reduce){html,.week-list{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Personal journal */
+.journal-section{padding-top:7px}
+.journal-filters{display:grid;grid-template-columns:2fr 1.1fr 1fr 1fr;gap:14px;padding:19px 21px;margin-top:20px}
+.journal-filters label{font-size:11px;margin:0;font-weight:500}
+.journal-filters input,.journal-filters select{margin-top:6px;font-size:12px;min-height:42px;padding:9px 10px}
+input[type=search],input[type=time],textarea{border:1px solid #d9dfce;background:#fbfcf7;border-radius:7px;color:var(--ink);width:100%;padding:12px 14px;min-height:46px;min-width:0}
+textarea{resize:vertical;line-height:1.8;min-height:110px;margin-bottom:18px}
+.journal-filters .journal-archive-toggle{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:400;margin-top:0}
+.journal-archive-toggle input{margin:0;min-height:0}
+.journal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:14px 0;color:var(--muted);font-size:11px}
+.journal-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px;align-items:start}
+.journal-entries{display:flex;flex-direction:column;gap:15px;min-width:0}
+.journal-entry{padding:23px 25px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}
+.journal-entry.archived{background:#efeee7;border-style:dashed}
+.journal-entry-header{display:flex;align-items:flex-start;justify-content:space-between;gap:13px}
+.journal-entry h3{font:400 22px/1.3 var(--serif);letter-spacing:-.3px}
+.journal-entry-meta{font-size:10px;color:var(--muted);margin-top:5px}
+.journal-entry-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.journal-entry-actions .text-link{font-size:10px}
+.journal-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.journal-symptom{font-size:10px;padding:4px 9px;border-radius:20px;background:#f2e8de;color:#8a6f5b}
+.journal-tag-chip{font-size:10px;padding:3px 0;color:#748365;margin-right:4px}
+.journal-note{font-size:13px;line-height:1.9;color:#66735f;white-space:pre-wrap;margin-top:15px}
+.entry-measurements{display:flex;flex-wrap:wrap;gap:13px 25px;margin-top:17px;padding-top:13px;border-top:1px solid var(--line)}
+.entry-measurements>div{display:block;margin:0}
+.entry-measurements dt{font-size:10px}
+.entry-measurements dd{font-size:19px;font-weight:400;color:var(--green);margin-top:3px}
+.journal-trend{padding:23px 24px;background:#edf1e7;min-width:0}
+.journal-trend>.eyebrow{font-size:9px;margin-bottom:15px}
+.journal-trend>label{font-size:11px}
+.journal-trend select{margin-top:6px;font-size:12px;background:#f8faf3}
+.journal-trend h3{font:400 34px/1.2 var(--serif);margin-top:19px;letter-spacing:-.6px}
+#journal-chart-caption{font-size:10px;line-height:1.8;color:var(--muted);margin-top:11px}
+.journal-chart>svg{width:100%;height:auto;stroke:none;display:block;margin-top:15px;overflow:visible}
+.chart-grid{stroke:#d4ddc9;stroke-width:1}
+.chart-line{fill:none;stroke:#526f45;stroke-width:2.5;stroke-linejoin:round}
+.chart-dot{fill:#526f45;stroke:#edf1e7;stroke-width:2}
+.chart-label{font:11px var(--sans);fill:#7b856f}
+.journal-chart-empty{font-size:12px;color:var(--muted);margin-top:20px}
+#journal-metric-table{border-top:1px solid #d4ddc9;margin-top:19px;padding-top:12px;font-size:10px;overflow:auto}
+#journal-metric-table summary{cursor:pointer}
+#journal-metric-table table{width:100%;border-collapse:collapse;margin-top:10px;white-space:nowrap}
+#journal-metric-table caption{font-size:9px;text-align:left;white-space:normal;margin-bottom:8px;color:var(--muted)}
+#journal-metric-table th,#journal-metric-table td{text-align:left;padding:7px 5px;border-bottom:1px solid #d4ddc9;font-size:10px}
+.journal-empty{padding:30px 28px;border:1px dashed #cdd8c2;border-radius:10px;color:#829075;font-size:13px;line-height:1.9}
+.journal-dialog{max-width:640px}
+.journal-date-row{display:grid;grid-template-columns:1.2fr 1fr;gap:17px;margin-bottom:20px}
+.journal-date-row input{margin-top:7px;font-size:13px}
+.symptom-suggestions{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.symptom-chip{font-size:11px;background:#f0f2e8;border:1px solid #dfe4d5;border-radius:25px;padding:6px 11px;min-height:33px}
+.symptom-chip.selected{background:var(--green);border-color:var(--green);color:white}
+.journal-metric-fieldset{border:1px solid var(--line);padding:14px 16px 17px;border-radius:9px;margin:21px 0}
+.journal-metric-fieldset legend{padding:0 7px;font-size:12px;font-weight:550}
+.journal-metric-fieldset>.field-hint{margin-bottom:15px}
+.metric-input-row{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) 28px;gap:10px;align-items:start;margin-top:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.metric-input-row label{font-size:10px;margin:0}
+.metric-input-row input,.metric-input-row select{font-size:12px;margin-top:6px;min-height:42px;padding:10px}
+.metric-remove{font-size:24px;line-height:1;align-self:start;margin-top:25px;color:#9a7f6a;width:28px;height:42px}
+.custom-metric-fields{grid-column:1/-1;display:grid;grid-template-columns:1.8fr 1fr;gap:10px}
+#entry-add-metric{margin-top:12px;font-size:11px}
+@media(max-width:900px){.journal-layout{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}.journal-filters{grid-template-columns:1.5fr 1fr}.journal-entry-header{flex-wrap:wrap}.journal-entry-actions{justify-content:flex-start}}
+@media(max-width:760px){.main-nav{gap:clamp(12px,4vw,26px)}.journal-section .section-heading{flex-wrap:wrap}.journal-section .section-heading .button{margin-top:3px;font-size:11px}.journal-layout{grid-template-columns:1fr}.journal-trend{grid-row:1}.journal-filters{padding:16px;gap:12px}.journal-search-label{grid-column:1/-1}.journal-filters{grid-template-columns:1fr 1fr}.journal-filters>label:nth-child(2){grid-column:1/-1}.journal-toolbar{align-items:flex-start;font-size:10px}.journal-toolbar .text-link{font-size:10px;max-width:180px;text-align:right}.journal-entry{padding:20px}.journal-entry h3{font-size:22px}.journal-note{font-size:13px}.journal-dialog{padding:22px}.metric-input-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 25px;gap:7px}.journal-metric-fieldset{padding:10px 12px 14px}}

@@ -1,28 +1,11 @@
+import { todayISO, dayNumber, addDays } from './dates.js';
+export { todayISO, dayNumber, addDays, formatDate } from './dates.js';
+import { normalizeJournal, assertJournalContinuity, MAX_SNAPSHOT_BYTES } from './journal.js';
+
 // All dates are civil calendar dates. UTC is only used as a DST-safe day counter.
 export const DAY = 86_400_000;
 export const STORAGE_KEY = 'bauchgefuehl.v1';
 export const HISTORY_KEY = 'bauchgefuehl.history.v1';
-
-export function todayISO(now = new Date()) {
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
-
-export function dayNumber(iso) {
-  if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) throw new Error('Ungültiges Datum.');
-  const [y, m, d] = iso.split('-').map(Number);
-  const ms = Date.UTC(y, m - 1, d);
-  if (new Date(ms).toISOString().slice(0, 10) !== iso) throw new Error('Ungültiges Datum.');
-  return ms / DAY;
-}
-
-export function addDays(iso, days) {
-  return new Date((dayNumber(iso) + days) * DAY).toISOString().slice(0, 10);
-}
-
-export function formatDate(iso, options = {}) {
-  return new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC', ...options })
-    .format(new Date(dayNumber(iso) * DAY));
-}
 
 export function validateProfile(value, today = todayISO()) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Die Schwangerschaftsdaten sind ungültig.');
@@ -105,33 +88,45 @@ export function decodeShare(hash, today = todayISO()) {
 
 export function readLocal(storage, today = todayISO()) {
   let raw;
-  try { raw = storage.getItem(STORAGE_KEY); } catch { return { profile: null, checks: {}, error: 'Dein Browser erlaubt keinen lokalen Speicher. Du kannst die App für diese Sitzung nutzen.' }; }
-  if (!raw) return { profile: null, checks: {}, error: null };
+  try { raw = storage.getItem(STORAGE_KEY); } catch { return { profile: null, checks: {}, journal: [], error: 'Dein Browser erlaubt keinen lokalen Speicher. Du kannst die App für diese Sitzung nutzen.' }; }
+  if (!raw) return { profile: null, checks: {}, journal: [], error: null };
   try {
     const data = JSON.parse(raw);
-    if (!data || ![1, 2].includes(data.v)) throw new Error();
-    if (data.v === 2 && !['period', 'due-date'].includes(data.profile?.method)) throw new Error();
-    const profile = validateProfile(data.v === 1 ? { ...data.profile, method: 'period' } : data.profile, today);
+    if (!data || ![1, 2, 3].includes(data.v)) throw new Error();
+    if (data.v >= 2 && !['period', 'due-date'].includes(data.profile?.method)) throw new Error();
+    if (data.v === 3 && !Array.isArray(data.journal)) throw new Error();
+    const journal = normalizeJournal(data.journal, today);
     const checks = {};
     if (data.checks && typeof data.checks === 'object') {
       for (const [key, value] of Object.entries(data.checks)) {
         if (/^[a-z0-9-]{1,40}$/.test(key) && value === true) checks[key] = true;
       }
     }
-    return { profile, checks, error: null };
+    let profile;
+    try { profile = validateProfile(data.v === 1 ? { ...data.profile, method: 'period' } : data.profile, today); }
+    catch { return { profile: null, checks, journal, error: 'Die Berechnungsgrundlage muss aktualisiert werden. Dein Journal bleibt sichtbar und gespeichert.' }; }
+    return { profile, checks, journal, error: null };
   } catch {
-    return { profile: null, checks: {}, error: 'Die gespeicherten Daten sind veraltet oder beschädigt. Bitte trage deine Daten erneut ein.' };
+    return { profile: null, checks: {}, journal: [], error: 'Die gespeicherten Daten sind veraltet oder beschädigt. Bitte sichere ein Backup, bevor du sie änderst.' };
   }
 }
 
-export function writeLocal(storage, profile, checks, today = todayISO()) {
+export function writeLocal(storage, profile, checks, today = todayISO(), journal, { replaceJournal = false } = {}) {
   const valid = validateProfile(profile, today);
-  const next = JSON.stringify({ v: 2, profile: valid, checks });
   const previous = storage.getItem?.(STORAGE_KEY);
+  let previousData = null;
+  try { if (previous) previousData = JSON.parse(previous); } catch { /* Archive damaged raw data before replacing it. */ }
+  const entries = normalizeJournal(journal === undefined ? previousData?.journal : journal, today);
+  if (previousData?.journal && !replaceJournal) assertJournalContinuity(entries, normalizeJournal(previousData.journal, today));
+  const next = JSON.stringify({ v: 3, profile: valid, checks, journal: entries });
+  // Reserve room for the sync schema header so a saved journal also fits there.
+  if (new TextEncoder().encode(next).length > MAX_SNAPSHOT_BYTES - 64) throw new Error('Der Datenstand überschreitet 512 KiB. Bitte zuerst ein Backup sichern; vorhandene Einträge werden nicht gekürzt.');
   if (previous && previous !== next) {
     const history = JSON.parse(storage.getItem(HISTORY_KEY) || '[]');
     if (!Array.isArray(history)) throw new Error('Der Sicherungsverlauf ist beschädigt. Bitte zuerst ein Backup herunterladen.');
     history.unshift({ savedAt: new Date().toISOString(), raw: previous });
+    history.splice(20);
+    while (history.length > 1 && new TextEncoder().encode(JSON.stringify(history)).length > 2 * 1024 * 1024) history.pop();
     // Write the recovery copy first. If it fails, never overwrite the old profile.
     storage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
   }

@@ -1,9 +1,14 @@
 import { validateProfile, todayISO } from './pregnancy.js';
+import { normalizeJournal, assertJournalContinuity, MAX_SNAPSHOT_BYTES } from './journal.js';
 
 export const SYNC_KEY = 'bauchgefuehl.sync.v1';
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 const ID = /^[A-Za-z0-9_-]{32,64}$/;
-const bytes64 = bytes => btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+const bytes64 = bytes => {
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 32768) binary += String.fromCharCode(...bytes.subarray(i, i + 32768));
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+};
 const from64 = text => Uint8Array.from(atob(text.replaceAll('-', '+').replaceAll('_', '/')), c => c.charCodeAt(0));
 export const randomToken = () => bytes64(crypto.getRandomValues(new Uint8Array(32)));
 export const hashToken = async token => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)))].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -23,7 +28,11 @@ export function snapshot(value, today = todayISO()) {
   for (const [id, checked] of entries.sort(([a], [b]) => a.localeCompare(b))) {
     if (/^[a-z0-9-]{1,40}$/.test(id) && checked === true) checks[id] = true;
   }
-  return { profile, checks };
+  if (value?.schema !== undefined && value.schema !== 3) throw new Error('Dieser Datenstand benötigt eine neuere App-Version.');
+  if (value?.schema === 3 && !Array.isArray(value.journal)) throw new Error('Im Datenstand fehlt das Journal.');
+  const result = { schema: 3, profile, checks, journal: normalizeJournal(value?.journal, today) };
+  if (new TextEncoder().encode(JSON.stringify(result)).length > MAX_SNAPSHOT_BYTES) throw new Error('Der Datenstand überschreitet 512 KiB. Vorhandene Einträge werden nicht gekürzt.');
+  return result;
 }
 
 export function validateConnection(raw) {
@@ -49,21 +58,24 @@ export function validateConnection(raw) {
 }
 
 function validEnvelope(e) {
-  return e?.v === 1 && /^[A-Za-z0-9_-]{16}$/.test(e.iv) && typeof e.data === 'string' && /^[A-Za-z0-9_-]{22,12000}$/.test(e.data);
+  return ((e?.v === 1) || (e?.v === 2 && e.schema === 3)) && /^[A-Za-z0-9_-]{16}$/.test(e.iv) && typeof e.data === 'string' && /^[A-Za-z0-9_-]{22,720000}$/.test(e.data);
 }
 const aad = room => new TextEncoder().encode(`bauchgefuehl-sync-v1:${room}`);
+const journalAad = room => new TextEncoder().encode(`bauchgefuehl-sync-v2:${room}:3`);
 export async function encryptSnapshot(value, connection) {
   const data = new TextEncoder().encode(JSON.stringify(snapshot(value)));
   const key = await crypto.subtle.importKey('raw', from64(connection.key), 'AES-GCM', false, ['encrypt']);
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: aad(connection.room) }, key, data);
-  return { v: 1, iv: bytes64(iv), data: bytes64(new Uint8Array(cipher)) };
+  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: journalAad(connection.room) }, key, data);
+  return { v: 2, schema: 3, iv: bytes64(iv), data: bytes64(new Uint8Array(cipher)) };
 }
 export async function decryptSnapshot(envelope, connection) {
   if (!validEnvelope(envelope)) throw new Error('Ungültige verschlüsselte Daten.');
   const key = await crypto.subtle.importKey('raw', from64(connection.key), 'AES-GCM', false, ['decrypt']);
-  const clear = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: from64(envelope.iv), additionalData: aad(connection.room) }, key, from64(envelope.data));
-  return snapshot(JSON.parse(new TextDecoder().decode(clear)));
+  const clear = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: from64(envelope.iv), additionalData: envelope.v === 1 ? aad(connection.room) : journalAad(connection.room) }, key, from64(envelope.data));
+  const parsed = JSON.parse(new TextDecoder().decode(clear));
+  if (envelope.v === 2 && parsed.schema !== 3) throw new Error('Der Datenstand hat ein unvollständiges Journalformat.');
+  return snapshot(parsed);
 }
 
 export function invitation(connection, baseURL) {
@@ -136,7 +148,7 @@ export class SyncEngine {
     if (!Number.isSafeInteger(remote?.revision) || remote.revision < 1) throw new Error('Ungültiger Serverstand.');
     const value = await decryptSnapshot(remote.envelope, connection);
     // A recovery copy of the existing local profile is made by applySnapshot.
-    await this.applySnapshot(value);
+    await this.applySnapshot(value, { replaceJournal: true });
     connection.revision = remote.revision;
     connection.published = value;
     this.connection = connection;
@@ -146,7 +158,9 @@ export class SyncEngine {
   queue(value) {
     if (!this.connection) return;
     if (this.connection.role !== 'master') throw new Error('Änderungen sind nur am Master möglich.');
-    this.connection.pending = { id: randomToken(), snapshot: snapshot(value) };
+    const next = snapshot(value);
+    assertJournalContinuity(next.journal, this.connection.published?.journal || []);
+    this.connection.pending = { id: randomToken(), snapshot: next };
     this.persist();
     this.onStatus('Änderung lokal gesichert · Übertragung ausstehend.');
     void this.tick();
@@ -161,6 +175,7 @@ export class SyncEngine {
         // Recover the small crash window between saving the profile and queuing it.
         if (!c.pending && !c.inflight && c.published) {
           const current = snapshot(this.getSnapshot());
+          assertJournalContinuity(current.journal, c.published.journal);
           if (JSON.stringify(current) !== JSON.stringify(c.published)) {
             c.pending = { id: randomToken(), snapshot: current };
             this.persist();
@@ -174,6 +189,15 @@ export class SyncEngine {
         }
         if (c.inflight) {
           const sent = c.inflight;
+          // A previously used old app may have discarded the journal from its
+          // local cache and connection metadata. Check the actual authority too.
+          const remote = await this.request(c, 'GET');
+          if (remote.revision === sent.baseRevision) {
+            const previous = await decryptSnapshot(remote.envelope, c);
+            const next = await decryptSnapshot(sent.envelope, c);
+            try { assertJournalContinuity(next.journal, previous.journal); }
+            catch (error) { error.status = 409; throw error; }
+          }
           const result = await this.request(c, 'PUT', sent);
           if (!Number.isSafeInteger(result?.revision) || result.revision < c.revision) throw new Error('Ungültige Serverbestätigung.');
           c.revision = result.revision;
@@ -206,7 +230,7 @@ export class SyncEngine {
         this.onStatus(`Mitlesend verbunden · Stand ${c.revision}.`);
       }
     } catch (error) {
-      if (error.status === 409) { c.conflict = true; this.persist(); }
+      if (error.status === 409 || error.status === 426) { c.conflict = true; this.persist(); }
       this.onStatus(error.status === 409 ? 'Versionskonflikt · nichts überschrieben. Backup herunterladen; Sync bleibt angehalten.' : `Sync ausstehend · ${error.message} Der letzte lokale Stand bleibt erhalten.`);
     } finally { this.busy = false; }
   }
@@ -229,7 +253,7 @@ export class SyncEngine {
       const remote = await this.request(c, 'GET');
       if (!Number.isSafeInteger(remote.revision) || remote.revision < 1) throw new Error('Ungültiger Serverstand.');
       const value = await decryptSnapshot(remote.envelope, c);
-      await this.applySnapshot(value);
+      await this.applySnapshot(value, { replaceJournal: true });
       c.revision = remote.revision;
       c.published = value;
       c.ready = true;

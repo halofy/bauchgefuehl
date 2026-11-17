@@ -4,6 +4,7 @@
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Agent; Hostingziel ausdrücklich vom Nutzer vorgegeben
 - **Betroffene Dateien:** [index.html](../../index.html), [package.json](../../package.json), [Build](../../scripts/build.js), [Pages-Workflow](../../.github/workflows/pages.yml)
+- **Erweitert durch:** [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) – optionaler lokaler Sync-Dienst; die statische App bleibt separat veröffentlichbar. Die folgenden Abschnitte dokumentieren die ursprüngliche reine Browserarchitektur.
 
 ## Kontext und Herkunft
 

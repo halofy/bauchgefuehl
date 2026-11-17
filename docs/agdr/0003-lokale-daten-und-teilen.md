@@ -5,6 +5,7 @@
 - **Entscheidende Instanz:** Lokale Speicherung und Teilbarkeit vom Nutzer verlangt; Mechanismus vom Agenten gewählt
 - **Betroffene Dateien:** [Speicher und Codec](../../src/pregnancy.js), [Interaktionen](../../src/app.js), [Hinweise und Dialoge](../../index.html)
 - **Erweitert durch:** [AgDR-0006](0006-waehlbare-berechnungsmethode.md) – versionierte Methodenauswahl und ET-Payload; die folgende v1-Payload beschreibt den ursprünglichen Stand.
+- **Erweitert durch:** [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) – separater Geräte-Link mit laufendem Master-Sync und Merkhäkchen, lokaler Sicherungsverlauf und Backups. Der einfache Teilen-Link bleibt eine unabhängige Kopie.
 
 ## Kontext und Herkunft
 

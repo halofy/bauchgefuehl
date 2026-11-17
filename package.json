@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "python3 -m http.server 4173 --bind 127.0.0.1",
     "test": "node --test tests/*.test.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "start:local": "node scripts/build.js && node sync-server/local.js"
   },
-  "engines": { "node": ">=22" }
+  "engines": { "node": ">=22.13" }
 }
