@@ -54,3 +54,6 @@ Die verlinkten Quellen wurden im Rahmen der Erstellung online geprüft. Tests be
 - [Charité / Embryotox: Arzneimittel](https://www.embryotox.de/).
 - [NHS: Beschwerden und medizinische Hilfe](https://www.nhs.uk/pregnancy/common-symptoms/pregnancy-symptoms-you-need-to-get-help-for/).
 - [NHS: Zeit nach dem Termin](https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-41/).
+
+
+**Erweiterung vom 18.11.2026:** Die aktive schematische Darstellung und Größenanzeige werden durch [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) ergänzt beziehungsweise abgelöst. Ursprüngliche Phasentexte bleiben mit ihrer bisherigen Quellenzuordnung erhalten.

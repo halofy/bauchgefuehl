@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { growthAt,measurementContext,developmentSvg,GROWTH_ANCHORS } from '../src/growth.js';
+import { helpForSymptom,symptomHelp } from '../src/symptoms.js';
+test('NHS completed weeks map to gestational days and German ordinal week correctly',()=>{assert.equal(growthAt(56).cm,1.6);assert.equal(growthAt(84).cm,5.4);assert.equal(growthAt(280).cm,51.2);assert.equal(growthAt(41),null);assert.equal(growthAt(281),null);});
+test('daily intermediate estimates stay between same-method source anchors',()=>{for(const anchor of GROWTH_ANCHORS)assert.equal(growthAt(anchor.day).cm,anchor.cm);const mid=growthAt(70);assert.equal(mid.cm,3.5);assert.equal(mid.interpolated,true);assert.equal(mid.sources.length,2);});
+test('measurement switch is never interpolated and is separately labelled',()=>{assert.equal(growthAt(139).cm,15.3);assert.equal(growthAt(139).kind,'crl');assert.equal(growthAt(139).held,true);assert.equal(growthAt(140).cm,25.6);assert.equal(growthAt(140).kind,'length');});
+test('personal measurements compare only matching methods and never change reference curve',()=>{const before=growthAt(84);assert.equal(measurementContext({kind:'crl',value:54},84).cm,5.4);assert.equal(measurementContext({kind:'length',value:54},84).reference,null);assert.deepEqual(growthAt(84),before);});
+test('schematic stages differ and have accessible descriptions without scripts',()=>{const svgs=[14,42,98,196].map(developmentSvg);assert.equal(new Set(svgs).size,4);for(const svg of svgs){assert.match(svg,/aria-label=/);assert.doesNotMatch(svg,/<script|https:/);}});
+test('symptom lookup is explicit and every card has reviewable HTTPS provenance',()=>{assert.equal(helpForSymptom(' ÜBELKEIT ').key,'übelkeit');assert.equal(helpForSymptom('Unbekannt'),null);for(const x of symptomHelp){assert.match(x.source,/^https:/);assert.ok(x.contact);assert.ok(x.help);}});

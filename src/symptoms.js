@@ -1,0 +1,11 @@
+export const SYMPTOM_REVIEWED = '2026-11-18';
+const general = 'https://gesund.bund.de/typische-schwangerschaftsbeschwerden';
+export const symptomHelp = [
+ { key:'übelkeit',title:'Übelkeit',help:'Kleine Mahlzeiten über den Tag verteilen. Probiere aus, welche Speisen und Gerüche du verträgst.',contact:'Wenn du kaum Flüssigkeit bei dir behalten kannst oder stark beziehungsweise anhaltend erbrichst, zeitnah ärztlich abklären lassen.',source:'https://www.familienplanung.de/schwangerschaft/die-schwangerschaft/beschwerden-und-krankheiten/beschwerden/uebelkeit-und-erbrechen/' },
+ { key:'sodbrennen',title:'Sodbrennen',help:'Kleinere Portionen, langsames Essen und Abstand zwischen Essen und Hinlegen können helfen. Bei Beschwerden im Liegen den Oberkörper etwas erhöhen.',contact:'Starke, ungewöhnliche oder anhaltende Beschwerden mit deiner Praxis besprechen. Medikamente vorher abklären.',source:general },
+ { key:'rückenschmerzen',title:'Rückenschmerzen',help:'Angenehme Bewegung, Entlastung und wechselnde Positionen ausprobieren. Deine Hebamme kann passende Möglichkeiten mit dir besprechen.',contact:'Bei starken, neuartigen oder anhaltenden Schmerzen ärztlichen Rat einholen.',source:general },
+ { key:'müdigkeit',title:'Müdigkeit',help:'Pausen und Entlastung einplanen. Halte fest, was dir im Alltag Energie nimmt oder gibt.',contact:'Ausgeprägte oder anhaltende Erschöpfung bei der Vorsorge ansprechen; Ursachen gehören individuell abgeklärt.',source:general },
+ { key:'schlafprobleme',title:'Schlafprobleme',help:'Ruhezeiten einplanen und eine angenehme Schlafposition suchen. Notiere, was deinen Schlaf stört, für das nächste Gespräch.',contact:'Wenn Schlafprobleme dich anhaltend belasten, mit Hebamme oder Praxis besprechen.',source:general },
+ { key:'kopfschmerzen',title:'Kopfschmerzen',help:'Ruhe suchen und das Auftreten für ein Gespräch notieren. Medikamente in der Schwangerschaft mit Fachpersonen absprechen.',contact:'Starke oder ungewohnte Kopfschmerzen, besonders mit Sehstörungen oder anderen Beschwerden, sofort medizinisch abklären.',source:'https://www.nhs.uk/pregnancy/related-conditions/common-symptoms/headaches/' },
+];
+export function helpForSymptom(value) { return symptomHelp.find(x => x.key === value.trim().toLocaleLowerCase('de')) || null; }

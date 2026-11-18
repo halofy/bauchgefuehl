@@ -6,7 +6,7 @@ Stand: **18.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von ba
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
-**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0025 abgeglichen:** F01–F03, F05, F12–F16 und F18 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F04, F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0029 abgeglichen:** F01–F06, F09, F12–F16 und F18–F23 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F08, F10 und F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
 
 ## Geklärt und bereits vorhanden
 
@@ -62,9 +62,10 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
   - [x] Vorhandene Messwerte pro Bezeichnung und Einheit mit Anzahl, letztem/erstem Wert und Spanne zusammenfassen; eigene Schlafmessgrößen können bereits erscheinen.
   - [x] Strukturierte Stimmung, Energie, Schlaf und Beschwerdestärke aus F02 mit erster/letzter Angabe, Anzahl, Tagen und Erfassungslücken ergänzen. Check-ins getrennt von normalen Journalbeobachtungen zählen, Originaleinträge öffnen, keine Schlafsummen oder Ableitung aus Notizen. [AgDR-0023](agdr/0023-tages-check-in-und-strukturierter-rueckblick.md).
 
-- [ ] **F04 · Messwertverläufe mit Ausgangswert und Notizen**
+- [x] **F04 · Messwertverläufe mit Ausgangswert und Notizen**
   Vorhandene Gewichts- und Umfangsverläufe um eine selbst gewählte Ausgangsmessung, absolute Veränderungen und Notizmarkierungen ergänzen.
   **Fertig, wenn:** Ausgangswert und Vergleichszeitraum wählbar sind, Einheiten getrennt bleiben und sich markierte Beobachtungen öffnen lassen. Keine pauschalen Normalbereiche oder automatische gesundheitliche Bewertung.
+  **Umgesetzt:** Zeitraum (alle gefilterten / 28 / 90 Tage), frei gewählte Ausgangsmessung, absolute Differenz, Einheiten getrennt, freiwillige Check-in-Skalen, Notizmarkierungen und Originaleinträge. [AgDR-0026](agdr/0026-alltagsbegleitung-terminmappe-und-wochenbett.md).
 
 - [x] **F05 · Vorbereitung auf Praxis und Hebamme**
   Eigene Termine, Fragen, Untersuchungsergebnisse und besprochene nächste Schritte sammeln; tatsächliche Termine im bestehenden Kalender (F12) zusätzlich zu den Vorsorgefenstern anzeigen.
@@ -73,10 +74,10 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 ## P2 – Begleitung und Berichte ausbauen
 
-- [ ] **F06 · Journal im Wochenbett weiterführen**
+- [x] **F06 · Journal im Wochenbett weiterführen**
   Einen ausdrücklichen Übergang nach der Geburt anbieten und persönliche Einträge ohne laufende Schwangerschaft weiterbearbeiten können.
   **Fertig, wenn:** Der Wechsel bewusst erfolgt, Schwangerschaftseinträge erhalten bleiben und neue Einträge nach Tagen beziehungsweise Wochen seit der Geburt eingeordnet werden können. Eine abgelaufene Schwangerschaftsberechnung blockiert die Journalbearbeitung nicht.
-  **Vor Umsetzung:** Eigenen AgDR für Phasenwechsel, Datierung, Datenmigration und Sync-Kompatibilität erstellen.
+  **Umgesetzt:** Bewusstes Geburtsdatum, umkehrbarer Phasenwechsel, Tage seit Geburt im Kalender und Journal, Erhalt alter Datierungsgrundlagen und Journalbearbeitung bei historischer Schwangerschaft. Im neuen v3-Geräte-Stand und der Vollsicherung enthalten. [AgDR-0026](agdr/0026-alltagsbegleitung-terminmappe-und-wochenbett.md).
 
 - [ ] **F07 · Praxisbericht als PDF — In Arbeit, Journalbericht umgesetzt**
   Einen übersichtlichen Bericht mit ausgewähltem Zeitraum, Fragen, Symptomen und Messwerten erzeugen.
@@ -85,9 +86,27 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
   - [x] Zeitraum, Journalbereiche und einzelne Einträge wählen; Vorschau und selbstständige HTML-Datei offline erzeugen (F14). Check-in-Werte aus F02 sowie Terminnotizen und Termindaten aus F05 sind gesondert auswählbar und bei Auslassung tatsächlich aus Vorschau und Datei entfernt.
   - [ ] Direkte PDF-Erzeugung beziehungsweise geprüfter PDF-Ausgabeweg mit den erweiterten Daten aus F02/F05. Bisher: heruntergeladene HTML-Datei öffnen und die PDF-Funktion des Browser-Druckdialogs verwenden, sofern verfügbar; kein eingebauter PDF-Generator.
 
-- [ ] **F09 · Persönlicher Geburts- und Wochenbettplan**
+- [x] **F09 · Persönlicher Geburts- und Wochenbettplan**
   Wünsche, Vorbereitungen, Kontakte und benötigte Unterstützung in bearbeitbaren Vorlagen festhalten.
   **Fertig, wenn:** Abschnitte frei ergänzt oder ausgelassen werden können, der Bearbeitungsstand erhalten bleibt und eine druckbare Fassung erzeugt werden kann. Wünsche sind als persönliche Planung erkennbar.
+  **Umgesetzt:** Geburtswünsche, Tasche, Organisatorisches und Unterstützung frei ergänzen/bearbeiten, Zuständigkeiten, Erledigt-Status, umkehrbares Archiv und einzeln gewählte druckbare Ausgabe. Kontakte sind über die bestehende Verwaltung erreichbar. [AgDR-0026](agdr/0026-alltagsbegleitung-terminmappe-und-wochenbett.md).
+
+## Vollständig beauftragtes Umsetzungspaket 1–8
+
+Die vorherige Empfehlung enthielt fünf nummerierte Vorschläge plus Vollsicherung; die beiden zusätzlichen Wünsche ergänzen das Paket auf acht Punkte. Diese Zuordnung ist die kommunizierte Agenteninterpretation. Alle bleiben offline, kostenlos und ohne externen Datenserver nutzbar.
+
+| Paket | Feature | Stand |
+| --- | --- | --- |
+| 1 | **F19 · Heute für mich**: nächster Termin, offene Fragen, notierte Schritte und ein aufklappbarer Wochenimpuls | [x] Umgesetzt |
+| 2 | **F05 erweitert · Terminmappe**: Gesprächsmodus mit Auswahl eigener Fragen/Antworten und letzter 28 Tage Journal, Vorschau und Druckdatei | [x] Umgesetzt; eigener PDF-Generator weiterhin F07 offen |
+| 3 | **F20 · Beschwerdenhilfe**: sechs Offline-Karten, direkte Journal-Verknüpfung, Frage vormerken und Kontakte | [x] Umgesetzt, Quellen und Prüfstand je Karte |
+| 4 | **F09/F06 · Geburt und Wochenbett**: persönliche Planung, ausgewählte Ausgabe und ausdrückliche neue Phase | [x] Umgesetzt |
+| 5 | **F04 · Persönliche Verläufe**: Zeitraum, Ausgangswert, Differenz und Originalnotizen | [x] Umgesetzt |
+| 6 | **F21 · Verschlüsselte Vollsicherung**: Passwortbestätigung, intern geprüfter Export, entschlüsselte Vorschau und exakte Wiederherstellung einschließlich Verläufen und Master | [x] Umgesetzt; echte Geräte-/Dateidialogprüfung offen |
+| 7 | **F22 · App-Zurück**: Bereichsverlauf, Dialoge zuerst, Entwurfsabfrage und mobiler Übersichtseinstieg | [x] Umgesetzt; Betriebssystem-Gesten auf Geräten offen |
+| 8 | **F23 · Entwicklung und Untersuchungsmaße**: schematische Stufen, Tagesvorschau, quellenbezogene Größenstufen, eigene Maße ohne automatische Umdatierung | [x] Umgesetzt; vollständiger physischer Eingabeablauf offen |
+
+Entscheidungen und tatsächliche Prüflücken: [AgDR-0026](agdr/0026-alltagsbegleitung-terminmappe-und-wochenbett.md), [AgDR-0027](agdr/0027-verschluesselte-vollsicherung.md), [AgDR-0028](agdr/0028-mobile-zurueck-navigation.md), [AgDR-0029](agdr/0029-entwicklung-und-untersuchungsmasse.md). Signierter Geräteinhalt v3 enthält Planung/Phase/Untersuchungswerte; beide Smartphones vor neuer Weitergabe aktualisieren. Der manuelle Geräteabgleich wird dadurch nicht automatisch.
 
 ## P3 – Zusätzlichen Komfort ergänzen
 
@@ -120,4 +139,4 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 Die frühere Kennzeichnung als „Premium-Kandidat“ wurde durch die ausdrückliche Nutzerentscheidung abgelöst: **Alle heutigen und zukünftigen Funktionen sind kostenlos für alle.** Die Prioritäten bestimmen nur die Umsetzungsreihenfolge.
 
-**Empfohlene nächste Schritte innerhalb P1:** Nach den umgesetzten F01–F03 und dem ausdrücklich vorgezogenen F05 folgt F04 Messwertverläufe. F02/F03 auf den eigenen Smartphones einschließlich Speichern, Bearbeiten, Archivieren und Teilbericht erproben. F05 liefert Terminnotizen und Antworten bereits für den HTML-Teilbericht; der direkte PDF-Ausgabeweg von F07 bleibt offen. F17 bleibt separat für direkte Geräteverbindung und physische Erprobung offen; automatische und bereichsweise begrenzte Geräteaktualisierung ist nicht umgesetzt.
+**Nächste Schritte nach dem beauftragten Paket:** Hauptabläufe auf den eigenen iPhone-/Android-Geräten einschließlich installierter PWA, Zurück-Geste, Entwurfsschutz, Vollsicherung/Wiederherstellung und ausgewählter Druckdatei erproben. F07 bleibt für eine direkte beziehungsweise vollständig geprüfte PDF-Ausgabe offen, F17 für die direkte Geräteverbindung. Weitere Produktfeatures sind F08, F10 und F11; sie gehören nicht automatisch zum jetzt beauftragten Paket.

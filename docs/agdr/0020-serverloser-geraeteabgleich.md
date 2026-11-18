@@ -79,3 +79,6 @@ Am 18.11.2026 gelesen:
 - [WebRTC: Peer connections und Signalisierung](https://webrtc.org/getting-started/peer-connections) – Grundlage für die Abgrenzung zur garantierten Direktverbindung; die Produktwahl ist eine Agentenschlussfolgerung.
 - [W3C Web Cryptography](https://www.w3.org/TR/webcrypto/), [WHATWG Compression](https://compression.spec.whatwg.org/), [W3C Web Locks](https://www.w3.org/TR/web-locks/) – API-Dokumentation; die W3C-Seiten sind als Entwürfe gekennzeichnet, keine Zertifizierung dieser App.
 - [Implementierung und Tests](../../tests/device-transfer.test.js), [bestehende Datenvalidierung](../../src/sync.js), [bisherige Serverentscheidung](0008-master-sync-und-lokaler-betrieb.md).
+
+
+**Erweiterung vom 18.11.2026:** Der Klartext-Vollbackup-Export wird durch [AgDR-0027](0027-verschluesselte-vollsicherung.md) als Standard abgelöst. Signierter Geräteinhalt v3 ergänzt Planung, Phase und Untersuchungswerte; siehe [AgDR-0026](0026-alltagsbegleitung-terminmappe-und-wochenbett.md). Frühere Formate bleiben lesbar; ältere Stände dürfen neue Bereiche nicht still entfernen.

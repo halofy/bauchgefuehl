@@ -1,7 +1,7 @@
 import { CARE_KEY, readCare, writeCare, normalizeCare, upsertCare, archiveCare, careCollection, PROVIDERS, NOTE_KINDS } from './care.js';
 import { todayISO, formatDate } from './dates.js';
 
-export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefresh = () => {}, notify, openCalendar }) {
+export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefresh = () => {}, notify, openCalendar, openConversation }) {
   const $ = id => document.getElementById(id);
   const node = (tag, cls = '', text = '') => { const e = document.createElement(tag); e.className = cls; e.textContent = text; return e; };
   const button = (text, action, cls = 'text-link') => { const e = node('button', cls, text); e.type = 'button'; e.addEventListener('click', action); return e; };
@@ -21,7 +21,7 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
       if (dialog.id.startsWith('care-') && dirty) return false;
       dialog.close();
     }
-    dirty = false; $(`care-${type}-error`).hidden = true; $(`care-${type}-dialog`).showModal(); return true;
+    dirty = false; $(`care-${type}-error`).hidden = true; $(`care-${type}-dialog`).showModal(); requestAnimationFrame(() => $(type === 'note' ? 'care-note-text' : 'care-appt-title').focus()); return true;
   }
   function editable() { if (!canEdit() || !data || getMode() === 'shared') { notify(problem || 'Termine und Notizen bitte am aktiven Master mit eigenen Angaben bearbeiten.'); return false; } return true; }
   function openAppointment(date = todayISO(), existing = null) {
@@ -31,11 +31,11 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     $('care-appt-title').value = existing?.title || ''; $('care-appt-provider').value = existing?.provider || 'midwife'; $('care-appt-location').value = existing?.location || '';
     openDialog('appointment');
   }
-  function openNote(appointmentId = null, existing = null) {
+  function openNote(appointmentId = null, existing = null, initialText = '') {
     if (!editable() || busy || document.querySelector('dialog[open]')) return;
     editingNote = existing;
     $('care-note-kind').value = existing?.kind || 'qa'; $('care-note-date').value = existing?.date || todayISO(); $('care-note-date').max = todayISO();
-    $('care-note-text').value = existing?.text || ''; $('care-note-answer').value = existing?.answer || ''; $('care-note-next').value = existing?.nextSteps || ''; $('care-note-discussed').checked = existing?.discussed || false;
+    $('care-note-text').value = existing?.text || initialText; $('care-note-answer').value = existing?.answer || ''; $('care-note-next').value = existing?.nextSteps || ''; $('care-note-discussed').checked = existing?.discussed || false;
     const select = $('care-note-appointment'); select.replaceChildren();
     const none = node('option', '', 'Noch keinem Termin zugeordnet'); none.value = ''; select.append(none);
     for (const item of data.appointments.filter(item => !item.deletedAt || item.id === existing?.appointmentId).sort((a,b) => a.date.localeCompare(b.date))) {
@@ -99,7 +99,7 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     card.append(node('p', 'eyebrow', `${PROVIDERS[item.provider]}${item.deletedAt ? ' · ARCHIVIERT' : ''}`), node('h4', '', item.title), node('p', 'appointment-date', `${formatDate(item.date)}${item.time ? ' · ' + item.time + ' Uhr' : ' · Uhrzeit offen'}`));
     if (item.location) card.append(node('p', 'care-item-meta', item.location));
     card.append(node('p', 'care-item-meta', `${notes.length} Notizen · ${open} offene Fragen`));
-    const actions = node('div', 'care-card-actions'); actions.append(button('Im Kalender', () => openCalendar(item.date)));
+    const actions = node('div', 'care-card-actions'); actions.append(button('Terminmappe öffnen', () => openConversation?.(item.id)), button('Im Kalender', () => openCalendar(item.date)));
     if (canEdit()) {
       if (!item.deletedAt) actions.append(button('Termin bearbeiten', () => openAppointment(item.date, item)), button('Notiz / Frage ergänzen', () => openNote(item.id)));
       actions.append(button(item.deletedAt ? 'Wiederherstellen' : 'Termin archivieren', () => void run(fresh => archiveCare(fresh, 'appointments', item.id, !item.deletedAt))));
@@ -130,5 +130,5 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
   }
   window.addEventListener('storage', event => { if (event.key === CARE_KEY || event.key === null) reload(); });
   reload();
-  return { render, reload, getData: visible, openAppointment, openNote };
+  return { render, reload, getData: visible, openAppointment, openNote, editNote(id) { const note = data?.notes.find(x => x.id === id && !x.deletedAt); if(note) openNote(null,note); } };
 }

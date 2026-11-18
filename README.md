@@ -27,11 +27,28 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - Klar markierte Beispieldaten, bis eigene Angaben eingetragen sind.
 - **Kontakte & Wehen:** drei Anrufkontakte, dauerhafte Zeitmessung, Kalenderprotokoll und vorsichtige Zeitmusterhinweise mit Quellen.
 - **Master und mitlesendes Gerät ohne Datenserver:** signierte, passwortverschlüsselte Stände bewusst per QR/Link oder Datei weitergeben. Kein automatischer Hintergrund-Sync.
-- Vollständige lokale Backups einschließlich Kontakte, offener Messung und Geräteschlüssel; Sicherungsverlauf und Wiederherstellung.
+- **Heute für mich:** nächster eigener Termin, offene Fragen und notierte nächste Schritte, mit aufklappbarem Wochenimpuls.
+- **Terminmappe:** ausgewählte Fragen, Antworten und Journalbeobachtungen gemeinsam für das Gespräch anzeigen und als selbstständige Druckdatei mitnehmen.
+- **Beschwerdenhilfe:** sechs quellenbezogene Offline-Karten direkt aus dem Journal, Fragen vormerken und eigene Kontakte öffnen.
+- **Geburts-/Wochenbettplanung:** eigene Wünsche und Aufgaben, Unterstützungspersonen, Erledigt-Status, umkehrbare Archive und ausgewählte Druckausgabe. Geburtsdatum bewusst eintragen und das Journal nach Geburt weiterführen.
+- **Persönliche Verläufe:** Zeitraum, eigener Ausgangswert, absolute Veränderungen und Notizen mit Zugriff aufs Original; freiwillig auch Check-in-Skalen.
+- **Entwicklung & Untersuchungswerte:** schematische Stufen und tägliche Größen-Zwischenwerte mit NHS-Quellen. Eigene SSL, geschätzte Gesamtlänge/Gewicht, KU, AU und FL datiert erfassen. Gleiche Messarten am Untersuchungstag einordnen, ohne persönliche Prognose oder Änderung der SSW.
+- **Zurück-Navigation:** Browser-Zurück beziehungsweise unterstützte Verlaufsgeste schließt zunächst Dialoge mit Entwurfsschutz, dann vorherige Bereiche. Der App-Button nutzt denselben Verlauf.
+- **Verschlüsselte Vollsicherung:** Passwortbestätigung, intern geprüfter Download, Entschlüsselung mit Vorschau und exakte Wiederherstellung einschließlich Kontakte, offener Messung, kompletter Sicherungsverläufe, Planung, Untersuchungswerten und privatem Master-Schlüssel. Alte Klartext-Backups bleiben importierbar.
 
 ## Auf zwei Smartphones verwenden
 
 Die veröffentlichte App auf beiden Geräten über HTTPS öffnen und vollständig laden, optional installieren. Zum Benutzen ist kein eigener Dev- oder Sync-Server nötig. **Überblick → Daten & Backup** öffnet die serverlose Standweitergabe und Sicherungen. Nach dem Laden funktioniert die App offline; neue Stände werden bewusst übertragen. Anleitung unten unter „Geräte-Stände ohne Server“.
+
+## Alltag, Wochenbett und Sicherungen
+
+**Überblick → Heute für mich** führt zur nächsten Terminmappe oder den offenen Fragen. **Vorsorge → Geburt und Wochenbett planen** verwaltet Wünsche, Aufgaben und Unterstützung. Dort lässt sich unter **Geburt eintragen / Phase ändern** der Wechsel bewusst speichern und zurücknehmen. Historische Schwangerschaftsdaten bleiben erhalten; Kalender und neue Journaleinträge zeigen nach Geburt Tage seit Geburt. Für die Journalbearbeitung wird weiterhin eine eigene gespeicherte Schwangerschaftsgrundlage benötigt.
+
+**Kalender → Journalliste & Verlauf → Messwertverlauf** bietet Zeitraum, Ausgangsmessung und Notizmarkierungen. **Wissen → Was kann mir helfen?** öffnet die Beschwerdenhilfe. In der **Wochenreise → Dein Baby** lassen sich Tage innerhalb einer SSW und eigene Untersuchungsmaße auswählen.
+
+**Überblick → Daten & Backup → Vollständiges Backup & Wiederherstellung:** Sicherungspasswort mit mindestens zwölf Zeichen zweimal eingeben und die verschlüsselte Datei herunterladen. Eine verfügbare Sitzungsfassung von Schwangerschaft/Journal wird zusätzlich mitgesichert und kann bei der Wiederherstellung bewusst bevorzugt werden; standardmäßig werden die gespeicherten Rohdaten wiederhergestellt. Datei und Passwort getrennt aufbewahren; ein vergessenes Passwort lässt sich nicht zurücksetzen. Für Wiederherstellung Datei auswählen, entschlüsseln, Vorschau prüfen und den bestehenden Stand zunächst ebenfalls sichern. Die App bestätigt den gestarteten Download und die interne Entschlüsselungsprüfung, kann den dauerhaften Speicherort aber nicht kontrollieren. Bei beschädigten Rohdaten ist Export zur Rettung möglich; automatische Wiederherstellung bleibt gesperrt, bis die Inhalte geprüft sind.
+
+Die neuen persönlichen Bereiche sind im vollständigen **signierten Geräteinhalt v3** enthalten; beide Smartphones vorher aktualisieren. Ein Geräte-Stand überträgt keinen privaten Master-Schlüssel und ersetzt kein Vollbackup. Teilberichte und Planungsauszüge beginnen ohne Auswahl und enthalten ausschließlich die freigegebenen Inhalte. HTML-Druckdateien bleiben offline lesbar; PDF wird über den jeweiligen Browser-Druckdialog erzeugt.
 
 ## Lokal entwickeln und bauen
 
@@ -161,7 +178,7 @@ Im **Journalauszug** ist **Tages-Check-in** ein eigener, zunächst abgewählter 
 
 Ein Master signiert seine Stände; Mitleser besitzen seinen Signaturschlüssel nicht. Gekoppelte Empfänger verweigern fremde Master, ältere Versionen, Versionskonflikte und fehlende beziehungsweise zurückgesetzte Journalangaben. Der aktive Master-Tab ist gegen parallele Master-Tabs gesperrt. Eine abweichende eigene Reise muss vor dem erstmaligen Ersetzen vollständig gesichert werden.
 
-Unter **Vollständiges Backup & Wiederherstellung** die Klartext-Sicherung sicher aufbewahren. Sie enthält auch offene Messung, Kontakte, lokale Schlüssel, Verlauf und gegebenenfalls alte Server-Rohdaten. Eine ältere Sicherung kann zu einer niedrigeren Version führen; Mitleser übernehmen diese nicht still. Zum Wechsel des Masters beziehungsweise der Zuordnung erst sichern und die Zuordnung bewusst lösen. Der andere Master wird dadurch nicht aus der Ferne deaktiviert. Wiederherstellung verlangt bei bestehenden Angaben zuerst einen aktuellen Backup-Download. Die Quelldatei bleibt auch dann wichtig, wenn alte Rohverläufe nicht automatisch in den aktuellen Verlauf übernommen werden.
+Unter **Vollständiges Backup & Wiederherstellung** die neue passwortverschlüsselte Vollsicherung erstellen. Sie enthält auch offene Messung, Kontakte, Planung/Untersuchungswerte, lokale Schlüssel, sämtliche gespeicherten Verläufe und gegebenenfalls alte Server-Rohdaten. Neue Vollsicherungen stellen diese Bereiche exakt wieder her; alte Klartextdateien bleiben über den bisherigen Importweg nutzbar, ohne alte Rohverläufe blind zu aktivieren. Eine ältere Sicherung kann zu einer niedrigeren Version führen; Mitleser übernehmen diese nicht still. Zum Wechsel des Masters beziehungsweise der Zuordnung erst sichern und die Zuordnung bewusst lösen. Der andere Master wird dadurch nicht aus der Ferne deaktiviert. Wiederherstellung verlangt bei bestehenden Angaben zuerst einen aktuellen Backup-Download. Datei und Passwort getrennt aufbewahren. [AgDR-0027](docs/agdr/0027-verschluesselte-vollsicherung.md).
 
 Eine direkte automatische Browserverbindung ohne fremde Verbindungsdienste wird nicht als zuverlässig zugesagt und bleibt unter F17 offen. Die aktuelle Alternative ist vollständig serverlos, aber manuell. UWB, Web Bluetooth und Web NFC bieten laut geprüfter Plattformdokumentation keinen gemeinsamen iPhone-/Android-Webkanal. Ein WebRTC-Versuch im selben Netz mit manuellem QR-Angebot und QR-Antwort bleibt offen. Technikprüfung und Link-/Teilen-Grenzen: [AgDR-0022](docs/agdr/0022-smartphone-nahuebertragung-und-kompakte-links.md). Grenzen der Browserprüfung und Wiederherstellung: [AgDR-0020](docs/agdr/0020-serverloser-geraeteabgleich.md).
 

@@ -81,3 +81,6 @@ F05 ist umgesetzt; F04 bleibt offen und wird nicht implizit als erledigt markier
 - [Nutzerbeauftragte Feature-Liste F05](../open.md), [Kalendergrundlage](0014-kalender-und-journal.md), [bewusstes Teilen](0016-kostenlos-offline-und-selektives-teilen.md), [serverloser Geräteabgleich](0020-serverloser-geraeteabgleich.md), [kompakte URLs](0022-smartphone-nahuebertragung-und-kompakte-links.md).
 - [Terminmodell und Grenzen](../../src/care.js), [synthetische Tests](../../tests/care.test.js), [Recovery](../../src/device-transfer.js), [Berichtsprojektion](../../src/report.js).
 - Datenquelle für Notizen, Antworten und Ergebnisse sind eigene Eingaben. Diese Änderung führt keine neuen medizinischen Empfehlungen oder neuen medizinischen Grenzwerte ein; die vorhandenen Kalender-/Vorsorgequellen gelten unverändert.
+
+
+**Erweiterung vom 18.11.2026:** [AgDR-0026](0026-alltagsbegleitung-terminmappe-und-wochenbett.md) ergänzt Heute-Fokus, Terminmappe und Geräteinhalt v3. Die gemeinsame Speicherung der Terminnotizen bleibt maßgeblich.

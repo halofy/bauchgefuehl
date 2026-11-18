@@ -1,3 +1,5 @@
+import { collectBackup, encryptBackup, decryptBackup, restoreFullBackup, validateFullBackup, BACKUP_KEYS } from './backup.js';
+import { COMPANION_KEY, COMPANION_HISTORY_KEY, readCompanion, normalizeCompanion } from './companion.js';
 import { STORAGE_KEY, HISTORY_KEY, readLocal, todayISO } from './pregnancy.js';
 import { SYNC_KEY, snapshot } from './sync.js';
 import { BIRTH_KEY, BIRTH_HISTORY_KEY, readBirth, normalizeBirth } from './birth.js';
@@ -7,10 +9,11 @@ import { CARE_KEY, CARE_HISTORY_KEY, readCare, normalizeCare } from './care.js';
 
 export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onConnection, reloadExtras }) {
   const $ = id => document.getElementById(id);
+  let pendingFullBackup = null;
   let envelope = null; let packet = null; let backup = null; let generated = null; let working = false; let backupSignature = '';
   let generatedFile = null; let sharing = false;
   let storageAvailable = true;
-  function signature() { return [STORAGE_KEY, BIRTH_KEY, CARE_KEY, DEVICE_KEY, SYNC_KEY].map(key => storage.getItem(key)).join('|'); }
+  function signature() { return JSON.stringify([...BACKUP_KEYS,RECOVERY_KEY].map(key => storage.getItem(key))); }
   let leaseSource = null; let leaseHeld = false; let releaseLease = null;
   function config() {
     let recovery; let raw;
@@ -71,23 +74,25 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     update(); $('sync-dialog').showModal();
   }
   $('open-sync').addEventListener('click', open);
-  $('device-backup').addEventListener('click', () => {
-    try {
-      const raw = {}; const storageErrors = [];
-      for (const key of [STORAGE_KEY, HISTORY_KEY, BIRTH_KEY, BIRTH_HISTORY_KEY, CARE_KEY, CARE_HISTORY_KEY, DEVICE_KEY, SYNC_KEY, RECOVERY_KEY]) {
-        try { raw[key] = storage.getItem(key); } catch { raw[key] = null; storageErrors.push(key); }
-      }
-      let memorySnapshot = null; try { memorySnapshot = snapshot(getSnapshot()); } catch { /* Raw recovery data remain exportable without a valid profile. */ }
-      download({ format: 'bauchgefuehl-offline-backup', v: 1, createdAt: new Date().toISOString(), raw, memorySnapshot, storageErrors }, `bauchgefuehl-backup-${todayISO()}.json`);
-      try { backupSignature = signature(); } catch { backupSignature = ''; }
-      notify(storageErrors.length ? 'Sitzungsdaten gesichert. Gesperrte lokale Speicherbereiche konnten nicht gelesen werden; die Datei nennt die Prüflücken.' : 'Vollständiger Backup-Download gestartet. Die Datei enthält private Daten und gegebenenfalls Master-Schlüssel im Klartext. Bitte sicher aufbewahren.');
-    } catch (cause) { error(cause.message); }
-  });
+  $('device-backup').addEventListener('click', () => void run(async () => {
+    const password = $('backup-password').value;
+    if (password !== $('backup-password-confirm').value) throw new Error('Die beiden Sicherungspasswörter stimmen nicht überein.');
+    let memorySnapshot=null;try{memorySnapshot=snapshot(getSnapshot());}catch{/* Raw data remain exportable without a usable current profile. */}
+    const before = signature(), full = collectBackup(storage,memorySnapshot);
+    const encrypted = await encryptBackup(full,password);
+    const checked = await decryptBackup(encrypted,password);
+    if (JSON.stringify(checked) !== JSON.stringify(full) || signature() !== before) throw new Error('Während der Sicherung wurden Daten geändert. Bitte erneut sichern.');
+    download(encrypted, `bauchgefuehl-vollsicherung-${todayISO()}.json`);
+    backupSignature = before;
+    $('backup-status').textContent = `Vollsicherung am ${new Date().toLocaleString('de-DE')} verschlüsselt und intern entschlüsselt geprüft. Download gestartet${full.recovery?' · enthält Rohdaten eines unterbrochenen Imports':''}; bitte Datei und Passwort getrennt sicher aufbewahren. Die App kann den Speicherort nicht prüfen.`;
+    $('backup-password').value = ''; $('backup-password-confirm').value = '';
+    notify('Verschlüsselte Vollsicherung geprüft; Download gestartet.');
+  }));
   $('device-generate').addEventListener('click', () => void run(async () => {
     const value = getSnapshot();
     let device = config(); if (!device) device = await createIdentity();
     else if (device.role === 'master' && (!leaseHeld || leaseSource !== device.source)) throw new Error('Dieser Master ist in einem anderen Tab aktiv. Bitte dort den Stand erstellen.');
-    const result = await sealTransfer(value, device, $('device-password').value, { care: readCare(storage), contacts: $('device-include-contacts').checked ? readBirth(storage).contacts : null });
+    const result = await sealTransfer(value, device, $('device-password').value, { care: readCare(storage), companion: readCompanion(storage), contacts: $('device-include-contacts').checked ? readBirth(storage).contacts : null });
     storage.setItem(DEVICE_KEY, JSON.stringify(result.device)); generated = result.envelope;
     generatedFile = new File([JSON.stringify(generated)], `bauchgefuehl-stand-${todayISO()}.json`, { type: 'application/json' });
     const link = transferLink(generated, location.href);
@@ -124,7 +129,7 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     envelope = parseTransferInput($('device-input').value);
     packet = await openTransfer(envelope, $('device-receive-password').value);
     const data = packet.data.snapshot;
-    $('device-preview').textContent = `Master ${packet.source.slice(0, 16)} · Version ${packet.revision} · ${data.journal.length} Journaleinträge einschließlich Archiv · ${Object.keys(data.checks).length} Merkhäkchen · ${packet.data.care?.appointments.length ?? 0} Termine · ${packet.data.care?.notes.length ?? 0} Terminnotizen${packet.data.contacts ? ` · ${packet.data.contacts.length} Kontakte optional enthalten` : ''}. Die Berechnungsgrundlage wird ebenfalls übernommen. Noch wurde nichts geändert.`;
+    $('device-preview').textContent = `Master ${packet.source.slice(0, 16)} · Version ${packet.revision} · ${data.journal.length} Journaleinträge einschließlich Archiv · ${Object.keys(data.checks).length} Merkhäkchen · ${packet.data.care?.appointments.length ?? 0} Termine · ${packet.data.care?.notes.length ?? 0} Terminnotizen · ${packet.data.companion?.plans.length ?? 0} Planungseinträge · ${packet.data.companion?.growth.length ?? 0} Untersuchungswerte${packet.data.contacts ? ` · ${packet.data.contacts.length} Kontakte optional enthalten` : ''}. Die Berechnungsgrundlage wird ebenfalls übernommen. Noch wurde nichts geändert.`;
     $('device-candidate').hidden = false; $('device-take-contacts').checked = false; $('device-take-contacts-label').hidden = !packet.data.contacts;
   }));
   $('device-file').addEventListener('change', async event => {
@@ -137,16 +142,16 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
   });
   $('device-input').addEventListener('input', () => { packet = null; $('device-candidate').hidden = true; update(); });
   $('device-receive-password').addEventListener('input', () => { packet = null; $('device-candidate').hidden = true; update(); });
-  $('sync-dialog').addEventListener('close', () => { $('device-password').value = ''; $('device-receive-password').value = ''; packet = null; $('device-candidate').hidden = true; });
+  $('sync-dialog').addEventListener('close', () => { $('device-password').value = ''; $('device-receive-password').value = ''; packet = null; $('device-candidate').hidden = true; $('backup-password').value=''; $('backup-password-confirm').value=''; $('backup-restore-password').value=''; pendingFullBackup=null; backup=null; $('backup-unlock-box').hidden=true; $('device-restore-box').hidden=true; });
   $('device-apply').addEventListener('click', () => void run(async () => {
     if (!packet) throw new Error('Bitte zuerst entschlüsseln und die Vorschau prüfen.');
     const birth = readBirth(storage);
     if (birth.active) throw new Error('Bitte zuerst die offene Wehenmessung abschließen.');
-    const current = { ...readLocal(storage), care: readCare(storage) }; const device = config();
+    const current = { ...readLocal(storage), care: readCare(storage), companion: readCompanion(storage) }; const device = config();
     const replace = !device && backupSignature === signature();
     const next = checkIncoming(packet, device, current, { replace });
     if (current.profile && !device && JSON.stringify(current.profile) !== JSON.stringify(packet.data.snapshot.profile) && !replace) throw new Error('Die Datierung unterscheidet sich. Bitte zuerst den vorhandenen Stand mit „Vollständiges Backup“ sichern.');
-    const value = importSnapshot(storage, packet.data.snapshot, { device: next, care: packet.data.care ?? normalizeCare(), ...(packet.data.contacts && $('device-take-contacts').checked ? { birth: { ...birth, contacts: packet.data.contacts } } : {}), replaceJournal: replace });
+    const value = importSnapshot(storage, packet.data.snapshot, { device: next, care: packet.data.care ?? normalizeCare(), companion: packet.data.companion ?? normalizeCompanion(), ...(packet.data.contacts && $('device-take-contacts').checked ? { birth: { ...birth, contacts: packet.data.contacts } } : {}), replaceJournal: replace });
     applySnapshot(value, { alreadyStored: true }); reloadExtras(); packet = null; $('device-candidate').hidden = true;
     try { if (location.hash.startsWith('#transfer=')) history.replaceState(null, '', location.pathname + location.search); } catch { /* No data is sent in fragments. */ }
     notify('Stand übernommen. Dieses Gerät liest mit; Änderungen erfolgen am Master.');
@@ -156,6 +161,13 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
       const file = event.target.files?.[0]; if (!file) return;
       if (file.size > 64 * 1024 * 1024) throw new Error('Die Backup-Datei ist zu groß (maximal 64 MiB).');
       const parsed = JSON.parse(await file.text());
+      pendingFullBackup = null; backup = null;
+      if (parsed.format === 'bauchgefuehl-encrypted-backup') {
+        pendingFullBackup = parsed;
+        $('backup-unlock-box').hidden = false; $('device-restore-box').hidden = true;
+        $('backup-unlock-status').textContent = 'Verschlüsselte Vollsicherung ausgewählt. Passwort eingeben und Vorschau öffnen. Noch wurde nichts geändert.';
+        update(); return;
+      }
       if (parsed.format === 'bauchgefuehl-offline-backup' && parsed.v === 1) {
         const raw = parsed.raw; const local = JSON.parse(raw?.[STORAGE_KEY] || 'null');
         const data = local ? { ...local, schema: 3 } : parsed.memorySnapshot;
@@ -170,11 +182,26 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     } catch (cause) { backup = null; error(cause.message); update(); }
     event.target.value = '';
   });
+  $('backup-unlock').addEventListener('click', () => void run(async () => {
+    if (!pendingFullBackup) throw new Error('Bitte zuerst eine verschlüsselte Vollsicherung auswählen.');
+    const full = validateFullBackup(await decryptBackup(pendingFullBackup,$('backup-restore-password').value));
+    backup = { full };$('backup-use-memory').checked=false;
+    const differentSession=full.memorySnapshot && (!full.raw[STORAGE_KEY] || JSON.stringify(snapshot(full.memorySnapshot))!==JSON.stringify(snapshot(JSON.parse(full.raw[STORAGE_KEY]))));
+    $('backup-use-memory-label').hidden=!differentSession;
+    const raw=full.raw, care=raw[CARE_KEY]?normalizeCare(JSON.parse(raw[CARE_KEY])):normalizeCare();
+    const companion=raw[COMPANION_KEY]?normalizeCompanion(JSON.parse(raw[COMPANION_KEY])):normalizeCompanion();
+    const journal=raw[STORAGE_KEY]?JSON.parse(raw[STORAGE_KEY]).journal||[]:[];
+    $('device-backup-preview').textContent = `Vollsicherung vom ${full.createdAt}: ${journal.length} Journaleinträge, ${care.appointments.length} Termine, ${care.notes.length} Terminnotizen, ${companion.plans.length} Planungseinträge, ${companion.growth.length} Untersuchungswerte${companion.birthDate?' · Geburt am '+companion.birthDate:''}. Gerätezuordnung: ${raw[DEVICE_KEY]?JSON.parse(raw[DEVICE_KEY]).role==='master'?'Master (der bisherige Master wird nicht deaktiviert)':'Mitlesegerät':'keine'}. Enthält auch Archive, Sicherungsverläufe, Kontakte, offene Wehenmessung und gegebenenfalls Master-Schlüssel. Ersetzt alle aufgeführten lokalen Bereiche einschließlich Gerätezuordnung. Noch wurde nichts geändert.`;
+    $('device-restore-box').hidden=false;
+    $('backup-unlock-status').textContent='Erfolgreich entschlüsselt und geprüft. Vorschau unten kontrollieren.';
+    $('backup-restore-password').value='';
+  }));
   $('device-restore').addEventListener('click', () => void run(() => {
     if (!backup) throw new Error('Bitte eine gültige Sicherung auswählen.');
     const device = config();
     if (device?.role === 'master' && (!leaseHeld || leaseSource !== device.source)) throw new Error('Wiederherstellung bitte im aktiven Master-Tab durchführen.');
-    if ((storage.getItem(STORAGE_KEY) || storage.getItem(BIRTH_KEY) || storage.getItem(CARE_KEY)) && backupSignature !== signature()) throw new Error('Bitte zuerst den aktuellen Stand als vollständiges Backup herunterladen.');
+    if (BACKUP_KEYS.some(key=>storage.getItem(key)!==null) && backupSignature !== signature()) throw new Error('Bitte zuerst den aktuellen Stand als vollständiges Backup herunterladen.');
+    if (backup.full) { restoreFullBackup(storage,backup.full,{useMemory:$('backup-use-memory').checked}); location.reload(); return; }
     const value = importSnapshot(storage, backup.snapshot, { ...(backup.snapshot ? { device: backup.device, legacySync: backup.legacySync } : {}), care: backup.care, birth: backup.birth, birthHistory: backup.birthHistory, replaceJournal: true });
     if (value) applySnapshot(value, { alreadyStored: true });
     reloadExtras(); backup = null; $('device-restore-box').hidden = true;

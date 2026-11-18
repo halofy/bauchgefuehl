@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { normalizeCompanion,changeCompanion } from '../src/companion.js';
+import { projectCompanion,companionDocument } from '../src/companion-report.js';
+const now='2026-11-18T10:00:00.000Z';
+function fixture(){let data=changeCompanion(normalizeCompanion(),'plans',{area:'birth',text:'Selected $& <script>unsafe()</script>',person:'Testperson',done:false},null,now);data=changeCompanion(data,'plans',{area:'support',text:'OMITTED_PRIVATE_PLAN',person:'OMITTED_PERSON',done:false},null,now);data=changeCompanion(data,'growth',{date:'2026-11-18',kind:'crl',value:54,note:'OMITTED_GROWTH_NOTE'},null,now);return data;}
+test('default selected planning report reveals no personal content or phase',()=>{const data=fixture(),report=projectCompanion(data);assert.deepEqual(report,{plans:[],growth:[]});assert.doesNotMatch(companionDocument(report),/OMITTED|Testperson|birthDate|updatedAt|privateKey/);});
+test('only selected fields survive projection; IDs, archives and omitted areas never enter file',()=>{const data=fixture(),chosen=data.plans.find(x=>x.text.startsWith('Selected'));const report=projectCompanion(data,[chosen.id]);assert.equal(report.plans.length,1);assert.deepEqual(report.growth,[]);const html=companionDocument(report);assert.doesNotMatch(html,/OMITTED|<script>|updatedAt|deletedAt/);assert.ok(!html.includes(chosen.id));assert.match(html,/Selected \$&amp;/);assert.match(html,/&lt;script&gt;/);});
+test('archived measurements cannot be exported by retained selection IDs',()=>{const data=fixture(),item=data.growth[0];const archived=changeCompanion(data,'growth',{...item,deletedAt:now},item,now);assert.deepEqual(projectCompanion(archived,[item.id]).growth,[]);});

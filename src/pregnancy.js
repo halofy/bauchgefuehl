@@ -1,3 +1,4 @@
+import { readCompanion } from './companion.js';
 import { todayISO, dayNumber, addDays } from './dates.js';
 export { todayISO, dayNumber, addDays, formatDate } from './dates.js';
 import { normalizeJournal, assertJournalContinuity, MAX_SNAPSHOT_BYTES } from './journal.js';
@@ -30,8 +31,18 @@ export function validateProfile(value, today = todayISO()) {
   return { method, lmp: value.lmp, cycle: value.cycle, irregular: value.irregular === true };
 }
 
+// Existing pregnancies remain readable after birth. New profile entry still uses validateProfile's recency checks.
+export function validateStoredProfile(value, today = todayISO()) {
+  try { return validateProfile(value,today); } catch (original) {
+    const reference = value?.method === 'due-date' ? value.dueDate : value?.lmp;
+    let elapsed; try { elapsed = dayNumber(today)-dayNumber(reference); } catch { throw original; }
+    if (reference < '1900-01-01' || elapsed <= (value?.method === 'due-date' ? 86 : 366)) throw original;
+    return validateProfile(value,reference);
+  }
+}
+
 export function calculatePregnancy(profile, today = todayISO()) {
-  const p = validateProfile(profile, today);
+  const p = validateStoredProfile(profile, today);
   const fromDueDate = p.method === 'due-date';
   const referenceDate = fromDueDate ? addDays(p.dueDate, -280) : p.lmp;
   const elapsedDays = dayNumber(today) - dayNumber(referenceDate);
@@ -103,7 +114,7 @@ export function readLocal(storage, today = todayISO()) {
       }
     }
     let profile;
-    try { profile = validateProfile(data.v === 1 ? { ...data.profile, method: 'period' } : data.profile, today); }
+    try { let postpartum=false; try { postpartum=!!readCompanion(storage,today).birthDate; } catch { /* Invalid planning does not authorize a phase change. */ } profile = (postpartum ? validateStoredProfile : validateProfile)(data.v === 1 ? { ...data.profile, method: 'period' } : data.profile, today); }
     catch { return { profile: null, checks, journal, error: 'Die Berechnungsgrundlage muss aktualisiert werden. Dein Journal bleibt sichtbar und gespeichert.' }; }
     return { profile, checks, journal, error: null };
   } catch {
@@ -112,7 +123,8 @@ export function readLocal(storage, today = todayISO()) {
 }
 
 export function writeLocal(storage, profile, checks, today = todayISO(), journal, { replaceJournal = false } = {}) {
-  const valid = validateProfile(profile, today);
+  let postpartum=false; try { postpartum=!!readCompanion(storage,today).birthDate; } catch { /* Preserve strict validation without an explicit phase. */ }
+  const valid = (postpartum ? validateStoredProfile : validateProfile)(profile, today);
   const previous = storage.getItem?.(STORAGE_KEY);
   let previousData = null;
   try { if (previous) previousData = JSON.parse(previous); } catch { /* Archive damaged raw data before replacing it. */ }

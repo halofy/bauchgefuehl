@@ -1,4 +1,4 @@
-import { validateProfile, todayISO } from './pregnancy.js';
+import { validateStoredProfile, todayISO } from './pregnancy.js';
 import { normalizeJournal, assertJournalContinuity, MAX_SNAPSHOT_BYTES } from './journal.js';
 
 export const SYNC_KEY = 'bauchgefuehl.sync.v1';
@@ -21,7 +21,7 @@ export function endpointURL(value) {
 }
 
 export function snapshot(value, today = todayISO()) {
-  const profile = validateProfile(value?.profile, today);
+  const profile = validateStoredProfile(value?.profile, today);
   const checks = {};
   const entries = Object.entries(value?.checks || {});
   if (entries.length > 64) throw new Error('Zu viele Merkhäkchen im Datenstand.');

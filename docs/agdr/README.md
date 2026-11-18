@@ -31,6 +31,10 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0023](0023-tages-check-in-und-strukturierter-rueckblick.md) | F02 Tages-Check-in, strukturierter F03-Rückblick und getrenntes Teilen | Umgesetzt; Modell geprüft, manueller Gesamtdurchlauf offen |
 | [AgDR-0024](0024-fuer-dich-und-mobile-layoutkorrekturen.md) | F01 „Für dich“, quellenbezogene Phasenthemen und zwei mobile Layoutkorrekturen | Umgesetzt; Inhalte und zwölf Safari-Layoutkombinationen geprüft |
 | [AgDR-0025](0025-termine-fragensammlung-und-klarerer-kalender.md) | F05 Termine und gemeinsame Notizen/Q&A, Datenweitergabe v2 und klarerer Kalender | Umgesetzt; Datenerhalt und synthetischer Hauptablauf geprüft |
+| [AgDR-0026](0026-alltagsbegleitung-terminmappe-und-wochenbett.md) | Heute-Fokus, Terminmappe, Beschwerdenhilfe, Verläufe, Planung und explizite Wochenbettphase | Umgesetzt; automatisiert und teilweise in Safari geprüft |
+| [AgDR-0027](0027-verschluesselte-vollsicherung.md) | Passwortverschlüsselte exakte Vollsicherung mit Historien, Master und offener Messung | Umgesetzt; Rundlauf und Fehlerfälle geprüft |
+| [AgDR-0028](0028-mobile-zurueck-navigation.md) | Browser-Zurück für Bereiche, Dialoge und geschützte Entwürfe | Umgesetzt; Safari-Entwurf und Verlaufssimulation geprüft |
+| [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) | Entwicklungsstufen, quellenbezogene Zwischenwerte und eigene Untersuchungsmaße | Umgesetzt; Modell geprüft, physische Geräte offen |
 
 ## Fortschreiben
 

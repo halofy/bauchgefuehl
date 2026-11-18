@@ -1,7 +1,10 @@
+import { setupCompanion } from './companion-ui.js';
+import { COMPANION_KEY, COMPANION_HISTORY_KEY } from './companion.js';
+import { developmentSvg } from './growth.js';
 import { explainCalculation } from './calculation-explanation.js';
 import { setupAppNavigation, showAppPanel } from './navigation.js';
 import { setupPwa } from './pwa.js';
-import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
+import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, validateStoredProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
 import { setupDevices } from './devices-ui.js';
@@ -39,6 +42,7 @@ let reportUi = null;
 let birthUi = null;
 let motherUi = null;
 let careUi = null;
+let companionUi = null;
 
 function announce(message) {
   $('#notice').textContent = message;
@@ -109,6 +113,8 @@ function renderMode() {
 function renderSummary() {
   const data = calculatePregnancy(state.profile, today);
   const fromDueDate = data.method === 'due-date';
+  $('.baby-art').innerHTML = developmentSvg(data.gestationalDays) + '<span>Schematische Entwicklung · nicht maßstabsgetreu</span>';
+  $('#greeting').innerHTML = companionUi?.isPostpartum() ? 'Ein neuer Abschnitt.<br><em>Raum für dich.</em>' : 'Da wächst etwas<br><em>Wunderbares.</em>';
   $('#estimate-label-text').textContent = fromDueDate ? 'Vom ET zurückgerechnet · 28-Tage-Basis' : 'Zyklusangepasste Schätzung';
   $('#profile-method').textContent = fromDueDate ? 'ET · 28-Tage-Basis' : 'Periode & Zyklus';
   $('#profile-date-label').textContent = fromDueDate ? 'Eingetragener ET' : 'Letzte Periode';
@@ -182,6 +188,7 @@ function renderWeeks(center = false) {
   motherUi?.render(selectedWeek);
   $('#phase-size').textContent = content.size;
   $('#phase-comparison').textContent = content.comparison;
+  companionUi?.renderGrowth(selectedWeek, calculated.gestationalDays);
   $('#development-source').href = content.source;
   $('#development-source').textContent = `Entwicklung in dieser Phase · ${selectedWeek <= 40 ? 'BIÖG' : 'NHS'} ↗`;
   if (center) {
@@ -260,6 +267,9 @@ function render(center = false) {
   reportUi?.refreshIfOpen();
   birthUi?.render();
   careUi?.render();
+  companionUi?.render();
+  companionUi?.renderGrowth(selectedWeek, calculatePregnancy(state.profile,today).gestationalDays);
+  companionUi?.refreshConversation();
 }
 
 function queueSync() {
@@ -474,9 +484,10 @@ $('#confirm-delete').addEventListener('click', () => {
     storage.removeItem(SYNC_KEY);
     storage.removeItem(HISTORY_KEY);
     storage.removeItem(STORAGE_KEY);
-    for (const key of [BIRTH_KEY, BIRTH_HISTORY_KEY, CARE_KEY, CARE_HISTORY_KEY, DEVICE_KEY, RECOVERY_KEY]) storage.removeItem(key);
+    for (const key of [BIRTH_KEY, BIRTH_HISTORY_KEY, CARE_KEY, CARE_HISTORY_KEY, COMPANION_KEY, COMPANION_HISTORY_KEY, DEVICE_KEY, RECOVERY_KEY]) storage.removeItem(key);
     birthUi?.reload();
     careUi?.reload();
+    companionUi?.reload();
     clearShareHash();
     local = { profile: null, checks: {}, error: null };
     state = { profile: demoProfile(today), checks: {}, journal: [], mode: 'demo' };
@@ -511,7 +522,7 @@ function refreshDate() {
   today = fresh;
   if (state.mode === 'demo') state.profile = demoProfile(today);
   try {
-    validateProfile(state.profile, today);
+    validateStoredProfile(state.profile, today);
     if (wasCurrent) selectedWeek = currentWeek();
     render(wasCurrent);
   } catch {
@@ -548,15 +559,36 @@ function saveJournalEntries(entries) {
   writeLocal(storage, state.profile, state.checks, today, journal);
   state.journal = journal; state.mode = 'local';
   local = { profile: state.profile, checks: { ...state.checks }, journal, error: null };
-  queueSync(); renderMode(); calendarUi?.render(); reportUi?.refreshIfOpen(); birthUi?.render();
+  queueSync(); renderMode(); calendarUi?.render(); reportUi?.refreshIfOpen(); birthUi?.render(); companionUi?.render(); companionUi?.refreshConversation();
 }
 announce(recoveryProblem || local.error || '');
 careUi = setupPersonalCare({ storage, getMode: () => state.mode,
   canEdit: () => state.mode !== 'shared' && !syncUi?.readOnly,
-  onChange() { queueSync(); calendarUi?.render(); reportUi?.refreshIfOpen(); },
-  onRefresh() { calendarUi?.render(); reportUi?.refreshIfOpen(); },
+  onChange() { queueSync(); calendarUi?.render(); reportUi?.refreshIfOpen(); companionUi?.render(); companionUi?.refreshConversation(); },
+  onRefresh() { calendarUi?.render(); reportUi?.refreshIfOpen(); companionUi?.render(); companionUi?.refreshConversation(); },
   notify: toast,
+  openConversation: id => companionUi?.openConversation(id),
   openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); $('#calendar-selected-date').scrollIntoView({ behavior: 'instant' }); },
+});
+function refreshPersonalContext() {
+  if(!['shared','session'].includes(state.mode)) {
+    try { if(storage.getItem(STORAGE_KEY)) {
+      const fresh=readLocal(storage,today),changed=JSON.stringify(state.profile)!==JSON.stringify(fresh.profile);
+      local=fresh;state={profile:fresh.profile||demoProfile(today),checks:fresh.checks,journal:fresh.journal,mode:fresh.profile?'local':'demo'};
+      if(changed)selectedWeek=currentWeek();
+      if(fresh.error)announce(fresh.error);
+    }} catch(cause) {announce(cause.message);}
+  }
+  render();
+}
+companionUi = setupCompanion({ storage, getMode: () => state.mode, getJournal: () => state.journal, getCare: () => careUi.getData(),
+  getAge: date => calculatePregnancy(state.profile,today).gestationalDays + dayNumber(date)-dayNumber(today),
+  canEdit: () => state.mode !== 'shared' && !syncUi?.readOnly,
+  onChange() { queueSync(); refreshPersonalContext(); },
+  onRefresh: refreshPersonalContext,
+  openPanel(id, anchor) { showAppPanel(id,true); if(anchor) document.getElementById(anchor)?.scrollIntoView({behavior:'instant',block:'start'}); },
+  openNote: (id,text) => careUi.openNote(id,null,text), editNote: id => careUi.editNote(id),
+  openBirth: () => birthUi?.open(), openJournal: () => journalUi?.openForDate(today),
 });
 guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mode, getToday: () => today });
 reportUi = setupReport({ getJournal: () => state.journal, getCare: () => careUi.getData(), getToday: () => today, notify: toast });
@@ -566,9 +598,11 @@ journalUi = setupJournal({
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
   saveJournal: saveJournalEntries,
+  symptomHelp: label => companionUi.openHelp(label),
   notify: toast,
   weekOnDate(date) {
     if (state.mode === 'demo' || state.mode === 'shared') return null;
+    if (companionUi?.isPostpartum() && date >= companionUi.getData().birthDate) return `Nach Geburt · Tag ${dayNumber(date)-dayNumber(companionUi.getData().birthDate)}`;
     const age = calculatePregnancy(state.profile, today).gestationalDays + dayNumber(date) - dayNumber(today);
     return age >= 0 ? `SSW ${Math.floor(age / 7)}+${age % 7}` : 'Vor rechnerischem Beginn';
   },
@@ -579,6 +613,7 @@ calendarUi = setupCalendar({
   getMode: () => state.mode,
   getJournal: () => state.journal,
   getChecks: () => state.checks,
+  getBirthDate: () => companionUi?.getData()?.birthDate,
   getCare: () => careUi.getData(),
   addAppointment: date => careUi.openAppointment(date),
   openAppointmentNotes(id) { showAppPanel('vorsorge', true); careUi.openNote(id); },
@@ -615,16 +650,17 @@ syncUi = setupDevices({
     render(true);
   },
   notify: toast,
-  reloadExtras() { birthUi?.reload(); careUi?.reload(); },
+  reloadExtras() { birthUi?.reload(); careUi?.reload(); companionUi?.reload(); },
   onConnection(connection, readOnly) {
     const role = `${connection?.role || ''}:${readOnly}`;
     for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
-    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); birthUi?.render(); careUi?.render(); }
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); birthUi?.render(); careUi?.render(); companionUi?.render(); }
   },
 });
 birthUi = setupBirth({
   storage, getProfile: () => state.profile, getMode: () => state.mode, getJournal: () => state.journal,
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
+  isPostpartum: () => companionUi?.isPostpartum(),
   saveJournal: saveJournalEntries, notify: toast,
   openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); document.getElementById('calendar-view').scrollIntoView({ behavior: 'instant' }); },
 });

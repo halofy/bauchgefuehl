@@ -1,7 +1,7 @@
 import { calculatePregnancy, todayISO, formatDate } from './pregnancy.js';
 import { BIRTH_KEY, readBirth, writeBirth, normalizeBirth, startContraction, finishContraction, contractionPattern, showContractionFab } from './birth.js';
 
-export function setupBirth({ storage, getProfile, getMode, getJournal, canEdit, saveJournal, notify, openCalendar }) {
+export function setupBirth({ storage, getProfile, getMode, getJournal, canEdit, saveJournal, notify, openCalendar, isPostpartum = () => false }) {
   const $ = id => document.getElementById(id);
   let birth;
   let damaged = false;
@@ -36,7 +36,7 @@ export function setupBirth({ storage, getProfile, getMode, getJournal, canEdit, 
     let age;
     try { age = calculatePregnancy(getProfile(), todayISO()).gestationalDays; } catch { age = null; }
     const own = !['demo', 'shared'].includes(getMode());
-    $('contraction-fab').hidden = !showContractionFab(age, birth.active, own);
+    $('contraction-fab').hidden = (!birth.active && isPostpartum()) || !showContractionFab(age, birth.active, own);
     $('contraction-fab').textContent = birth.active ? '● Wehe läuft' : '◷ Wehen messen';
     $('birth-start').hidden = !!birth.active; $('birth-stop').hidden = !birth.active;
     $('birth-end-label').hidden = !birth.active;

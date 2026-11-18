@@ -1,9 +1,11 @@
+import { helpForSymptom } from './symptoms.js';
+import { personalTrend } from './trends.js';
 import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv, symptomOptions, isCheckinEntry } from './journal.js';
 import { CHECKIN_FIELDS, readCheckin, isCheckinMetric, checkinField, checkinValue, upsertCheckin } from './checkin.js';
-import { todayISO, formatDate, dayNumber } from './dates.js';
+import { todayISO, formatDate, dayNumber, addDays } from './dates.js';
 import { getAppLayout } from './layout.js';
 
-export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate, onOpen = () => {} }) {
+export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate, onOpen = () => {}, symptomHelp = () => {} }) {
   const $ = selector => document.querySelector(selector);
   const node = (tag, className = '', text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
   const number = value => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(value);
@@ -12,6 +14,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   let rows = [];
   let dirty = false;
   let filtered = [];
+  $('#journal-metric').parentElement.insertAdjacentHTML('afterend', '<div class="trend-controls"><label class="checkbox-label"><input id="trend-checkins" type="checkbox">Auch Check-in-Skalen anzeigen</label><label>Zeitraum<select id="trend-period"><option value="all">Alle gefilterten Messungen</option><option value="28">Letzte 28 Tage</option><option value="90">Letzte 90 Tage</option></select></label><label>Persönlicher Ausgangswert<select id="trend-baseline"><option value="">Erster Wert im Zeitraum</option></select></label><p id="trend-difference" class="field-hint"></p><label class="checkbox-label"><input id="trend-notes" type="checkbox">Notizen im Verlauf markieren</label><div id="trend-annotations"></div></div>');
   const mobile = getAppLayout();
   const arrangePanels = () => {
     $('#journal-filter-panel').open = !mobile.matches;
@@ -124,7 +127,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
 
   function renderChart() {
     const definitions = new Map();
-    for (const entry of getJournal()) if (!entry.deletedAt) for (const metric of entry.metrics) if (!isCheckinMetric(entry, metric)) definitions.set(metricKey(metric), metric);
+    for (const entry of getJournal()) if (!entry.deletedAt) for (const metric of entry.metrics) if ($('#trend-checkins').checked || !isCheckinMetric(entry, metric)) definitions.set(metricKey(metric), metric);
     const selected = $('#journal-metric').value;
     $('#journal-metric').replaceChildren();
     for (const [key, metric] of definitions) {
@@ -132,7 +135,19 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     }
     if (definitions.has(selected)) $('#journal-metric').value = selected;
     $('#journal-metric').disabled = !definitions.size;
-    const points = metricSeries(filtered.map(entry => ({ ...entry, metrics: entry.metrics.filter(metric => !isCheckinMetric(entry, metric)) })), $('#journal-metric').value);
+    const key = $('#journal-metric').value;
+    const baseline = $('#trend-baseline').value;
+    $('#trend-baseline').replaceChildren(); const first = new Option('Erster Wert im Zeitraum',''); $('#trend-baseline').append(first);
+    for(const point of metricSeries(getJournal(),key)) $('#trend-baseline').append(new Option(`${formatDate(point.date)}${point.time?' '+point.time:''} · ${number(point.value)} ${point.unit}`,point.id));
+    if([...$('#trend-baseline').options].some(o=>o.value===baseline)) $('#trend-baseline').value=baseline;
+    const range = $('#trend-period').value;
+    const from = range === 'all' ? '' : addDays(todayISO(),-Number(range)+1);
+    const trend = personalTrend(filtered,key,{from,to:todayISO(),baseline:$('#trend-baseline').value,referenceEntries:getJournal()});
+    const points = trend.points;
+    $('#trend-difference').textContent=trend.reference&&trend.difference!==null?`Ausgangswert: ${number(trend.reference.value)} ${trend.reference.unit} am ${formatDate(trend.reference.date)}${trend.reference.time?' '+trend.reference.time+' Uhr':''}. Veränderung zum letzten sichtbaren Wert: ${trend.difference>0?'+':''}${number(trend.difference)} ${trend.reference.unit}. Keine Bewertung.`:'';
+    $('#trend-annotations').replaceChildren();
+    if($('#trend-notes').checked) for(const item of trend.annotations){const p=node('p','field-hint',`◇ ${formatDate(item.date)}: ${item.text}`);const original=node('button','text-link','Originaleintrag öffnen');original.type='button';original.addEventListener('click',()=>{const entry=getJournal().find(x=>x.id===item.id);if(entry&&canEdit())open(entry);else filterRange(item.date,item.date);});$('#trend-annotations').append(p,original);}
+
     const chart = $('#journal-chart'); chart.replaceChildren();
     $('#journal-metric-table-body').replaceChildren();
     $('#journal-metric-table').hidden = !points.length;
@@ -159,6 +174,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     for (const y of [20, 80, 140]) svg.append(svgNode('line', { x1: 58, x2: 500, y1: y, y2: y, class: 'chart-grid' }));
     svg.append(svgNode('text', { x: 2, y: 24, class: 'chart-label' }, number(high)), svgNode('text', { x: 2, y: 144, class: 'chart-label' }, number(low)));
     svg.append(svgNode('polyline', { points: coords.map(p => p.join(',')).join(' '), class: 'chart-line' }));
+    if($('#trend-notes').checked) for(const note of trend.annotations){ const time=dayNumber(note.date);if(time<Math.floor(minX)||time>Math.ceil(maxX))continue;const x=maxX===minX?280:Math.max(58,Math.min(500,58+(time-minX)/(maxX-minX)*442));const marker=svgNode('line',{x1:x,x2:x,y1:20,y2:140,class:'chart-note-marker'});marker.append(svgNode('title',{},`${formatDate(note.date)}: ${note.text}`));svg.append(marker); }
     points.forEach((p, i) => { const dot = svgNode('circle', { cx: coords[i][0], cy: coords[i][1], r: 4, class: 'chart-dot' }); dot.append(svgNode('title', {}, `${formatDate(p.date)} ${p.time}: ${number(p.value)} ${p.unit}`)); svg.append(dot); });
     svg.append(svgNode('text', { x: 58, y: 170, class: 'chart-label' }, formatDate(points[0].date, { year: undefined })), svgNode('text', { x: 500, y: 170, 'text-anchor': 'end', class: 'chart-label' }, formatDate(last.date, { year: undefined })));
     chart.append(svg);
@@ -206,7 +222,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
         }); actions.append(archive);
       }
       header.append(date, actions); card.append(header);
-      if (entry.symptoms.length) { const symptoms = node('div', 'journal-chips'); for (const value of entry.symptoms) symptoms.append(node('span', 'journal-symptom', value)); card.append(symptoms); }
+      if (entry.symptoms.length) { const symptoms = node('div', 'journal-chips'); for (const value of entry.symptoms) { const help=helpForSymptom(value);const chip=node(help?'button':'span','journal-symptom',value+(help?' · Hilfe':''));if(help){chip.type='button';chip.addEventListener('click',()=>symptomHelp(value));}symptoms.append(chip); } card.append(symptoms); }
       if (entry.text) card.append(node('p', 'journal-note', entry.text));
       const data = readCheckin(entry);
       if (data) {
@@ -222,7 +238,8 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     renderChart();
   }
   for (const id of ['journal-search', 'journal-tag', 'journal-symptom', 'journal-type', 'journal-from', 'journal-to', 'journal-archived']) $( '#' + id).addEventListener('input', render);
-  $('#journal-metric').addEventListener('change', renderChart);
+  $('#journal-metric').addEventListener('change',()=>{$('#trend-baseline').value='';renderChart();});
+  for(const id of ['trend-period','trend-baseline','trend-notes','trend-checkins']) $('#'+id).addEventListener('change',renderChart);
   $('#journal-export').addEventListener('click', () => {
     const url = URL.createObjectURL(new Blob([journalCsv(filtered)], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = `bauchgefuehl-journal-${todayISO()}.csv`; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);

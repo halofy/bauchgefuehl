@@ -6,7 +6,7 @@ import { symptomMentions } from './reflection.js';
 import { setupReflection } from './reflection-ui.js';
 import { normalizeCare, appointmentsOnDate, PROVIDERS, careCollection } from './care.js';
 
-export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, getCare = normalizeCare, addAppointment, openAppointmentNotes, openCare, canEdit, addEntry, addCheckin, editEntry, showEntries, showEntriesRange, showWeek, showGuide }) {
+export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, getBirthDate = () => null, getCare = normalizeCare, addAppointment, openAppointmentNotes, openCare, canEdit, addEntry, addCheckin, editEntry, showEntries, showEntriesRange, showWeek, showGuide }) {
   const $ = id => document.getElementById(id);
   const node = (tag, className = '', text = '') => { const element = document.createElement(tag); element.className = className; element.textContent = text; return element; };
   let selected = getToday();
@@ -17,6 +17,8 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   let symptom = '';
   let showCare = false; let showSymptoms = false;
   const ssw = age => age.status === 'before' ? 'Vor Beginn' : `${age.weeks}+${age.days}`;
+  const afterBirth = date => getMode() !== 'shared' && getBirthDate() && date >= getBirthDate();
+  const dateAge = (date,age) => afterBirth(date) ? `Tag ${dayNumber(date)-dayNumber(getBirthDate())}` : age.status === 'before' ? '–' : ssw(age);
   const shortDate = date => formatDate(date, { month: 'short' });
   const button = (label, callback, className = 'text-link') => {
     const element = node('button', className, label); element.type = 'button'; element.addEventListener('click', callback); return element;
@@ -105,13 +107,13 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   function renderSelected() {
     const age = gestationOnDate(timeline, selected);
     $('calendar-selected-date').textContent = formatDate(selected, { weekday: 'long' });
-    $('calendar-selected-ssw').textContent = age.status === 'before' ? 'Vor dem rechnerischen Schwangerschaftsbeginn' : `${ssw(age)} · ${age.weekNumber}. SSW${age.status === 'beyond' ? ' · außerhalb der Wocheninfos' : ''}`;
+    $('calendar-selected-ssw').textContent = afterBirth(selected) ? `Nach der Geburt · ${dateAge(selected,age)}` : age.status === 'before' ? 'Vor dem rechnerischen Schwangerschaftsbeginn' : `${ssw(age)} · ${age.weekNumber}. SSW${age.status === 'beyond' ? ' · außerhalb der Wocheninfos' : ''}`;
     const dayEvents = eventsOnDate(events, selected);
     const eventList = $('calendar-day-events'); eventList.replaceChildren();
-    if (age.status === 'ongoing' && age.days === 0) eventList.append(node('p', 'calendar-week-start', `Eine neue Woche beginnt: ${age.weekNumber}. SSW (${age.weeks}+0).`));
+    if (!afterBirth(selected) && age.status === 'ongoing' && age.days === 0) eventList.append(node('p', 'calendar-week-start', `Eine neue Woche beginnt: ${age.weekNumber}. SSW (${age.weeks}+0).`));
     for (const event of dayEvents) eventList.append(eventCard(event, selected));
     if (!dayEvents.length) eventList.append(node('p', 'calendar-empty', 'Für diesen Tag ist kein Vorsorgefenster oder Meilenstein hinterlegt.'));
-    $('calendar-week-info').hidden = age.status !== 'ongoing';
+    $('calendar-week-info').hidden = afterBirth(selected) || age.status !== 'ongoing';
     $('calendar-week-info').onclick = () => showWeek(age.weekNumber);
     $('calendar-open-guide').onclick = () => showGuide(selected);
     const care = getCare();
@@ -161,6 +163,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
 
   function render() {
     timeline = pregnancyTimeline(getProfile(), getToday()); events = timelineEvents(timeline);
+    if(getMode() !== 'shared' && getBirthDate()) events=events.filter(x=>x.date<getBirthDate()).map(x=>({...x,...(x.endDate>=getBirthDate()?{endDate:addDays(getBirthDate(),-1),openEnded:false}:{})}));
     const options = symptomOptions(getJournal());
     const previousLabel = $('calendar-symptom').selectedOptions[0]?.textContent || symptom;
     if (symptom && !options.some(option => option.key === symptom)) options.push({ key: symptom, label: previousLabel });
@@ -193,10 +196,10 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
       day.classList.toggle('has-symptom', mentions > 0);
       if (date === today) { day.classList.add('is-today'); day.setAttribute('aria-current', 'date'); }
       day.setAttribute('aria-pressed', String(date === selected));
-      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${age.status === 'before' ? 'vor rechnerischem Beginn' : `SSW ${ssw(age)}, ${age.weekNumber}. Schwangerschaftswoche`}${date === today ? ' · heute' : ''}${labeledEvents.length ? ' · ' + labeledEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
+      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${afterBirth(date) ? 'Nach der Geburt · '+dateAge(date,age) : age.status === 'before' ? 'vor rechnerischem Beginn' : `SSW ${ssw(age)}, ${age.weekNumber}. Schwangerschaftswoche`}${date === today ? ' · heute' : ''}${labeledEvents.length ? ' · ' + labeledEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
       if (mentions) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${mentions} Beobachtungen ${symptom ? 'zum ausgewählten Symptom' : 'mit Symptomen'}`);
       if (appointments.length) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${appointments.length} eigene Termine: ${appointments.map(item => `${item.time} ${item.title}`).join(', ')}`);
-      day.append(node('span', 'calendar-day-number', String(Number(date.slice(8)))), node('span', 'calendar-day-ssw', age.status === 'before' ? '–' : ssw(age)));
+      day.append(node('span', 'calendar-day-number', String(Number(date.slice(8)))), node('span', 'calendar-day-ssw', dateAge(date,age)));
       const markers = node('span', 'calendar-markers'); markers.setAttribute('aria-hidden', 'true');
       if (careStart) markers.append(node('span', 'calendar-mark calendar-mark-care', 'V'));
       if (appointments.length) markers.append(node('span', 'calendar-mark calendar-mark-appointment', appointments.length === 1 ? 'T' : `T${Math.min(appointments.length, 9)}${appointments.length > 9 ? '+' : ''}`));
