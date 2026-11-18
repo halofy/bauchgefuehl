@@ -20,7 +20,7 @@ function paint() {
 
 export function showAppPanel(id, focus = false) {
   if (!sections.includes(id)) return;
-  if (mobile.matches) {
+  {
     positions.set(active, scrollY);
     active = id;
     paint();
@@ -30,9 +30,6 @@ export function showAppPanel(id, focus = false) {
       heading.tabIndex = -1;
       heading.focus({ preventScroll: true });
     }
-  } else {
-    active = id;
-    paint();
   }
 }
 
@@ -43,16 +40,6 @@ export function setupAppNavigation() {
     showAppPanel(button.dataset.scroll, true);
     if (!mobile.matches) document.getElementById(active).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   });
-  let pending = false;
-  window.addEventListener('scroll', () => {
-    if (mobile.matches || pending) return;
-    pending = true;
-    requestAnimationFrame(() => {
-      active = sections.filter(id => document.getElementById(id).getBoundingClientRect().top <= 190).at(-1) || sections[0];
-      paint();
-      pending = false;
-    });
-  }, { passive: true });
   mobile.subscribe(() => {
     paint();
     if (mobile.matches) window.scrollTo({ top: 0, behavior: 'instant' });

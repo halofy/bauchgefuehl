@@ -4,7 +4,10 @@ import { setupPwa } from './pwa.js';
 import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
-import { setupSync } from './sync-ui.js';
+import { setupDevices } from './devices-ui.js';
+import { setupBirth } from './birth-ui.js';
+import { BIRTH_KEY, BIRTH_HISTORY_KEY } from './birth.js';
+import { DEVICE_KEY, RECOVERY_KEY, recoverBundle } from './device-transfer.js';
 import { setupJournal } from './journal-ui.js';
 import { setupCalendar } from './calendar-ui.js';
 import { normalizeJournal } from './journal.js';
@@ -18,6 +21,8 @@ const $$ = selector => [...document.querySelectorAll(selector)];
 const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
 let storage;
 try { storage = window.localStorage; } catch { storage = { getItem() { throw new Error(); }, setItem() { throw new Error(); }, removeItem() { throw new Error(); } }; }
+let recoveryProblem = '';
+try { recoverBundle(storage); } catch (cause) { recoveryProblem = cause.message; }
 let today = todayISO();
 let local = readLocal(storage, today);
 let state = { profile: local.profile || demoProfile(today), checks: { ...local.checks }, journal: local.journal || [], mode: local.profile ? 'local' : 'demo' };
@@ -28,6 +33,7 @@ let journalUi = null;
 let calendarUi = null;
 let guideUi = null;
 let reportUi = null;
+let birthUi = null;
 
 function announce(message) {
   $('#notice').textContent = message;
@@ -53,7 +59,7 @@ function currentWeek() {
 
 function readIncomingLink() {
   if (syncUi?.connection && location.hash.startsWith('#s=')) {
-    announce('Ein einzelner Teilen-Link ersetzt keine verbundene Reise. Trenne die Geräteverbindung bewusst, bevor du einen anderen Datenstand übernimmst.');
+    announce('Ein Reise-Link ersetzt keinen zugeordneten Masterstand. Löse die Gerätezuordnung nach einer Sicherung, bevor du eine andere Reise übernimmst.');
     selectedWeek = currentWeek();
     return;
   }
@@ -236,7 +242,7 @@ function renderCare() {
   $('#milestones').replaceChildren(...upcoming.map(item => milestoneCard(item, 'next', days)));
   $('#all-milestones').replaceChildren(...milestones.map(item => milestoneCard(item, 'all', days)));
   $('#checklist-note').textContent = state.mode === 'demo' ? 'In der Vorschau sind die Merkhäkchen deaktiviert. Trage deine Daten ein, um sie lokal zu nutzen.' : state.mode === 'shared' ? 'Übernimm die Daten auf diesem Gerät, um eigene Merkhäkchen zu setzen. Häkchen werden nicht geteilt.' : 'Deine Häkchen sind persönliche Merkhilfen, keine medizinische Dokumentation. Sie werden nicht geteilt.';
-  if (syncUi?.connection) $('#checklist-note').textContent = syncUi.readOnly ? 'Merkhäkchen kommen automatisch vom Master. Änderungen sind nur dort möglich.' : 'Merkhäkchen werden wie deine Berechnungsgrundlage an verbundene Geräte synchronisiert.';
+  if (syncUi?.connection) $('#checklist-note').textContent = syncUi.readOnly ? 'Merkhäkchen stammen aus dem zuletzt übernommenen Masterstand. Änderungen erfolgen am Master.' : 'Merkhäkchen sind im nächsten bewusst übertragenen Geräte-Stand enthalten.';
 }
 
 function render(center = false) {
@@ -248,6 +254,7 @@ function render(center = false) {
   calendarUi?.render();
   guideUi?.render();
   reportUi?.refreshIfOpen();
+  birthUi?.render();
 }
 
 function queueSync() {
@@ -444,10 +451,10 @@ const actions = {
   sources: () => openDetail('#sources-details'),
   report: () => reportUi?.open(),
 };
-for (const element of $$('[data-action]')) element.addEventListener('click', () => actions[element.dataset.action]());
+for (const element of $$('[data-action]')) if (actions[element.dataset.action]) element.addEventListener('click', () => actions[element.dataset.action]());
 for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
 for (const dialog of $$('dialog')) {
-  if (dialog.id === 'journal-dialog') continue;
+  if (dialog.id === 'journal-dialog' || dialog.id === 'birth-dialog') continue;
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
@@ -458,10 +465,12 @@ for (const dialog of $$('dialog')) {
 $('#delete-data').addEventListener('click', () => { $('#delete-error').hidden = true; $('#delete-dialog').showModal(); });
 $('#confirm-delete').addEventListener('click', () => {
   try {
-    if (syncUi?.connection) throw new Error('Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen.');
+    if (syncUi?.connection) throw new Error('Bitte zuerst unter „Daten & Backup“ eine Sicherung herunterladen und die Gerätezuordnung lösen.');
     storage.removeItem(SYNC_KEY);
     storage.removeItem(HISTORY_KEY);
     storage.removeItem(STORAGE_KEY);
+    for (const key of [BIRTH_KEY, BIRTH_HISTORY_KEY, DEVICE_KEY, RECOVERY_KEY]) storage.removeItem(key);
+    birthUi?.reload();
     clearShareHash();
     local = { profile: null, checks: {}, error: null };
     state = { profile: demoProfile(today), checks: {}, journal: [], mode: 'demo' };
@@ -471,7 +480,7 @@ $('#confirm-delete').addEventListener('click', () => {
     announce('');
     toast('Deine lokalen Angaben, dein Journal und deine Merkhäkchen wurden gelöscht.');
   } catch {
-    $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Geräte verbinden“ ein Backup herunterladen und die Geräteverbindung trennen. Serverstände bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
+    $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Daten & Backup“ eine Sicherung herunterladen und die Gerätezuordnung lösen. Bereits weitergegebene Kopien bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
     $('#delete-error').hidden = false;
   }
 });
@@ -525,7 +534,17 @@ window.addEventListener('storage', event => {
   render(true);
 });
 
-announce(local.error || '');
+function saveJournalEntries(entries) {
+  if (syncUi?.readOnly || !['local', 'session'].includes(state.mode)) throw new Error('Bitte zuerst eigene Angaben am schreibberechtigten Gerät speichern.');
+  const fresh = readLocal(storage, today);
+  if (JSON.stringify(fresh.journal) !== JSON.stringify(state.journal)) throw new Error('Das Journal wurde in einem anderen Tab geändert. Bitte neu öffnen; die offene Messung bleibt gespeichert.');
+  const journal = normalizeJournal(entries, today);
+  writeLocal(storage, state.profile, state.checks, today, journal);
+  state.journal = journal; state.mode = 'local';
+  local = { profile: state.profile, checks: { ...state.checks }, journal, error: null };
+  queueSync(); renderMode(); calendarUi?.render(); reportUi?.refreshIfOpen(); birthUi?.render();
+}
+announce(recoveryProblem || local.error || '');
 guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mode, getToday: () => today });
 reportUi = setupReport({ getJournal: () => state.journal, getToday: () => today, notify: toast });
 journalUi = setupJournal({
@@ -533,19 +552,7 @@ journalUi = setupJournal({
   onOpen: () => calendarUi?.showJournal(),
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
-  saveJournal(entries) {
-    if (syncUi?.readOnly || !['local', 'session'].includes(state.mode)) throw new Error('Bitte zuerst deine Angaben am Master speichern.');
-    const journal = normalizeJournal(entries, today);
-    // Commit durable data first; a failed save keeps the editor and its draft open.
-    writeLocal(storage, state.profile, state.checks, today, journal);
-    state.journal = journal;
-    state.mode = 'local';
-    local = { profile: state.profile, checks: { ...state.checks }, journal, error: null };
-    queueSync();
-    renderMode();
-    calendarUi?.render();
-    reportUi?.refreshIfOpen();
-  },
+  saveJournal: saveJournalEntries,
   notify: toast,
   weekOnDate(date) {
     if (state.mode === 'demo' || state.mode === 'shared') return null;
@@ -575,25 +582,32 @@ calendarUi = setupCalendar({
   },
 });
 let lastSyncRole = '';
-syncUi = setupSync({
+syncUi = setupDevices({
   storage,
   getSnapshot() {
     if (state.mode === 'demo' || state.mode === 'shared') throw new Error('Bitte zuerst eigene Angaben auf diesem Gerät speichern.');
     return { profile: state.profile, checks: state.checks, journal: state.journal };
   },
   applySnapshot(value, options = {}) {
-    writeLocal(storage, value.profile, value.checks, today, value.journal, options);
+    if (!options.alreadyStored) writeLocal(storage, value.profile, value.checks, today, value.journal, options);
     local = { profile: value.profile, checks: value.checks, journal: value.journal, error: null };
     state = { profile: value.profile, checks: { ...value.checks }, journal: value.journal, mode: 'local' };
     selectedWeek = currentWeek();
     render(true);
   },
   notify: toast,
+  reloadExtras() { birthUi?.reload(); },
   onConnection(connection, readOnly) {
     const role = `${connection?.role || ''}:${readOnly}`;
     for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
-    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); }
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); birthUi?.render(); }
   },
+});
+birthUi = setupBirth({
+  storage, getProfile: () => state.profile, getMode: () => state.mode, getJournal: () => state.journal,
+  canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
+  saveJournal: saveJournalEntries, notify: toast,
+  openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); document.getElementById('calendar-view').scrollIntoView({ behavior: 'instant' }); },
 });
 readIncomingLink();
 render(true);

@@ -9,6 +9,8 @@
 
 ## Kontext und Herkunft
 
+**Fortschreibung vom 18.11.2026:** [AgDR-0020](0020-serverloser-geraeteabgleich.md) löst die nachfolgend historischen Annahmen über aktive Sync-Räume/Server ab. Vollständige Geräte-Stände werden nun bewusst ohne Datenserver übertragen; der ausgewählte Journalauszug und der ET-only-Reise-Link bleiben erhalten. Kostenlosigkeit und lokale Verarbeitung gelten unverändert.
+
 **Ausdrücklich vom Nutzer:** Weitere Ideen aus der Feature-Liste dürfen umgesetzt werden. Alles soll offline und „privacy first“ funktionieren, beim Teilen sollen gegebenenfalls Bereiche ausgelassen werden. Es wird kein Bezahl-Premium geben; alle Funktionen sind für alle frei. Quellen für Daten sind immer anzugeben.
 
 **Agentenentscheidung zum Umfang:** Neben dem separat dokumentierten Offline-Wissenskatalog werden eine datensparsame Variante des vorhandenen Reise-Links und ein ausgewählter Journalauszug umgesetzt. F07 wird teilweise erfüllt; spätere Check-ins und Terminfragen werden nicht vorweggenommen. Die neue Produktgrundlage gilt auch für die übrigen offenen Features und wird in Projektkonventionen und Feature-Liste festgehalten.

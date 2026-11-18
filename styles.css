@@ -713,3 +713,43 @@ html:where(.app-layout){scroll-padding-top:88px}
 :where(.app-layout) #report-dialog{width:100%;max-width:none}
 :where(.app-layout) .report-preview{padding:14px}
 :where(.app-layout) #report-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
+/* One clear primary area at a time, with secondary information behind explicit summaries. */
+.app-navigation .mobile-inactive{display:none!important}
+.more-panel{margin:18px 0;border:1px solid var(--line);border-radius:12px;background:var(--white);padding:0 18px;min-width:0}
+.more-panel>summary{cursor:pointer;padding:17px 0;min-height:52px;font-size:14px;font-weight:550}
+.more-panel[open]{padding-bottom:18px}
+.more-panel p,.more-panel label{overflow-wrap:anywhere}
+.more-panel .source-link{display:block;margin:14px 0}
+.more-panel .reflection{margin-top:0}
+.quick-help{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+.care-tools{padding:22px;display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:26px}
+.care-tools h3{font:27px var(--serif);margin:8px 0}.care-tools p:not(.eyebrow){font-size:13px;color:var(--muted)}
+.contraction-fab{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:24px;z-index:15;background:var(--green);color:var(--white);padding:14px 20px;min-height:52px;border-radius:30px;box-shadow:0 4px 20px #284d4033;font-size:14px;font-weight:600}
+:where(.app-layout) .contraction-fab{bottom:calc(88px + env(safe-area-inset-bottom));right:16px}
+.contact-call-list{display:grid;gap:10px;margin:20px 0}
+.contact-call{justify-content:space-between;text-decoration:none;flex-wrap:wrap;overflow-wrap:anywhere;text-align:left}
+.contact-call span{font-size:13px;font-weight:400}
+.birth-tracker{padding:20px;margin:20px 0;min-width:0}.birth-tracker h3{font:27px var(--serif)}
+.birth-warning{font-size:12px;padding:13px;border-left:3px solid #a26c42;background:#f7eedf;margin:13px 0;overflow-wrap:anywhere}
+.birth-timer{display:block;text-align:center;font:60px/1.4 var(--serif);font-variant-numeric:tabular-nums;margin:20px 0 10px}
+.birth-tracker .button{min-height:62px;margin:14px 0}
+.birth-pattern{font-size:13px;margin:15px 0;padding:14px;background:var(--sage);border-radius:10px}
+.birth-pattern.pattern-matched{background:#f7e6cf;border:1px solid #b3834f}
+.birth-measurements{display:grid;gap:8px;margin:14px 0}
+.birth-measurement{text-align:left;font-size:12px;min-height:48px;padding:12px;border:1px solid var(--line);border-radius:8px}
+.contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}.contact-fields label{min-width:0;margin:0}
+.contact-fields input{margin-top:6px;min-width:0}
+#birth-contacts-save{margin-top:18px}
+#device-qr{margin:18px auto;max-width:280px}
+#device-qr svg{display:block;width:100%;height:auto}
+#device-input{width:100%;min-width:0}
+#sync-dialog .more-panel .button{margin:12px 0}
+:where(.app-layout) .contact-fields{grid-template-columns:1fr}
+:where(.app-layout) .birth-tracker{padding:15px}
+:where(.app-layout) .care-tools{align-items:flex-start;flex-direction:column}
+:where(.app-layout) .care-tools .button{width:100%}
+:where(.app-layout) .birth-warning{font-size:13px}
+:where(.app-layout) .more-panel{padding-left:14px;padding-right:14px}
+
+.device-share-actions{display:flex;flex-wrap:wrap;gap:10px;margin-block:12px}.device-share-actions>.button{flex:1 1 180px;min-width:0}

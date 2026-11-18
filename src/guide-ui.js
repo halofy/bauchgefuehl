@@ -7,6 +7,7 @@ export function setupGuide({ getProfile, getMode, getToday = todayISO }) {
   const node = (tag, className, text) => { const element = document.createElement(tag); element.className = className; element.textContent = text; return element; };
   const variants = {};
   let date = getToday();
+  let showAll = false;
   $('guide-date').value = date;
   function render() {
     let age;
@@ -25,7 +26,11 @@ export function setupGuide({ getProfile, getMode, getToday = todayISO }) {
     const items = searchGuide({ query: $('guide-search').value, category: $('guide-category').value, level: $('guide-level').value, variants });
     $('guide-count').textContent = `${items.length} Treffer · Redaktionell geprüft: ${formatDate(GUIDE_REVIEWED)}`;
     const results = $('guide-results'); results.replaceChildren();
-    for (const item of items) {
+    const condensed = !showAll && !$('guide-search').value.trim() && !$('guide-category').value && !$('guide-level').value;
+    const visibleItems = condensed ? items.slice(0, 6) : items;
+    $('guide-show-all').hidden = !condensed || items.length <= 6;
+    if (condensed) $('guide-count').textContent = `6 von ${items.length} Themen · Suchbegriff eingeben oder alle Themen öffnen · Geprüft: ${formatDate(GUIDE_REVIEWED)}`;
+    for (const item of visibleItems) {
       const advice = guideAdvice(item, variants[item.id]);
       const card = node('details', 'guide-item card', '');
       card.dataset.guideId = item.id;
@@ -63,6 +68,7 @@ export function setupGuide({ getProfile, getMode, getToday = todayISO }) {
   }
   for (const id of ['guide-search', 'guide-category', 'guide-level']) $(id).addEventListener('input', render);
   $('guide-date').addEventListener('change', render);
+  $('guide-show-all').addEventListener('click', () => { showAll = true; render(); });
   $('guide-apply-filter').addEventListener('click', render);
   $('guide-today').addEventListener('click', () => { $('guide-date').value = getToday(); render(); });
   return {

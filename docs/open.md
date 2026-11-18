@@ -1,20 +1,42 @@
 # Feature-Liste
 
-Stand: **17.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von bauchgefühl. Die Liste wurde vom Nutzer beauftragt; Prioritäten und Abschlusskriterien sind Vorschläge des Agenten. Begründungen und Herkunft: [AgDR-0012](agdr/0012-roadmap-und-ssw-pruefung.md).
+Stand: **18.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von bauchgefühl. Die Liste wurde vom Nutzer beauftragt; Prioritäten und Abschlusskriterien sind Vorschläge des Agenten. Begründungen und Herkunft: [AgDR-0012](agdr/0012-roadmap-und-ssw-pruefung.md).
 
 **Verbindliche Nutzeranforderung:** Alle Funktionen sind für alle kostenlos. Es gibt kein Bezahl-Premium. Neue Funktionen funktionieren offline und datensparsam; Quellen und Prüfstand werden angegeben. Für begrenztes Teilen werden Bereiche aus dem weitergegebenen Inhalt entfernt. Siehe [AgDR-0016](agdr/0016-kostenlos-offline-und-selektives-teilen.md).
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
-**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0018 abgeglichen:** F12–F14 sind umgesetzt. F03 und F07 sind teilweise umgesetzt und bleiben offen. F01, F02, F04–F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0022 abgeglichen:** F12–F16 und F18 sind umgesetzt. F03, F07 und F17 sind teilweise umgesetzt und bleiben offen. F01, F02, F04–F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
 
 ## Geklärt und bereits vorhanden
 
 - [x] **SSW-Berechnungsfrage geklärt.** Der Nutzer hat die Erklärung zur Zyklusanpassung bestätigt. Keine offene Aufgabe zur Änderung der Formel oder zur zusätzlichen Gegenüberstellung. Die persönliche Rechenerklärung ist bereits umgesetzt; siehe [AgDR-0011](agdr/0011-persoenliche-berechnungserklaerung.md).
-- [x] **Bestehende Grundlage:** Journal mit Symptomen, Text, Tags und Messwerten, Archivierung/Wiederherstellung, einfache Verläufe, Filter und CSV; lokale Speicherung, Backups und Master-Sync. Diese Funktionen werden durch die folgenden Features erweitert.
+- [x] **Bestehende Grundlage:** Journal mit Symptomen, Text, Tags und Messwerten, Archivierung/Wiederherstellung, einfache Verläufe, Filter und CSV; lokale Speicherung, Backups und bewusster Geräteabgleich mit Master. Diese Funktionen werden durch die folgenden Features erweitert.
 - [x] **F12 · Kalender, SSW-Vorausblick und Journal** — am 17.11.2026 zusätzlich vom Nutzer gewünscht und umgesetzt. Monatsansicht mit SSW je Datum, Datum-/SSW-Suche, 42 Wochen mit Datumsbereichen, Vorsorgefenster und Meilensteine; bestehende Journaleinträge direkt am Tag lesen, bearbeiten oder ergänzen. [Umfang und Prüfnachweise: AgDR-0014](agdr/0014-kalender-und-journal.md).
 - [x] **F13 · Offline-Suche zu Lebensmitteln und Aktivitäten** — 26 redaktionell belegte Einträge mit Suchbegriffen, Bereichs-/Ampelfilter, Zubereitungswahl, Bedingungen, Quellen und Prüfdatum. Kalender-Tagesbezug mit derselben Datierung; keine Freigabe für unbekannte Produkte oder allein durch einen SSW-Wechsel. [AgDR-0017](agdr/0017-lebensmittel-und-aktivitaeten.md). NDR „Tatsächlich schwanger“ ist ergänzend im Quellenbereich und mit dem geprüften Ernährungsartikel bei sechs passenden Karten verlinkt ([AgDR-0018](agdr/0018-ndr-als-ergaenzende-quelle.md)). Der Katalog ist eine erweiterbare Auswahl.
-- [x] **F14 · Datensparsame Weitergabe** — Reise-Link standardmäßig nur mit ET, vollständige Grundlage bewusst wählbar. Journalauszug mit Zeitraum, Bereichsauswahl, einzelnen ausgelassenen Einträgen, Vorschau und offline lesbarer HTML-Datei. Keine Sync-Schlüssel im Bericht. Vollständiger Geräte-Sync bleibt ausdrücklich als solcher gekennzeichnet. [AgDR-0016](agdr/0016-kostenlos-offline-und-selektives-teilen.md).
+- [x] **F14 · Datensparsame Weitergabe** — Reise-Link standardmäßig nur mit ET, vollständige Grundlage bewusst wählbar. Journalauszug mit Zeitraum, Bereichsauswahl, einzelnen ausgelassenen Einträgen, Vorschau und offline lesbarer HTML-Datei. Keine Sync-Schlüssel im Bericht. Vollständige Geräte-Stände bleiben ausdrücklich als solche gekennzeichnet; sie werden inzwischen ohne Server bewusst weitergegeben (F17). [AgDR-0016](agdr/0016-kostenlos-offline-und-selektives-teilen.md).
+
+## Neu beauftragt – Kontakte, Geburt, Geräte und Übersicht
+
+- [x] **F15 · Drei Anrufkontakte**
+  Bis zu drei Namen und Telefonnummern lokal speichern und über `tel:` bewusst in der Telefon-App öffnen. Kontaktverwaltung auch ohne eingetragene Schwangerschaft; Kontakte in vollständigen Backups, in Geräte-Ständen nur nach ausdrücklicher Auswahl. Keine automatischen Anrufe. [AgDR-0019](agdr/0019-kontakte-und-wehentracker.md).
+
+- [x] **F16 · Wehentracker mit Kalenderprotokoll**
+  Beginn und Ende messen, Dauer und Abstand von Beginn zu Beginn speichern. Offene Messung über Neuladen erhalten; Endzeit korrigierbar, versehentliche Messungen ohne Verlust von der Musterübersicht ausschließbar. Jeder Abschluss landet im vorhandenen Journal und am Beginndatum im Kalender.
+  **Schnellzugriff:** Schwebende Schaltfläche ab **22+0** bei eigenen Angaben, bei offener Messung immer; früher über „Hilfe & Kontakte“ erreichbar. Diese Anzeigegrenze ist eine Agentenentscheidung für die Bedienung, keine individuelle Überlebensprognose.
+  **Zeitmuster:** Quellenbasierte Orientierung für erstes beziehungsweise weiteres Kind mit Kontaktlinks. Keine Bestätigung von Geburtswehen oder Entwarnung; vor 37+0 und bei Warnzeichen nicht auf ein Muster warten. [AgDR-0019](agdr/0019-kontakte-und-wehentracker.md).
+
+- [ ] **F17 · Zwei Smartphones ohne Sync-Server — In Arbeit, manueller Standabgleich umgesetzt**
+  **Nutzeranforderung:** Kein eigener Dev-/Sync-Server und keine fremden Verbindungsdienste; bevorzugt eine performante direkte Lösung, notfalls QR/URL. Der alte Server-Sync wird nicht mehr angeboten oder automatisch gestartet.
+  - [x] Verschlüsselten, vom Master signierten Stand lokal erzeugen; Passwort getrennt vom Inhalt.
+  - [x] Kleine Stände per QR/Link, größere Journale als vollständige verschlüsselte Datei ohne Kürzung übertragen.
+  - [x] iOS ↔ Android als Fokus: kompakte vollständige URL ohne doppelte Base64-Kodierung, QR bis 2.200 Zeichen und lange Links bis 65.536 Zeichen getrennt behandeln. Native Link-/Datei-Teilen-Auswahl bei Browserunterstützung; Kopieren/Download bleiben verfügbar. Grenzen und Primärquellen: [AgDR-0022](agdr/0022-smartphone-nahuebertragung-und-kompakte-links.md).
+  - [x] Vor Übernahme entschlüsselte Vorschau; Masterbindung, Versionsprüfung, Schutz vor fehlenden Einträgen und dem Zurücksetzen neuerer Journalfassungen und abgesicherter Import.
+  - [x] Kontakte optional; Journal-Teilweitergabe weiterhin als ausgewählter Bericht. Alte Schlüssel, ausstehende Serverdaten und Rohstände in vollständigen Backups erhalten; alte Backups weiterhin auswählbar.
+  - [ ] Direkten WebRTC-DataChannel im selben WLAN/geeigneten Hotspot mit QR-Angebot und QR-Antwort ohne fremde Signalisierungs-/STUN-/TURN-Dienste auf iPhone und Android evaluieren. UWB/Web Bluetooth/Web NFC tragen laut geprüften Primärquellen keinen gemeinsamen Webapp-Kanal. Aktuell gibt es **keine automatische Aktualisierung**; jeder neue Stand wird bewusst übertragen. Keine Zusage einer universell zuverlässigen Browserverbindung. [AgDR-0020](agdr/0020-serverloser-geraeteabgleich.md), [AgDR-0022](agdr/0022-smartphone-nahuebertragung-und-kompakte-links.md).
+
+- [x] **F18 · Klare Hauptbereiche, Details bei Bedarf**
+  Auf Smartphone und Desktop jeweils nur einen der fünf Hauptbereiche zeigen; Bereichspositionen erhalten. Kalender-Wochenrückblick und Vorausblick aufklappbar, Wissensstart mit sechs Themen und „Alle Themen anzeigen“, Kontakte und Wehentracker als gezielte Schnellzugriffe. [AgDR-0021](agdr/0021-uebersichtliche-hauptbereiche.md). Weitere Verfeinerungen nach konkreter Rückmeldung bleiben möglich.
 
 ## P1 – Mutterbezogenen Alltag verbessern
 
@@ -83,16 +105,16 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 ## Gemeinsame Abschlusskriterien
 
-- Neue persönliche Angaben bleiben lokal nutzbar und werden in Sicherung, Wiederherstellung und vorhandenen Master-Sync einbezogen. Nur der aktive Master bearbeitet synchronisierte Daten.
+- Neue persönliche Angaben bleiben lokal nutzbar und werden in Sicherung und Wiederherstellung einbezogen. Geräte-Stände werden bewusst ohne Datenserver weitergegeben; nur der aktive Master bearbeitet die zugeordnete Schwangerschaft und das Journal. Anrufkontakte bleiben gerätespezifisch und sind optional übertragbar.
 - Bestehende Daten werden bei Formatänderungen erhalten; Migrationen und Fehlerfälle werden passend geprüft. In Tests und Dokumentation stehen ausschließlich synthetische Beispiele.
 - GitHub-Pages-Kompatibilität, mobile Bedienung und die vorhandene Offline-Nutzung bleiben erhalten. Funktionen mit zusätzlichem Infrastrukturbedarf bekommen vor der Umsetzung eine dokumentierte Architekturentscheidung.
 - Medizinische Inhalte haben Fachquellen und einen redaktionellen Stand; der vom Nutzer gewünschte NDR-Bereich „Tatsächlich schwanger“ wird als ergänzende redaktionelle Quelle mit konkret geprüften Beiträgen berücksichtigt ([AgDR-0018](agdr/0018-ndr-als-ergaenzende-quelle.md)). Beobachtungen werden nicht als Diagnosen oder nachgewiesene Ursachen interpretiert.
-- Alle Funktionen sind ohne Bezahlstufe zugänglich. Neue Ansichten, Suche und Berichte funktionieren offline; die App speichert keine Suchhistorie und lädt keine externen Inhalte automatisch nach. Externe Originalquellen und optionaler Geräte-Sync brauchen eine Verbindung.
-- Bei Teilweitergabe werden ausgelassene Inhalte einschließlich Metadaten tatsächlich entfernt. Filter allein beschränken keine bestehenden Sync-Leserechte. Ein begrenzter automatischer Geräte-Sync würde getrennte Datenräume und Schlüssel sowie eine eigene Kompatibilitätsentscheidung benötigen und ist weiterhin offen.
+- Alle Funktionen sind ohne Bezahlstufe zugänglich. Neue Ansichten, Suche und Berichte funktionieren offline; die App speichert keine Suchhistorie und lädt keine externen Inhalte automatisch nach. Externe Originalquellen brauchen Internet. Die App muss auf beiden Geräten zunächst vollständig geladen sein; danach können Dateien offline übertragen und importiert werden. QR/Link benötigen eine auf dem Zielgerät verfügbare App-Adresse.
+- Bei Teilweitergabe werden ausgelassene Inhalte einschließlich Metadaten tatsächlich entfernt. Ein bereits übergebener vollständiger Geräte-Stand wird durch spätere Ansichtsfilter nicht eingeschränkt. Ein begrenzter automatischer Geräteabgleich und seine Rechte-/Schlüsselregeln bleiben offen; aktive Serverräume werden in dieser App-Version nicht mehr verwendet.
 - Wesentliche Entscheidungen erhalten einen AgDR; README und diese Arbeitsliste werden entsprechend aktualisiert. Funktionsänderungen werden angemessen geprüft und gebaut, verbleibende Prüflücken dokumentiert.
 
 ## Festgelegte Produktgrundlage
 
 Die frühere Kennzeichnung als „Premium-Kandidat“ wurde durch die ausdrückliche Nutzerentscheidung abgelöst: **Alle heutigen und zukünftigen Funktionen sind kostenlos für alle.** Die Prioritäten bestimmen nur die Umsetzungsreihenfolge.
 
-**Empfohlene nächste Schritte:** F02 umsetzen und damit die offenen Check-in-Anteile von F03 ergänzen. F01, F04 und F05 können unabhängig davon weiterentwickelt werden; F02 und F05 liefern später weitere Daten für F07. Begrenzter automatischer Geräte-Sync bleibt ebenfalls offen; F14 bietet bereits begrenzte Weitergabe als Datei, aber keine eingeschränkten Sync-Leserechte.
+**Empfohlene nächste Schritte:** F15–F18 auf den eigenen Smartphones erproben und die optionale direkte Verbindung aus F17 untersuchen. Danach F02 umsetzen und damit die offenen Check-in-Anteile von F03 ergänzen. F01, F04 und F05 können unabhängig davon weiterentwickelt werden; F02 und F05 liefern später weitere Daten für F07. Automatischer und bereichsweise begrenzter Geräteabgleich bleibt offen; F14 bietet bereits begrenzte Weitergabe als Datei.

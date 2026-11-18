@@ -13,9 +13,9 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0005](0005-bedienung-und-verifikation.md) | Bedienung, Beispieldaten und gestufte Verifikation | Teilweise abgelöst durch AgDR-0010 |
 | [AgDR-0006](0006-waehlbare-berechnungsmethode.md) | Wählbare Berechnung aus Periode/Zyklus oder ET mit 28-Tage-Basis | Umgesetzt |
 | [AgDR-0007](0007-github-pages-ziel.md) | Repository und Projektpfad für GitHub Pages | Teilweise abgelöst durch AgDR-0010, Veröffentlichung offen |
-| [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) | Master, Geräte-QR, verschlüsselter Sync und lokaler SQLite-Dienst | Umgesetzt, lokal geprüft |
+| [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) | Master, Geräte-QR, verschlüsselter Sync und lokaler SQLite-Dienst | Aktiver Verbindungsweg abgelöst durch AgDR-0020; Altstände erhalten |
 | [AgDR-0009](0009-persoenliches-journal.md) | Persönliches Journal, Messwertverläufe und Datenmigration | Umgesetzt, lokal geprüft |
-| [AgDR-0010](0010-mobile-app-und-pwa.md) | Mobile App-Navigation, Installation, Offline-Dateien und bewusste Updates | Layout-Erkennung teilweise abgelöst durch AgDR-0013; Geräteinstallation offen |
+| [AgDR-0010](0010-mobile-app-und-pwa.md) | Mobile App-Navigation, Installation, Offline-Dateien und bewusste Updates | Layout-Erkennung erweitert durch AgDR-0013, Desktopbereiche abgelöst durch AgDR-0021; Geräteinstallation offen |
 | [AgDR-0011](0011-persoenliche-berechnungserklaerung.md) | Persönliche Rechenschritte mit den aktuellen Angaben | Umgesetzt, lokal geprüft |
 | [AgDR-0012](0012-roadmap-und-ssw-pruefung.md) | Mutterbezogener Feature-Backlog und abgeschlossene SSW-Prüfung | Premium-Vorschläge abgelöst durch AgDR-0016; SSW-Frage geklärt |
 | [AgDR-0013](0013-app-layout-erkennung.md) | App-Layout auf großen Smartphones und installierten PWAs | Umgesetzt, Safari-Prüfung; physisches Smartphone offen |
@@ -24,6 +24,10 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md) | Alle Funktionen kostenlos; ET-only-Link und ausgewählter Journalauszug ohne Upload | Umgesetzt; begrenzter Geräte-Sync weiterhin offen |
 | [AgDR-0017](0017-lebensmittel-und-aktivitaeten.md) | Quellenbasierte Offline-Suche mit bedingter Ampel und Kalenderbezug | Redaktionelle Auswahl umgesetzt; keine individuelle medizinische Prüfung |
 | [AgDR-0018](0018-ndr-als-ergaenzende-quelle.md) | NDR „Tatsächlich schwanger“ als geprüfte ergänzende redaktionelle Quelle | Quellen ergänzt; medizinische Regeln unverändert |
+| [AgDR-0019](0019-kontakte-und-wehentracker.md) | Drei Anrufkontakte, persistente Wehenmessung, Kalender und vorsichtige Zeitmuster | Umgesetzt und synthetisch geprüft; physische Geräte offen |
+| [AgDR-0020](0020-serverloser-geraeteabgleich.md) | Signierte, verschlüsselte Geräte-Stände per QR/Link oder Datei ohne Datenserver | Manueller Abgleich umgesetzt; direkter automatischer Kanal offen |
+| [AgDR-0021](0021-uebersichtliche-hauptbereiche.md) | Ein Hauptbereich je Ansicht, Details aufklappbar und kompakter Wissensstart | Umgesetzt; vier Inhaltsbreiten geprüft |
+| [AgDR-0022](0022-smartphone-nahuebertragung-und-kompakte-links.md) | iOS-/Android-Nahübertragung, kompakte Stand-Links und native Teilen-Auswahl | Link/Teilen umgesetzt; physische Geräte und WebRTC offen |
 
 ## Fortschreiben
 

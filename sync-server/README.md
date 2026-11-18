@@ -1,5 +1,7 @@
 # Lokaler Sync-Dienst
 
+**Historischer Betriebsweg:** Seit der Entscheidung vom 18.11.2026 startet die App diese Serververbindung nicht mehr. Die aktuelle Nutzung auf Smartphones benötigt keinen eigenen Datenserver; siehe [serverlosen Geräteabgleich](../README.md#geräte-stände-ohne-server) und [AgDR-0020](../docs/agdr/0020-serverloser-geraeteabgleich.md). Die folgenden Hinweise bleiben zur Nachvollziehbarkeit und Sicherung bestehender `.local-sync/`-Altstände erhalten.
+
 Die Webapp und der Sync-Dienst können gemeinsam lokal laufen. Es ist kein Cloudflare-Konto und keine Installation von npm-Paketen erforderlich. Voraussetzung ist Node.js ab **22.13** mit `node:sqlite`.
 
 ## Start auf diesem Rechner

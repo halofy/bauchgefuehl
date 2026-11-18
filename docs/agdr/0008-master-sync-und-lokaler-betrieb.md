@@ -1,12 +1,14 @@
 # AgDR-0008: Master-Synchronisierung per QR-Code und lokaler Betrieb
 
-- **Status:** Umgesetzt und lokal geprüft; WLAN-/Browser-Restprüfungen offen
+- **Status:** Ursprünglich umgesetzt und lokal geprüft; aktiver Verbindungsweg abgelöst durch AgDR-0020
 - **Datum:** 2026-11-17
 - **Entscheidende Instanz:** Master, Schutz vor Datenverlust und automatischer Sync ausdrücklich vom Nutzer gewünscht; anschließend lokaler Betrieb ausdrücklich bevorzugt
 - **Betroffene Dateien:** [Sync-Engine](../../src/sync.js), [Geräteoberfläche](../../src/sync-ui.js), [Protokoll/Worker](../../sync-server/worker.js), [lokaler Server](../../sync-server/local.js), [SQLite-Adapter](../../sync-server/sqlite-storage.js), [QR-Ausgabe](../../src/qr.js), [Starter](../../start-local.command), [Tests](../../tests/sync.test.js)
 - **Erweitert beziehungsweise ersetzt teilweise:** [AgDR-0001](0001-statische-webapp.md), [AgDR-0003](0003-lokale-daten-und-teilen.md), [AgDR-0006](0006-waehlbare-berechnungsmethode.md)
 
 ## Kontext und Herkunft
+
+**Abgelöst am 18.11.2026:** Der Nutzer verlangt Geräteabgleich ohne eigenen Datenserver und ohne fremde Verbindungsdienste. [AgDR-0020](0020-serverloser-geraeteabgleich.md) ersetzt die aktive Serverkopplung durch bewusste signierte und verschlüsselte Geräte-Stände. Die alte Oberfläche wird nicht mehr gestartet; gespeicherte Altstände, Schlüssel und Serverdateien werden erhalten. Dieser Record beschreibt den historischen Aufbau, keine aktuelle Betriebsvoraussetzung.
 
 **Ergänzung vom 17.11.2026:** [AgDR-0009](0009-persoenliches-journal.md) erweitert Datenstand, Sicherungen und Sync um das persönliche Journal und beschreibt den Formatschutz sowie die zusätzlichen Größenbegrenzungen. Die folgenden Prüfnachweise dokumentieren den ursprünglichen Stand dieser Entscheidung.
 

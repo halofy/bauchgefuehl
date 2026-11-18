@@ -179,5 +179,5 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     }
     switchView(view);
   }
-  return { render, showJournal: () => switchView('journal') };
+  return { render, showJournal: () => switchView('journal'), showDate: date => choose(date, true) };
 }
