@@ -6,7 +6,7 @@ Stand: **18.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von ba
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
-**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0022 abgeglichen:** F12–F16 und F18 sind umgesetzt. F03, F07 und F17 sind teilweise umgesetzt und bleiben offen. F01, F02, F04–F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0025 abgeglichen:** F01–F03, F05, F12–F16 und F18 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F04, F06 und F08–F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
 
 ## Geklärt und bereits vorhanden
 
@@ -40,15 +40,17 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 ## P1 – Mutterbezogenen Alltag verbessern
 
-- [ ] **F01 · Eigener Bereich „Für dich“**
+- [x] **F01 · Eigener Bereich „Für dich“**
   Gleichwertig sichtbarer Bereich neben den Babyinformationen mit vertieften Wocheninfos zu körperlichen Veränderungen, Alltag, Schlaf, Gefühlen und Unterstützung.
   **Fertig, wenn:** Die Inhalte folgen der ausgewählten Woche, haben nachvollziehbare Quellen und sind mobil wie am Desktop erreichbar. Bestehende Körpertexte sind sinnvoll eingebunden.
+  **Umgesetzt:** Gleichwertige Reiter „Dein Baby“/„Für dich“ in der Wochenreise, direkte aktuelle Mutterinfo aus dem Überblick, Themen zu Alltag, Schlaf, Gefühlen und Unterstützung passend zur gewählten Phase. Vier aufklappbare Vertiefungen mit einzelnen Quellen und Prüfstand; vorhandene Körpertexte und Check-in-Zugriff integriert. [AgDR-0024](agdr/0024-fuer-dich-und-mobile-layoutkorrekturen.md).
 
-- [ ] **F02 · Tages-Check-in**
+- [x] **F02 · Tages-Check-in**
   Kurze strukturierte Erfassung von Stimmung, Energie, Schlaf und Symptomstärke als Ergänzung zum freien Journal.
-  **Fertig, wenn:** Kategorien beziehungsweise Skalen verständlich erklärt sind, einzelne Angaben ausgelassen werden können und mehrere Beobachtungen am selben Tag mit Uhrzeit unterscheidbar bleiben. Check-ins sind bearbeitbar, archivierbar, gesichert und synchronisiert.
+  **Fertig, wenn:** Kategorien beziehungsweise Skalen verständlich erklärt sind, einzelne Angaben ausgelassen werden können und mehrere Beobachtungen am selben Tag mit Uhrzeit unterscheidbar bleiben. Check-ins sind bearbeitbar, archivierbar und in Backups sowie verschlüsselter Geräteweitergabe enthalten.
+  **Umgesetzt:** Stimmung und Energie jeweils 1–5, Schlaf in Stunden der letzten 24 Stunden, stärkste Beschwerden jetzt 0–10; alle Felder ohne Vorgabe und optional. Mehrere Beobachtungen mit eigener Uhrzeit, gemeinsamer Journalablage, Kalenderanzeige, Originalfilter und getrennter Auswahl beim Teilen. Persönliche Merkhilfen ohne medizinische Auswertung. [AgDR-0023](agdr/0023-tages-check-in-und-strukturierter-rueckblick.md).
 
-- [ ] **F03 · Symptomkalender und Wochenrückblick — In Arbeit, Journal-Grundlage umgesetzt**
+- [x] **F03 · Symptomkalender und Wochenrückblick**
   Kalenderansicht für Beobachtungen sowie eine Zusammenfassung von Stimmung, Schlaf, Energie und Symptomen für eine gewählte Woche.
   **Fertig, wenn:** Von der Zusammenfassung zu den Originaleinträgen gewechselt werden kann, fehlende Angaben als fehlend erkennbar bleiben und archivierte Daten konsistent behandelt werden. Häufigkeiten beziehen sich auf erfasste Beobachtungen, nicht auf vermeintlich beschwerdefreie Tage.
   **Abhängigkeit:** F02 für strukturierte Check-in-Auswertungen; vorhandene Journalangaben weiter berücksichtigen.
@@ -58,15 +60,16 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
   - [x] Tage ohne Eintrag, Einträge ohne Symptomangabe und zukünftige Tage unterscheiden; archivierte Daten ausschließen und Wiederherstellung berücksichtigen.
   - [x] Aus dem Rückblick zu allen Originaleinträgen der Woche oder zu den Einträgen eines genauen Symptoms springen.
   - [x] Vorhandene Messwerte pro Bezeichnung und Einheit mit Anzahl, letztem/erstem Wert und Spanne zusammenfassen; eigene Schlafmessgrößen können bereits erscheinen.
-  - [ ] Strukturierte Stimmung, Energie, Schlaf und Symptomstärke aus F02 im Rückblick ergänzen. Keine Ableitung aus freien Notizen oder vermeintlich beschwerdefreien Tagen.
+  - [x] Strukturierte Stimmung, Energie, Schlaf und Beschwerdestärke aus F02 mit erster/letzter Angabe, Anzahl, Tagen und Erfassungslücken ergänzen. Check-ins getrennt von normalen Journalbeobachtungen zählen, Originaleinträge öffnen, keine Schlafsummen oder Ableitung aus Notizen. [AgDR-0023](agdr/0023-tages-check-in-und-strukturierter-rueckblick.md).
 
 - [ ] **F04 · Messwertverläufe mit Ausgangswert und Notizen**
   Vorhandene Gewichts- und Umfangsverläufe um eine selbst gewählte Ausgangsmessung, absolute Veränderungen und Notizmarkierungen ergänzen.
   **Fertig, wenn:** Ausgangswert und Vergleichszeitraum wählbar sind, Einheiten getrennt bleiben und sich markierte Beobachtungen öffnen lassen. Keine pauschalen Normalbereiche oder automatische gesundheitliche Bewertung.
 
-- [ ] **F05 · Vorbereitung auf Praxis und Hebamme**
+- [x] **F05 · Vorbereitung auf Praxis und Hebamme**
   Eigene Termine, Fragen, Untersuchungsergebnisse und besprochene nächste Schritte sammeln; tatsächliche Termine im bestehenden Kalender (F12) zusätzlich zu den Vorsorgefenstern anzeigen.
   **Fertig, wenn:** Fragen einem Termin zugeordnet und als besprochen markiert werden können. Ergebnisse und nächste Schritte sind mit Datum erfassbar und später wieder auffindbar; ausstehende Fragen bleiben sichtbar. Keine automatischen Diagnosen oder Behandlungsvorschläge.
+  **Umgesetzt und vom Nutzer vorgezogen:** Eigene Termine, einmalig gespeicherte zugeordnete oder zunächst freie Notizen und Fragen/Antworten, Ergebnisse, nächste Schritte und ausdrücklicher Gesprächsstatus; identisch am Termin und in der durchsuchbaren Sammlung. Archiv/Wiederherstellung, Kalenderintegration, vollständiges Backup, verschlüsselte v2-Geräteweitergabe und zwei getrennte Bereiche für Teilberichte. [AgDR-0025](agdr/0025-termine-fragensammlung-und-klarerer-kalender.md).
 
 ## P2 – Begleitung und Berichte ausbauen
 
@@ -79,7 +82,7 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
   Einen übersichtlichen Bericht mit ausgewähltem Zeitraum, Fragen, Symptomen und Messwerten erzeugen.
   **Fertig, wenn:** Zeitraum und enthaltene Bereiche auswählbar sind, eine Vorschau verfügbar ist und die lokal erzeugte PDF Datumsangaben und Einheiten korrekt darstellt. Eine ausgewählte Teilmenge exportiert ausschließlich diese Angaben.
   **Abhängigkeiten:** Bestehendes Journal; F05 für Terminfragen und Ergebnisse, F02 für strukturierte Check-ins im Bericht.
-  - [x] Zeitraum, Journalbereiche und einzelne Einträge wählen; Vorschau und selbstständige HTML-Datei offline erzeugen (F14).
+  - [x] Zeitraum, Journalbereiche und einzelne Einträge wählen; Vorschau und selbstständige HTML-Datei offline erzeugen (F14). Check-in-Werte aus F02 sowie Terminnotizen und Termindaten aus F05 sind gesondert auswählbar und bei Auslassung tatsächlich aus Vorschau und Datei entfernt.
   - [ ] Direkte PDF-Erzeugung beziehungsweise geprüfter PDF-Ausgabeweg mit den erweiterten Daten aus F02/F05. Bisher: heruntergeladene HTML-Datei öffnen und die PDF-Funktion des Browser-Druckdialogs verwenden, sofern verfügbar; kein eingebauter PDF-Generator.
 
 - [ ] **F09 · Persönlicher Geburts- und Wochenbettplan**
@@ -117,4 +120,4 @@ Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, 
 
 Die frühere Kennzeichnung als „Premium-Kandidat“ wurde durch die ausdrückliche Nutzerentscheidung abgelöst: **Alle heutigen und zukünftigen Funktionen sind kostenlos für alle.** Die Prioritäten bestimmen nur die Umsetzungsreihenfolge.
 
-**Empfohlene nächste Schritte:** F15–F18 auf den eigenen Smartphones erproben und die optionale direkte Verbindung aus F17 untersuchen. Danach F02 umsetzen und damit die offenen Check-in-Anteile von F03 ergänzen. F01, F04 und F05 können unabhängig davon weiterentwickelt werden; F02 und F05 liefern später weitere Daten für F07. Automatischer und bereichsweise begrenzter Geräteabgleich bleibt offen; F14 bietet bereits begrenzte Weitergabe als Datei.
+**Empfohlene nächste Schritte innerhalb P1:** Nach den umgesetzten F01–F03 und dem ausdrücklich vorgezogenen F05 folgt F04 Messwertverläufe. F02/F03 auf den eigenen Smartphones einschließlich Speichern, Bearbeiten, Archivieren und Teilbericht erproben. F05 liefert Terminnotizen und Antworten bereits für den HTML-Teilbericht; der direkte PDF-Ausgabeweg von F07 bleibt offen. F17 bleibt separat für direkte Geräteverbindung und physische Erprobung offen; automatische und bereichsweise begrenzte Geräteaktualisierung ist nicht umgesetzt.

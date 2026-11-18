@@ -1,6 +1,7 @@
 import { addDays, formatDate } from './dates.js';
 import { symptomKey } from './journal.js';
 import { weeklySummary, symptomMentions } from './reflection.js';
+import { checkinValue } from './checkin.js';
 
 export function setupReflection({ getSelected, getToday, getJournal, getSymptom, chooseDate, openEntries }) {
   const $ = id => document.getElementById(id);
@@ -40,6 +41,20 @@ export function setupReflection({ getSelected, getToday, getJournal, getSymptom,
     }
     $('reflection-open-entries').disabled = !summary.entries.length;
     $('reflection-open-entries').onclick = () => openEntries(summary.from, summary.to, '');
+    const checkins = summary.checkins;
+    $('reflection-checkin-coverage').textContent = `${count(checkins.count, 'Check-in', 'Check-ins')} an ${count(checkins.dayCount, 'Tag', 'Tagen')} · ${count(checkins.missingDays, 'verstrichener Tag ohne Check-in', 'verstrichene Tage ohne Check-in')}${checkins.futureDays ? ` · ${checkins.futureDays} Tage liegen noch vor dir` : ''}. Leere Felder bleiben fehlend. Schlafangaben können sich auf überlappende 24 Stunden beziehen; sie werden nicht addiert. Die Symptomauswahl ändert diese Übersicht nicht.`;
+    const checkinList = $('reflection-checkins'); checkinList.replaceChildren();
+    for (const field of checkins.fields) {
+      const card = node('article', 'reflection-checkin');
+      card.append(node('h5', '', field.label));
+      card.append(node('strong', '', field.last ? checkinValue(field.key, field.last.value) : 'Keine Angabe'));
+      if (field.last) card.append(node('p', '', `Zuletzt ${shortDate(field.last.date)}${field.last.time ? ', ' + field.last.time + ' Uhr' : ''} · ${count(field.count, 'Angabe', 'Angaben')} an ${count(field.dayCount, 'Tag', 'Tagen')}`));
+      card.append(node('p', '', `${field.missing} von ${checkins.count} Check-ins ohne diese Angabe${field.invalid ? ` · ${field.invalid} nicht auswertbar` : ''}.`));
+      if (field.count > 1) card.append(node('p', '', `Erste Angabe: ${checkinValue(field.key, field.first.value)}. Jede Beobachtung bleibt im Original erhalten.`));
+      checkinList.append(card);
+    }
+    $('reflection-open-checkins').disabled = !checkins.count;
+    $('reflection-open-checkins').onclick = () => openEntries(summary.from, summary.to, '', 'checkin');
     const symptoms = $('reflection-symptoms'); symptoms.replaceChildren();
     const selected = summary.symptoms.filter(item => !symptom || item.key === symptomKey(symptom));
     for (const item of selected) {

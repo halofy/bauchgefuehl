@@ -2,6 +2,7 @@
 
 - **Status:** Journal-Grundlage umgesetzt; automatisiert und lokal in Safari geprüft. Strukturierte Check-ins aus F02 weiterhin offen.
 - **Datum:** 2026-11-17
+- **Fortgeschrieben durch:** [AgDR-0023](0023-tages-check-in-und-strukturierter-rueckblick.md) – F02 und der hier noch offene strukturierte Rückblick sind seit 18.11.2026 umgesetzt; der folgende Text dokumentiert den damaligen Stand.
 - **Entscheidende Instanz:** Nutzeranforderung; Auswahl der unabhängigen F03-Teile und konkrete Aggregationsregeln durch den Agenten
 - **Betroffene Dateien:** [Rückblickmodell](../../src/reflection.js), [Rückblickoberfläche](../../src/reflection-ui.js), [Journalmodell](../../src/journal.js), [Journaloberfläche](../../src/journal-ui.js), [Kalenderoberfläche](../../src/calendar-ui.js), [App](../../src/app.js), [HTML](../../index.html), [Stylesheet](../../styles.css), [Offline-Dateien](../../sw.js), [Tests](../../tests/reflection.test.js)
 - **Erweitert:** [AgDR-0009](0009-persoenliches-journal.md), [AgDR-0012](0012-roadmap-und-ssw-pruefung.md), [AgDR-0014](0014-kalender-und-journal.md)

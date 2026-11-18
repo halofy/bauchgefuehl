@@ -2,6 +2,7 @@
 
 - **Status:** Umgesetzt; automatisiert und lokal in Safari geprüft
 - **Datum:** 2026-11-17
+- **Fortgeschrieben durch:** [AgDR-0025](0025-termine-fragensammlung-und-klarerer-kalender.md) – eigene Termine/Notizen, kompakteres Raster und optionale Bereichshervorhebung.
 - **Entscheidende Instanz:** Nutzeranforderung; konkrete Ansicht, Datumsprojektion und Integrationsumfang durch den Agenten
 - **Betroffene Dateien:** [Kalendermodell](../../src/calendar.js), [Kalenderoberfläche](../../src/calendar-ui.js), [Journal](../../src/journal-ui.js), [App](../../src/app.js), [HTML](../../index.html), [Stylesheet](../../styles.css), [Offline-Dateien](../../sw.js), [Tests](../../tests/calendar.test.js)
 - **Erweitert:** [AgDR-0009](0009-persoenliches-journal.md), [AgDR-0010](0010-mobile-app-und-pwa.md), [AgDR-0013](0013-app-layout-erkennung.md)

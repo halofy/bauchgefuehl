@@ -1,5 +1,6 @@
 import { addDays, dayNumber } from './dates.js';
-import { metricKey, symptomKey } from './journal.js';
+import { metricKey, symptomKey, isCheckinEntry } from './journal.js';
+import { isCheckinMetric, summarizeCheckins } from './checkin.js';
 
 export function calendarWeek(date) {
   const weekday = (new Date(dayNumber(date) * 86400000).getUTCDay() + 6) % 7;
@@ -34,14 +35,16 @@ export function weeklySummary(entries, date, today) {
       const item = symptoms.get(key); item.count++; item.dates.add(entry.date); item.entryIds.push(entry.id);
     }
     for (const metric of entry.metrics) {
+      if (isCheckinMetric(entry, metric)) continue;
       const key = metricKey(metric);
       const point = { date: entry.date, time: entry.time, value: metric.value, entryId: entry.id };
       if (!metrics.has(key)) metrics.set(key, { key, label: metric.label, unit: metric.unit, count: 0, first: point, last: point, min: metric.value, max: metric.value });
       const item = metrics.get(key); item.count++; item.last = point; item.min = Math.min(item.min, metric.value); item.max = Math.max(item.max, metric.value);
     }
   }
+  const checkins = { ...summarizeCheckins(active), missingDays: days.filter(day => day.state !== 'future' && !day.entries.some(isCheckinEntry)).length, futureDays: days.filter(day => day.state === 'future').length };
   return {
-    from, to, entries: active, days,
+    from, to, entries: active, days, checkins,
     recordedDays: days.filter(day => day.state === 'recorded').length,
     missingDays: days.filter(day => day.state === 'missing').length,
     futureDays: days.filter(day => day.state === 'future').length,

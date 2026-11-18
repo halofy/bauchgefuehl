@@ -20,7 +20,7 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0012](0012-roadmap-und-ssw-pruefung.md) | Mutterbezogener Feature-Backlog und abgeschlossene SSW-Prüfung | Premium-Vorschläge abgelöst durch AgDR-0016; SSW-Frage geklärt |
 | [AgDR-0013](0013-app-layout-erkennung.md) | App-Layout auf großen Smartphones und installierten PWAs | Umgesetzt, Safari-Prüfung; physisches Smartphone offen |
 | [AgDR-0014](0014-kalender-und-journal.md) | Kalender mit Datum/SSW, Vorsorgefenstern, Meilensteinen und Journal | Umgesetzt, automatisiert und lokal geprüft |
-| [AgDR-0015](0015-f03-symptomkalender-und-wochenrueckblick.md) | F03: Symptomnennungen und Wochenrückblick aus dem bestehenden Journal | Journal-Grundlage umgesetzt und geprüft; strukturierte Check-ins aus F02 offen |
+| [AgDR-0015](0015-f03-symptomkalender-und-wochenrueckblick.md) | F03: Symptomnennungen und Wochenrückblick aus dem bestehenden Journal | Journal-Grundlage umgesetzt und geprüft; Check-ins ergänzt durch AgDR-0023 |
 | [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md) | Alle Funktionen kostenlos; ET-only-Link und ausgewählter Journalauszug ohne Upload | Umgesetzt; begrenzter Geräte-Sync weiterhin offen |
 | [AgDR-0017](0017-lebensmittel-und-aktivitaeten.md) | Quellenbasierte Offline-Suche mit bedingter Ampel und Kalenderbezug | Redaktionelle Auswahl umgesetzt; keine individuelle medizinische Prüfung |
 | [AgDR-0018](0018-ndr-als-ergaenzende-quelle.md) | NDR „Tatsächlich schwanger“ als geprüfte ergänzende redaktionelle Quelle | Quellen ergänzt; medizinische Regeln unverändert |
@@ -28,6 +28,9 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0020](0020-serverloser-geraeteabgleich.md) | Signierte, verschlüsselte Geräte-Stände per QR/Link oder Datei ohne Datenserver | Manueller Abgleich umgesetzt; direkter automatischer Kanal offen |
 | [AgDR-0021](0021-uebersichtliche-hauptbereiche.md) | Ein Hauptbereich je Ansicht, Details aufklappbar und kompakter Wissensstart | Umgesetzt; vier Inhaltsbreiten geprüft |
 | [AgDR-0022](0022-smartphone-nahuebertragung-und-kompakte-links.md) | iOS-/Android-Nahübertragung, kompakte Stand-Links und native Teilen-Auswahl | Link/Teilen umgesetzt; physische Geräte und WebRTC offen |
+| [AgDR-0023](0023-tages-check-in-und-strukturierter-rueckblick.md) | F02 Tages-Check-in, strukturierter F03-Rückblick und getrenntes Teilen | Umgesetzt; Modell geprüft, manueller Gesamtdurchlauf offen |
+| [AgDR-0024](0024-fuer-dich-und-mobile-layoutkorrekturen.md) | F01 „Für dich“, quellenbezogene Phasenthemen und zwei mobile Layoutkorrekturen | Umgesetzt; Inhalte und zwölf Safari-Layoutkombinationen geprüft |
+| [AgDR-0025](0025-termine-fragensammlung-und-klarerer-kalender.md) | F05 Termine und gemeinsame Notizen/Q&A, Datenweitergabe v2 und klarerer Kalender | Umgesetzt; Datenerhalt und synthetischer Hauptablauf geprüft |
 
 ## Fortschreiben
 

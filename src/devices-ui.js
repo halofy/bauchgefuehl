@@ -3,13 +3,14 @@ import { SYNC_KEY, snapshot } from './sync.js';
 import { BIRTH_KEY, BIRTH_HISTORY_KEY, readBirth, normalizeBirth } from './birth.js';
 import { DEVICE_KEY, RECOVERY_KEY, MAX_TRANSFER_QR_LENGTH, createIdentity, normalizeDevice, sealTransfer, openTransfer, transferLink, parseTransferInput, checkIncoming, importSnapshot, commitBundle } from './device-transfer.js';
 import { createQrSvg } from './qr.js';
+import { CARE_KEY, CARE_HISTORY_KEY, readCare, normalizeCare } from './care.js';
 
 export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onConnection, reloadExtras }) {
   const $ = id => document.getElementById(id);
   let envelope = null; let packet = null; let backup = null; let generated = null; let working = false; let backupSignature = '';
   let generatedFile = null; let sharing = false;
   let storageAvailable = true;
-  function signature() { return [STORAGE_KEY, BIRTH_KEY, DEVICE_KEY, SYNC_KEY].map(key => storage.getItem(key)).join('|'); }
+  function signature() { return [STORAGE_KEY, BIRTH_KEY, CARE_KEY, DEVICE_KEY, SYNC_KEY].map(key => storage.getItem(key)).join('|'); }
   let leaseSource = null; let leaseHeld = false; let releaseLease = null;
   function config() {
     let recovery; let raw;
@@ -73,7 +74,7 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
   $('device-backup').addEventListener('click', () => {
     try {
       const raw = {}; const storageErrors = [];
-      for (const key of [STORAGE_KEY, HISTORY_KEY, BIRTH_KEY, BIRTH_HISTORY_KEY, DEVICE_KEY, SYNC_KEY, RECOVERY_KEY]) {
+      for (const key of [STORAGE_KEY, HISTORY_KEY, BIRTH_KEY, BIRTH_HISTORY_KEY, CARE_KEY, CARE_HISTORY_KEY, DEVICE_KEY, SYNC_KEY, RECOVERY_KEY]) {
         try { raw[key] = storage.getItem(key); } catch { raw[key] = null; storageErrors.push(key); }
       }
       let memorySnapshot = null; try { memorySnapshot = snapshot(getSnapshot()); } catch { /* Raw recovery data remain exportable without a valid profile. */ }
@@ -86,7 +87,7 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     const value = getSnapshot();
     let device = config(); if (!device) device = await createIdentity();
     else if (device.role === 'master' && (!leaseHeld || leaseSource !== device.source)) throw new Error('Dieser Master ist in einem anderen Tab aktiv. Bitte dort den Stand erstellen.');
-    const result = await sealTransfer(value, device, $('device-password').value, { contacts: $('device-include-contacts').checked ? readBirth(storage).contacts : null });
+    const result = await sealTransfer(value, device, $('device-password').value, { care: readCare(storage), contacts: $('device-include-contacts').checked ? readBirth(storage).contacts : null });
     storage.setItem(DEVICE_KEY, JSON.stringify(result.device)); generated = result.envelope;
     generatedFile = new File([JSON.stringify(generated)], `bauchgefuehl-stand-${todayISO()}.json`, { type: 'application/json' });
     const link = transferLink(generated, location.href);
@@ -123,7 +124,7 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     envelope = parseTransferInput($('device-input').value);
     packet = await openTransfer(envelope, $('device-receive-password').value);
     const data = packet.data.snapshot;
-    $('device-preview').textContent = `Master ${packet.source.slice(0, 16)} · Version ${packet.revision} · ${data.journal.length} ${data.journal.length === 1 ? 'Journaleintrag' : 'Journaleinträge'} einschließlich Archiv · ${Object.keys(data.checks).length} Merkhäkchen${packet.data.contacts ? ` · ${packet.data.contacts.length} Kontakte optional enthalten` : ''}. Die Berechnungsgrundlage wird ebenfalls übernommen. Noch wurde nichts geändert.`;
+    $('device-preview').textContent = `Master ${packet.source.slice(0, 16)} · Version ${packet.revision} · ${data.journal.length} Journaleinträge einschließlich Archiv · ${Object.keys(data.checks).length} Merkhäkchen · ${packet.data.care?.appointments.length ?? 0} Termine · ${packet.data.care?.notes.length ?? 0} Terminnotizen${packet.data.contacts ? ` · ${packet.data.contacts.length} Kontakte optional enthalten` : ''}. Die Berechnungsgrundlage wird ebenfalls übernommen. Noch wurde nichts geändert.`;
     $('device-candidate').hidden = false; $('device-take-contacts').checked = false; $('device-take-contacts-label').hidden = !packet.data.contacts;
   }));
   $('device-file').addEventListener('change', async event => {
@@ -141,11 +142,11 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     if (!packet) throw new Error('Bitte zuerst entschlüsseln und die Vorschau prüfen.');
     const birth = readBirth(storage);
     if (birth.active) throw new Error('Bitte zuerst die offene Wehenmessung abschließen.');
-    const current = readLocal(storage); const device = config();
+    const current = { ...readLocal(storage), care: readCare(storage) }; const device = config();
     const replace = !device && backupSignature === signature();
     const next = checkIncoming(packet, device, current, { replace });
     if (current.profile && !device && JSON.stringify(current.profile) !== JSON.stringify(packet.data.snapshot.profile) && !replace) throw new Error('Die Datierung unterscheidet sich. Bitte zuerst den vorhandenen Stand mit „Vollständiges Backup“ sichern.');
-    const value = importSnapshot(storage, packet.data.snapshot, { device: next, ...(packet.data.contacts && $('device-take-contacts').checked ? { birth: { ...birth, contacts: packet.data.contacts } } : {}), replaceJournal: replace });
+    const value = importSnapshot(storage, packet.data.snapshot, { device: next, care: packet.data.care ?? normalizeCare(), ...(packet.data.contacts && $('device-take-contacts').checked ? { birth: { ...birth, contacts: packet.data.contacts } } : {}), replaceJournal: replace });
     applySnapshot(value, { alreadyStored: true }); reloadExtras(); packet = null; $('device-candidate').hidden = true;
     try { if (location.hash.startsWith('#transfer=')) history.replaceState(null, '', location.pathname + location.search); } catch { /* No data is sent in fragments. */ }
     notify('Stand übernommen. Dieses Gerät liest mit; Änderungen erfolgen am Master.');
@@ -158,12 +159,13 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
       if (parsed.format === 'bauchgefuehl-offline-backup' && parsed.v === 1) {
         const raw = parsed.raw; const local = JSON.parse(raw?.[STORAGE_KEY] || 'null');
         const data = local ? { ...local, schema: 3 } : parsed.memorySnapshot;
-        if (!data && !raw?.[BIRTH_KEY]) throw new Error('Die Sicherung enthält keine wiederherstellbaren Angaben.');
-        backup = { snapshot: data ? snapshot(data) : null, device: raw?.[DEVICE_KEY] ? normalizeDevice(JSON.parse(raw[DEVICE_KEY])) : null, birth: raw?.[BIRTH_KEY] ? normalizeBirth(JSON.parse(raw[BIRTH_KEY])) : normalizeBirth(), legacySync: raw?.[SYNC_KEY] ?? null, birthHistory: raw?.[BIRTH_HISTORY_KEY] ?? '[]' };
+        if (!data && !raw?.[BIRTH_KEY] && !raw?.[CARE_KEY]) throw new Error('Die Sicherung enthält keine wiederherstellbaren Angaben.');
+        backup = { snapshot: data ? snapshot(data) : null, device: raw?.[DEVICE_KEY] ? normalizeDevice(JSON.parse(raw[DEVICE_KEY])) : null, care: raw?.[CARE_KEY] ? normalizeCare(JSON.parse(raw[CARE_KEY])) : data ? normalizeCare() : undefined, birth: raw?.[BIRTH_KEY] ? normalizeBirth(JSON.parse(raw[BIRTH_KEY])) : data ? normalizeBirth() : undefined, legacySync: raw?.[SYNC_KEY] ?? null, birthHistory: raw?.[BIRTH_HISTORY_KEY] ?? '[]' };
         if (!data && backup.device) throw new Error('Die Gerätezuordnung benötigt eine gültige Schwangerschaftsgrundlage. Die Rohdaten bleiben in der Sicherungsdatei.');
       } else if (parsed.format === 'bauchgefuehl-backup' && parsed.version === 1) {
-        backup = { snapshot: snapshot(parsed.snapshot), device: null, birth: normalizeBirth(), legacySync: parsed.rawSync || (parsed.connection ? JSON.stringify(parsed.connection) : null) };
+        backup = { snapshot: snapshot(parsed.snapshot), device: null, care: normalizeCare(), birth: normalizeBirth(), legacySync: parsed.rawSync || (parsed.connection ? JSON.stringify(parsed.connection) : null) };
       } else throw new Error('Keine unterstützte Backup-Datei.');
+      $('device-backup-preview').textContent = `Enthalten: ${backup.care?.appointments.length ?? 0} Termine, ${backup.care?.notes.length ?? 0} Terminnotizen. ${backup.snapshot ? 'Der vollständige aktive Stand wird ersetzt; ältere Backups ohne Termine leeren diesen Bereich nach Sicherung.' : 'Nur enthaltene Zusatzbereiche werden wiederhergestellt; vorhandene Schwangerschaftsangaben bleiben erhalten.'}`;
       $('device-restore-box').hidden = false; update();
     } catch (cause) { backup = null; error(cause.message); update(); }
     event.target.value = '';
@@ -172,11 +174,11 @@ export function setupDevices({ storage, getSnapshot, applySnapshot, notify, onCo
     if (!backup) throw new Error('Bitte eine gültige Sicherung auswählen.');
     const device = config();
     if (device?.role === 'master' && (!leaseHeld || leaseSource !== device.source)) throw new Error('Wiederherstellung bitte im aktiven Master-Tab durchführen.');
-    if ((storage.getItem(STORAGE_KEY) || storage.getItem(BIRTH_KEY)) && backupSignature !== signature()) throw new Error('Bitte zuerst den aktuellen Stand als vollständiges Backup herunterladen.');
-    const value = importSnapshot(storage, backup.snapshot, { ...(backup.snapshot ? { device: backup.device, legacySync: backup.legacySync } : {}), birth: backup.birth, birthHistory: backup.birthHistory, replaceJournal: true });
+    if ((storage.getItem(STORAGE_KEY) || storage.getItem(BIRTH_KEY) || storage.getItem(CARE_KEY)) && backupSignature !== signature()) throw new Error('Bitte zuerst den aktuellen Stand als vollständiges Backup herunterladen.');
+    const value = importSnapshot(storage, backup.snapshot, { ...(backup.snapshot ? { device: backup.device, legacySync: backup.legacySync } : {}), care: backup.care, birth: backup.birth, birthHistory: backup.birthHistory, replaceJournal: true });
     if (value) applySnapshot(value, { alreadyStored: true });
     reloadExtras(); backup = null; $('device-restore-box').hidden = true;
-    notify(value ? 'Sicherung lokal wiederhergestellt. Es wird kein Server kontaktiert.' : 'Kontakte wiederhergestellt. Vorhandene Schwangerschaftsangaben und Gerätezuordnung bleiben erhalten.');
+    notify(value ? 'Sicherung lokal wiederhergestellt. Es wird kein Server kontaktiert.' : 'Enthaltene Zusatzbereiche wiederhergestellt. Vorhandene Schwangerschaftsangaben und Gerätezuordnung bleiben erhalten.');
   }));
   $('device-promote').addEventListener('click', () => void run(async () => {
     if (backupSignature !== signature()) throw new Error('Bitte zuerst diesen Mitlesestand als vollständiges Backup herunterladen.');

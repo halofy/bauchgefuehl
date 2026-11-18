@@ -14,6 +14,9 @@ import { normalizeJournal } from './journal.js';
 import { SYNC_KEY } from './sync.js';
 import { setupGuide } from './guide-ui.js';
 import { setupReport } from './report-ui.js';
+import { setupMother } from './mother-ui.js';
+import { setupPersonalCare } from './care-ui.js';
+import { CARE_KEY, CARE_HISTORY_KEY } from './care.js';
 import { makeShareLink, shareProfile } from './report.js';
 
 const $ = selector => document.querySelector(selector);
@@ -34,6 +37,8 @@ let calendarUi = null;
 let guideUi = null;
 let reportUi = null;
 let birthUi = null;
+let motherUi = null;
+let careUi = null;
 
 function announce(message) {
   $('#notice').textContent = message;
@@ -174,8 +179,7 @@ function renderWeeks(center = false) {
   const content = getWeekContent(selectedWeek);
   $('#development-title').textContent = content.title;
   $('#baby-description').textContent = content.baby;
-  $('#body-description').textContent = content.body;
-  $('#week-tip').textContent = content.tip;
+  motherUi?.render(selectedWeek);
   $('#phase-size').textContent = content.size;
   $('#phase-comparison').textContent = content.comparison;
   $('#development-source').href = content.source;
@@ -255,6 +259,7 @@ function render(center = false) {
   guideUi?.render();
   reportUi?.refreshIfOpen();
   birthUi?.render();
+  careUi?.render();
 }
 
 function queueSync() {
@@ -454,7 +459,7 @@ const actions = {
 for (const element of $$('[data-action]')) if (actions[element.dataset.action]) element.addEventListener('click', () => actions[element.dataset.action]());
 for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
 for (const dialog of $$('dialog')) {
-  if (dialog.id === 'journal-dialog' || dialog.id === 'birth-dialog') continue;
+  if (dialog.id === 'journal-dialog' || dialog.id === 'birth-dialog' || dialog.id.startsWith('care-')) continue;
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
@@ -469,8 +474,9 @@ $('#confirm-delete').addEventListener('click', () => {
     storage.removeItem(SYNC_KEY);
     storage.removeItem(HISTORY_KEY);
     storage.removeItem(STORAGE_KEY);
-    for (const key of [BIRTH_KEY, BIRTH_HISTORY_KEY, DEVICE_KEY, RECOVERY_KEY]) storage.removeItem(key);
+    for (const key of [BIRTH_KEY, BIRTH_HISTORY_KEY, CARE_KEY, CARE_HISTORY_KEY, DEVICE_KEY, RECOVERY_KEY]) storage.removeItem(key);
     birthUi?.reload();
+    careUi?.reload();
     clearShareHash();
     local = { profile: null, checks: {}, error: null };
     state = { profile: demoProfile(today), checks: {}, journal: [], mode: 'demo' };
@@ -545,8 +551,15 @@ function saveJournalEntries(entries) {
   queueSync(); renderMode(); calendarUi?.render(); reportUi?.refreshIfOpen(); birthUi?.render();
 }
 announce(recoveryProblem || local.error || '');
+careUi = setupPersonalCare({ storage, getMode: () => state.mode,
+  canEdit: () => state.mode !== 'shared' && !syncUi?.readOnly,
+  onChange() { queueSync(); calendarUi?.render(); reportUi?.refreshIfOpen(); },
+  onRefresh() { calendarUi?.render(); reportUi?.refreshIfOpen(); },
+  notify: toast,
+  openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); $('#calendar-selected-date').scrollIntoView({ behavior: 'instant' }); },
+});
 guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mode, getToday: () => today });
-reportUi = setupReport({ getJournal: () => state.journal, getToday: () => today, notify: toast });
+reportUi = setupReport({ getJournal: () => state.journal, getCare: () => careUi.getData(), getToday: () => today, notify: toast });
 journalUi = setupJournal({
   getJournal: () => state.journal,
   onOpen: () => calendarUi?.showJournal(),
@@ -566,11 +579,16 @@ calendarUi = setupCalendar({
   getMode: () => state.mode,
   getJournal: () => state.journal,
   getChecks: () => state.checks,
+  getCare: () => careUi.getData(),
+  addAppointment: date => careUi.openAppointment(date),
+  openAppointmentNotes(id) { showAppPanel('vorsorge', true); careUi.openNote(id); },
+  openCare() { showAppPanel('vorsorge', true); $('#personal-care-panel').scrollIntoView({ behavior: 'instant' }); },
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   addEntry: date => journalUi.openForDate(date),
+  addCheckin: date => journalUi.checkinForDate(date),
   editEntry: id => journalUi.editEntry(id),
   showEntries: date => journalUi.filterDate(date),
-  showEntriesRange: (from, to, symptom) => journalUi.filterRange(from, to, symptom),
+  showEntriesRange: (from, to, symptom, type) => journalUi.filterRange(from, to, symptom, type),
   showGuide(date) {
     guideUi.setDate(date); showAppPanel('wissen', true);
     $('#everyday-guide').scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -578,6 +596,7 @@ calendarUi = setupCalendar({
   },
   showWeek(week) {
     showAppPanel('wochenreise', true); selectWeek(week);
+    motherUi.show('baby');
     $('#wochenreise').scrollIntoView({ behavior: 'instant', block: 'start' });
   },
 });
@@ -596,11 +615,11 @@ syncUi = setupDevices({
     render(true);
   },
   notify: toast,
-  reloadExtras() { birthUi?.reload(); },
+  reloadExtras() { birthUi?.reload(); careUi?.reload(); },
   onConnection(connection, readOnly) {
     const role = `${connection?.role || ''}:${readOnly}`;
     for (const button of $$('[data-action="edit"]')) button.disabled = !!readOnly;
-    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); birthUi?.render(); }
+    if (role !== lastSyncRole && syncUi) { lastSyncRole = role; renderCare(); journalUi?.render(); calendarUi?.render(); birthUi?.render(); careUi?.render(); }
   },
 });
 birthUi = setupBirth({
@@ -609,5 +628,6 @@ birthUi = setupBirth({
   saveJournal: saveJournalEntries, notify: toast,
   openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); document.getElementById('calendar-view').scrollIntoView({ behavior: 'instant' }); },
 });
+motherUi = setupMother({ openCurrentWeek() { showAppPanel('wochenreise', true); selectWeek(currentWeek()); } });
 readIncomingLink();
 render(true);

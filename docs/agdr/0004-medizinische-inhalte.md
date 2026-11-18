@@ -2,6 +2,7 @@
 
 - **Status:** Umgesetzt
 - **Datum:** 2026-11-17
+- **Erweitert durch:** [AgDR-0024](0024-fuer-dich-und-mobile-layoutkorrekturen.md) – eigener Bereich „Für dich“ mit separat geprüften Vertiefungen und weiterhin gekennzeichnetem Quellenstand der vorhandenen Körpertexte.
 - **Entscheidende Instanz:** Entwicklungsinfos vom Nutzer gewünscht; Quellen, Umfang und Formulierungen vom Agenten gewählt
 - **Betroffene Dateien:** [Inhalte](../../src/content.js), [Information und Quellen](../../index.html)
 

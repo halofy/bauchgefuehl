@@ -1,10 +1,12 @@
 import { todayISO, addDays, dayNumber, formatDate } from './dates.js';
 import { pregnancyTimeline, gestationOnDate, dateForSsw, monthStart, shiftMonth, monthDays, timelineEvents, eventsOnDate, entriesOnDate, upcomingEvents, weekRanges } from './calendar.js';
-import { symptomOptions } from './journal.js';
+import { symptomOptions, isCheckinEntry } from './journal.js';
+import { readCheckin, CHECKIN_FIELDS, checkinValue, isCheckinMetric } from './checkin.js';
 import { symptomMentions } from './reflection.js';
 import { setupReflection } from './reflection-ui.js';
+import { normalizeCare, appointmentsOnDate, PROVIDERS, careCollection } from './care.js';
 
-export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, canEdit, addEntry, editEntry, showEntries, showEntriesRange, showWeek, showGuide }) {
+export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, getCare = normalizeCare, addAppointment, openAppointmentNotes, openCare, canEdit, addEntry, addCheckin, editEntry, showEntries, showEntriesRange, showWeek, showGuide }) {
   const $ = id => document.getElementById(id);
   const node = (tag, className = '', text = '') => { const element = document.createElement(tag); element.className = className; element.textContent = text; return element; };
   let selected = getToday();
@@ -13,6 +15,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   let timeline;
   let events = [];
   let symptom = '';
+  let showCare = false; let showSymptoms = false;
   const ssw = age => age.status === 'before' ? 'Vor Beginn' : `${age.weeks}+${age.days}`;
   const shortDate = date => formatDate(date, { month: 'short' });
   const button = (label, callback, className = 'text-link') => {
@@ -33,10 +36,13 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   $('calendar-view-toggle').addEventListener('click', () => switchView('calendar'));
   $('journal-view-toggle').addEventListener('click', () => switchView('journal'));
   $('calendar-symptom').addEventListener('change', event => { symptom = event.target.value; render(); });
+  $('calendar-show-care').addEventListener('change', event => { showCare = event.target.checked; render(); });
+  $('calendar-show-symptoms').addEventListener('change', event => { showSymptoms = event.target.checked; render(); });
+  $('calendar-open-care').addEventListener('click', openCare);
   const reflection = setupReflection({
-    getSelected: () => selected, getToday, getJournal, getSymptom: () => symptom,
+    getSelected: () => selected, getToday, getJournal, getSymptom: () => showSymptoms ? symptom : '',
     chooseDate: date => choose(date, true),
-    openEntries(from, to, selectedSymptom) { showEntriesRange(from, to, selectedSymptom); openList(); },
+    openEntries(from, to, selectedSymptom, type) { showEntriesRange(from, to, selectedSymptom, type); openList(); },
   });
   function choose(date, focus = false) {
     dayNumber(date); monthStart(date.slice(0, 7));
@@ -108,15 +114,38 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     $('calendar-week-info').hidden = age.status !== 'ongoing';
     $('calendar-week-info').onclick = () => showWeek(age.weekNumber);
     $('calendar-open-guide').onclick = () => showGuide(selected);
+    const care = getCare();
+    const appointments = care ? appointmentsOnDate(care, selected) : [];
+    const apptList = $('calendar-day-appointments'); apptList.replaceChildren();
+    for (const appointment of appointments) {
+      const card = node('article', 'calendar-appointment-card');
+      card.append(node('p', 'eyebrow', PROVIDERS[appointment.provider]), node('h4', '', appointment.title), node('p', '', appointment.time ? `${appointment.time} Uhr${appointment.location ? ' · ' + appointment.location : ''}` : 'Uhrzeit noch offen'));
+      const notes = careCollection(care, { appointmentId: appointment.id });
+      card.append(node('p', 'care-item-meta', `${notes.length} Notizen · ${notes.filter(note => note.kind === 'qa' && !note.discussed).length} offene Fragen`));
+      if (notes.length) {
+        const details = document.createElement('details'); details.append(node('summary', '', 'Notizen & Antworten lesen'));
+        for (const note of notes) { const block = node('div', 'calendar-appointment-note'); block.append(node('p', 'journal-note', note.text)); if (note.answer) block.append(node('p', 'journal-note', 'Antwort: ' + note.answer)); if (note.nextSteps) block.append(node('p', 'journal-note', 'Nächste Schritte: ' + note.nextSteps)); block.append(node('p', 'care-item-meta', note.discussed ? 'Besprochen' : 'Noch nicht als besprochen markiert')); details.append(block); }
+        card.append(details);
+      }
+      if (canEdit()) card.append(button('Notiz / Frage ergänzen', () => openAppointmentNotes(appointment.id)));
+      card.append(button('Termin & Sammlung verwalten', openCare)); apptList.append(card);
+    }
+    if (!appointments.length) apptList.append(node('p', 'calendar-empty', care ? 'Kein eigener Termin an diesem Tag.' : 'Termindaten nicht lesbar – bitte den Bereich Vorsorge prüfen.'));
+    $('calendar-add-appointment').disabled = !canEdit() || !care;
+    $('calendar-add-appointment').onclick = () => addAppointment(selected);
     const entries = entriesOnDate(getJournal(), selected);
     $('calendar-entry-count').textContent = `${entries.length} ${entries.length === 1 ? 'Journaleintrag' : 'Journaleinträge'}`;
     const list = $('calendar-day-journal'); list.replaceChildren();
     for (const entry of entries) {
       const card = node('article', 'calendar-journal-entry');
+      if (isCheckinEntry(entry)) card.append(node('p', 'eyebrow', 'TAGES-CHECK-IN'));
       if (entry.time) card.append(node('p', 'calendar-entry-time', `${entry.time} Uhr`));
       if (entry.symptoms.length) card.append(node('p', 'calendar-entry-symptoms', entry.symptoms.join(' · ')));
       if (entry.text) card.append(node('p', 'journal-note', entry.text));
-      if (entry.metrics.length) card.append(node('p', 'calendar-entry-metrics', entry.metrics.map(m => `${m.label}: ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(m.value)} ${m.unit}`.trim()).join(' · ')));
+      const data = readCheckin(entry);
+      if (data) for (const [key, field] of Object.entries(CHECKIN_FIELDS)) card.append(node('p', 'calendar-entry-metrics', `${field.label}: ${data.invalid.includes(key) ? 'Nicht auswertbar' : Object.hasOwn(data.values, key) ? checkinValue(key, data.values[key]) : 'Nicht angegeben'}`));
+      const otherMetrics = entry.metrics.filter(metric => !isCheckinMetric(entry, metric));
+      if (otherMetrics.length) card.append(node('p', 'calendar-entry-metrics', otherMetrics.map(m => `${m.label}: ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(m.value)} ${m.unit}`.trim()).join(' · ')));
       if (entry.tags.length) card.append(node('p', 'calendar-entry-tags', entry.tags.map(tag => '#' + tag).join(' ')));
       if (canEdit()) card.append(button('Eintrag bearbeiten', () => editEntry(entry.id)));
       list.append(card);
@@ -124,6 +153,8 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     if (!entries.length) list.append(node('p', 'calendar-empty', selected > getToday() ? 'Dieser Tag liegt noch vor dir. Persönliche Beobachtungen kannst du bis einschließlich heute erfassen.' : 'Für diesen Tag gibt es noch keinen Journaleintrag.'));
     const add = $('calendar-add-entry');
     add.hidden = selected > getToday(); add.disabled = !canEdit(); add.onclick = () => addEntry(selected);
+    const checkin = $('calendar-add-checkin');
+    checkin.hidden = selected > getToday(); checkin.disabled = !canEdit(); checkin.onclick = () => addCheckin(selected);
     $('calendar-open-journal').hidden = !entries.length;
     $('calendar-open-journal').onclick = () => { showEntries(selected); openList(); };
   }
@@ -136,20 +167,25 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     $('calendar-symptom').replaceChildren();
     const all = document.createElement('option'); all.value = ''; all.textContent = 'Alle erfassten Symptome'; $('calendar-symptom').append(all);
     for (const option of options) { const item = document.createElement('option'); item.value = option.key; item.textContent = option.label; $('calendar-symptom').append(item); }
-    $('calendar-symptom').value = symptom; $('calendar-symptom').disabled = !options.length;
+    $('calendar-symptom').value = symptom; $('calendar-symptom').disabled = !options.length || !showSymptoms;
     $('calendar-basis').textContent = `${getMode() === 'demo' ? 'Beispieldaten' : getMode() === 'shared' ? 'Geteilte Angaben' : 'Deine Angaben'} · ${timeline.method === 'due-date' ? 'ET-Rückrechnung' : 'Periode & Zyklus'} · ET ${shortDate(timeline.dueDate)}`;
     $('calendar-month-title').textContent = formatDate(month + '-01', { day: undefined, month: 'long', year: 'numeric' });
     $('calendar-month').value = month; $('calendar-date').value = selected;
     $('calendar-prev').disabled = month <= '1900-01'; $('calendar-next').disabled = month >= '2200-12';
     const days = $('calendar-days'); days.replaceChildren();
     const today = getToday();
+    const careData = getCare(); $('calendar-care-error').hidden = !!careData;
     const entryDates = new Map();
     for (const entry of getJournal()) if (!entry.deletedAt) entryDates.set(entry.date, (entryDates.get(entry.date) || 0) + 1);
     for (const date of monthDays(month)) {
       const age = gestationOnDate(timeline, date);
       const dayEvents = eventsOnDate(events, date);
-      const care = dayEvents.some(e => e.type === 'care'); const point = dayEvents.some(e => e.type === 'point'); const entries = entryDates.get(date) || 0;
-      const mentions = symptomMentions(entriesOnDate(getJournal(), date), symptom);
+      const care = showCare && dayEvents.some(e => e.type === 'care');
+      const careStart = dayEvents.some(e => e.type === 'care' && e.date === date);
+      const point = dayEvents.some(e => e.type === 'point'); const entries = entryDates.get(date) || 0;
+      const labeledEvents = dayEvents.filter(event => event.type === 'point' || event.date === date || showCare);
+      const appointments = careData ? appointmentsOnDate(careData, date) : [];
+      const mentions = showSymptoms ? symptomMentions(entriesOnDate(getJournal(), date), symptom) : 0;
       const day = button('', () => choose(date, true), 'calendar-day');
       day.dataset.calendarDate = date; day.tabIndex = date === selected ? 0 : -1;
       day.disabled = date.slice(0, 7) < '1900-01' || date.slice(0, 7) > '2200-12';
@@ -157,13 +193,15 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
       day.classList.toggle('has-symptom', mentions > 0);
       if (date === today) { day.classList.add('is-today'); day.setAttribute('aria-current', 'date'); }
       day.setAttribute('aria-pressed', String(date === selected));
-      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${age.status === 'before' ? 'vor rechnerischem Beginn' : `SSW ${ssw(age)}, ${age.weekNumber}. Schwangerschaftswoche`}${date === today ? ' · heute' : ''}${dayEvents.length ? ' · ' + dayEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
+      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${age.status === 'before' ? 'vor rechnerischem Beginn' : `SSW ${ssw(age)}, ${age.weekNumber}. Schwangerschaftswoche`}${date === today ? ' · heute' : ''}${labeledEvents.length ? ' · ' + labeledEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
       if (mentions) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${mentions} Beobachtungen ${symptom ? 'zum ausgewählten Symptom' : 'mit Symptomen'}`);
+      if (appointments.length) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${appointments.length} eigene Termine: ${appointments.map(item => `${item.time} ${item.title}`).join(', ')}`);
       day.append(node('span', 'calendar-day-number', String(Number(date.slice(8)))), node('span', 'calendar-day-ssw', age.status === 'before' ? '–' : ssw(age)));
       const markers = node('span', 'calendar-markers'); markers.setAttribute('aria-hidden', 'true');
-      if (care) markers.append(node('span', 'calendar-mark calendar-mark-care', '–'));
+      if (careStart) markers.append(node('span', 'calendar-mark calendar-mark-care', 'V'));
+      if (appointments.length) markers.append(node('span', 'calendar-mark calendar-mark-appointment', appointments.length === 1 ? 'T' : `T${Math.min(appointments.length, 9)}${appointments.length > 9 ? '+' : ''}`));
       if (point) markers.append(node('span', 'calendar-mark calendar-mark-point', '◆'));
-      if (entries) markers.append(node('span', 'calendar-mark calendar-mark-journal', String(entries)));
+      if (entries) markers.append(node('span', 'calendar-mark calendar-mark-journal', entries === 1 ? 'J' : `J${Math.min(entries, 9)}${entries > 9 ? '+' : ''}`));
       if (mentions) markers.append(node('span', 'calendar-mark calendar-mark-symptom', '•'));
       day.append(markers); days.append(day);
     }

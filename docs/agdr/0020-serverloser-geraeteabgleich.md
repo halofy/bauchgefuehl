@@ -2,6 +2,7 @@
 
 - **Status:** Manueller serverloser Abgleich umgesetzt und geprüft; direkter automatischer Abgleich bleibt in F17 offen
 - **Datum:** 2026-11-18
+- **Erweitert durch:** [AgDR-0025](0025-termine-fragensammlung-und-klarerer-kalender.md) – versionierte Termin-/Notizübertragung in Body-Version 2, Backup und Recovery; bisherige Hülle und Verschlüsselung unverändert.
 - **Teilweise abgelöst durch:** [AgDR-0022](0022-smartphone-nahuebertragung-und-kompakte-links.md) – getrennte QR-/Linkgrenzen, kompakte URLs, native Teilen-Auswahl und konkrete Nahübertragungsprüfung.
 - **Entscheidende Instanz:** Nutzer verlangt serverlosen Betrieb und erlaubt QR/URL als Rückfall; technische Ausgestaltung durch den Agenten
 - **Betroffene Dateien:** [Übertragungsmodell](../../src/device-transfer.js), [Oberfläche](../../src/devices-ui.js), [App](../../src/app.js), [HTML/CSP](../../index.html), [Offline-Dateien](../../sw.js), [Tests](../../tests/device-transfer.test.js)

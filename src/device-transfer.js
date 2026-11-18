@@ -1,10 +1,11 @@
 import { snapshot } from './sync.js';
 import { normalizeBirth, writeBirth } from './birth.js';
+import { CARE_KEY, CARE_HISTORY_KEY, normalizeCare, careContinuity, writeCare } from './care.js';
 import { STORAGE_KEY, HISTORY_KEY, writeLocal } from './pregnancy.js';
 
 export const DEVICE_KEY = 'bauchgefuehl.devices.v1';
 export const RECOVERY_KEY = 'bauchgefuehl.import-recovery.v1';
-const BUNDLE_KEYS = [STORAGE_KEY, HISTORY_KEY, 'bauchgefuehl.birth.v1', 'bauchgefuehl.birth-history.v1', DEVICE_KEY, 'bauchgefuehl.sync.v1'];
+const BUNDLE_KEYS = [STORAGE_KEY, HISTORY_KEY, 'bauchgefuehl.birth.v1', 'bauchgefuehl.birth-history.v1', CARE_KEY, CARE_HISTORY_KEY, DEVICE_KEY, 'bauchgefuehl.sync.v1'];
 export const b64 = bytes => {
   let text = ''; for (let offset = 0; offset < bytes.length; offset += 16384) text += String.fromCharCode(...bytes.subarray(offset, offset + 16384));
   return btoa(text).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
@@ -55,13 +56,13 @@ async function readBounded(stream, max) {
   for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.length; }
   return result;
 }
-export async function sealTransfer(value, identity, password, { contacts = null, today } = {}) {
+export async function sealTransfer(value, identity, password, { contacts = null, care, today } = {}) {
   const device = normalizeDevice(identity);
   if (device?.role !== 'master') throw new Error('Nur das Mastergerät kann einen Stand für Mitleser signieren.');
-  const data = { snapshot: snapshot(value, today), ...(contacts === null ? {} : { contacts: normalizeBirth({ contacts }).contacts }) };
+  const data = { snapshot: snapshot(value, today), ...(contacts === null ? {} : { contacts: normalizeBirth({ contacts }).contacts }), ...(care === undefined ? {} : { care: normalizeCare(care, today) }) };
   const currentDigest = await digest(JSON.stringify(data));
   const revision = currentDigest === device.lastDigest ? device.revision : device.revision + 1;
-  const body = JSON.stringify({ v: 1, source: device.source, revision, data });
+  const body = JSON.stringify({ v: care === undefined ? 1 : 2, source: device.source, revision, data });
   const key = await crypto.subtle.importKey('jwk', device.privateKey, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
   const signature = b64(new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(body))));
   let plain = bytes(JSON.stringify({ body, publicKey: device.publicKey, signature }));
@@ -90,8 +91,8 @@ export async function openTransfer(envelope, password, today) {
   const key = await crypto.subtle.importKey('jwk', pub, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
   if (typeof signed.body !== 'string' || !await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, un64(signed.signature, 100), bytes(signed.body))) throw new Error('Die Master-Signatur ist ungültig.');
   const body = JSON.parse(signed.body);
-  if (body.v !== 1 || body.source !== await digest(JSON.stringify(pub)) || !Number.isSafeInteger(body.revision) || body.revision < 1) throw new Error('Ungültiger Master-Datenstand.');
-  const data = { snapshot: snapshot(body.data?.snapshot, today), ...(body.data?.contacts === undefined ? {} : { contacts: normalizeBirth({ contacts: body.data.contacts }).contacts }) };
+  if (![1, 2].includes(body.v) || (body.v === 2 && body.data?.care === undefined) || (body.v === 1 && body.data?.care !== undefined) || body.source !== await digest(JSON.stringify(pub)) || !Number.isSafeInteger(body.revision) || body.revision < 1) throw new Error('Ungültiger Master-Datenstand. Bitte beide Geräte aktualisieren.');
+  const data = { snapshot: snapshot(body.data?.snapshot, today), ...(body.data?.contacts === undefined ? {} : { contacts: normalizeBirth({ contacts: body.data.contacts }).contacts }), ...(body.v === 2 ? { care: normalizeCare(body.data.care, today) } : {}) };
   return { source: body.source, revision: body.revision, data, digest: await digest(JSON.stringify(data)) };
 }
 // QR readability and URL transport are separate limits, not browser guarantees.
@@ -134,6 +135,7 @@ export function checkIncoming(packet, device, current, { replace = false } = {})
     const incoming = packet.data.snapshot.journal.find(entry => entry.id === local.id);
     if (incoming && (incoming.updatedAt < local.updatedAt || (incoming.updatedAt === local.updatedAt && JSON.stringify(incoming) !== JSON.stringify(local)))) throw new Error('Der eingehende Stand würde eine neuere oder abweichende Journalfassung überschreiben. Bitte die Sicherungen prüfen.');
   }
+  if (config || !replace) careContinuity(packet.data.care, current?.care);
   return { role: 'follower', source: packet.source, revision: packet.revision, lastDigest: packet.digest };
 }
 
@@ -150,14 +152,15 @@ export function recoverBundle(storage) {
   }
   storage.removeItem(RECOVERY_KEY);
 }
-export function importSnapshot(storage, value, { device, birth, legacySync, birthHistory, history, today, replaceJournal = false } = {}) {
-  if (value === null && birth === undefined) throw new Error('Die Sicherung enthält keine wiederherstellbaren Angaben.');
+export function importSnapshot(storage, value, { device, birth, care, legacySync, birthHistory, history, today, replaceJournal = false } = {}) {
+  if (value === null && birth === undefined && care === undefined) throw new Error('Die Sicherung enthält keine wiederherstellbaren Angaben.');
   const checked = value === null ? null : snapshot(value, today);
   const after = {};
   const shadow = { getItem: key => Object.hasOwn(after, key) ? after[key] : storage.getItem(key), setItem: (key, data) => { after[key] = data; } };
   if (checked) writeLocal(shadow, checked.profile, checked.checks, today, checked.journal, { replaceJournal });
   if (device !== undefined) after[DEVICE_KEY] = device === null ? null : JSON.stringify(normalizeDevice(device));
   if (birth !== undefined) writeBirth(shadow, birth);
+  if (care !== undefined) writeCare(shadow, care, today);
   if (legacySync !== undefined) after['bauchgefuehl.sync.v1'] = legacySync;
   if (birthHistory !== undefined) {
     if (typeof birthHistory !== 'string' || birthHistory.length > 200000 || !Array.isArray(JSON.parse(birthHistory))) throw new Error('Ungültiger Kontakt-Sicherungsverlauf.');

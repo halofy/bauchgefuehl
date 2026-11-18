@@ -16,6 +16,9 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - **Persönliches Journal:** datierte Notizen, auswählbare und eigene Symptome, freie Tags sowie Gewicht, Bauch-/Brust-/Hüftumfang, Temperatur und eigene Messgrößen mit Einheit.
 - **Kalender & Vorausblick:** SSW an jedem Datum, Suche in beide Richtungen, alle 42 Wochen mit Datumsbereichen sowie markierte Vorsorgefenster, Trimesterwechsel, Halbzeit und ET. Journaleinträge erscheinen an ihrem Datum im Kalender.
 - **Symptomkalender & Wochenrückblick:** einzelne Symptome hervorheben; Beobachtungen, erfasste Tage und Messwerte einer Kalenderwoche überblicken und passende Originaleinträge öffnen.
+- **Termine & Fragensammlung:** eigene Termine planen, Notizen und Fragen/Antworten zuordnen und zugleich gesammelt lesen. Ergebnisse, nächste Schritte und Gesprächsstatus selbst erfassen; bewusste Teilberichte.
+- **Für dich:** eigener Reiter neben „Dein Baby“ in der Wochenreise. Körpertexte, Alltag, Schlaf, Gefühle und Unterstützung folgen der ausgewählten Phase; Vertiefungen mit passenden Quellen und Prüfstand.
+- **Tages-Check-in:** Stimmung, Energie, Schlaf und Beschwerdestärke freiwillig erfassen; mehrere Beobachtungen pro Tag bleiben getrennt. Im Kalender und Wochenrückblick mit fehlenden Angaben und Originaleinträgen. Check-in-Werte sind beim Teilen gesondert auswählbar.
 - **Lebensmittel & Aktivitäten:** offline in 26 geprüften Einträgen suchen, Zubereitung beziehungsweise Sorte wählen und Bedingungen, Ampel, Quellen und Prüfstand nachlesen. Auch mit einem Tag aus dem Kalender verknüpft.
 - **Ausgewählte Journalbereiche weitergeben:** Zeitraum, Notizen, Symptome, Tags, Messwerte und Uhrzeiten einzeln wählen, einzelne Einträge auslassen und den tatsächlichen Dateiinhalt vorab ansehen. Selbstständige HTML-Datei ohne Upload; über den Browser druckbar.
 - Einträge bearbeiten, archivieren und wiederherstellen; Suche und Filter nach Tag, Symptom oder Zeitraum, Messwertverlauf mit Tabelle sowie CSV-Export der gefilterten Einträge.
@@ -71,13 +74,13 @@ Unter **Kalender → Kalender & Vorausblick** steht die SSW unter jedem Datum. W
 
 Über **Datum oder SSW nachschlagen** kannst du ein Datum wählen oder volle Wochen und Tage eingeben, zum Beispiel `24+0`. Die aufklappbare Übersicht **Alle 42 SSW mit Datumsbereichen ansehen** zeigt für jede laufende Woche deren Zeitraum. Der Vorausblick darunter gilt ab dem ausgewählten Tag und enthält auch bereits laufende Vorsorgefenster.
 
-Vorsorgefenster sind Orientierung, keine vereinbarten Termine. Eigene zukünftige Termine bleiben als Erweiterung in F05 der Feature-Liste offen. Die gewählte Datierung bestimmt alle SSW und Zeitfenster. Bei einer Änderung werden die Kalenderangaben neu berechnet; gespeicherte Journalbeobachtungen behalten ihr Datum.
+Vorsorgefenster sind Orientierung, keine vereinbarten Termine. Eigene Termine und Notizen verwaltest du unter Vorsorge und siehst sie am jeweiligen Kalendertag; sie sind von den Vorsorgefenstern getrennt. Die gewählte Datierung bestimmt alle SSW und Zeitfenster. Bei einer Änderung werden die Kalenderangaben neu berechnet; gespeicherte Journalbeobachtungen behalten ihr Datum.
 
-Über **Symptom im Kalender hervorheben** wählst du alle erfassten Symptome oder ein bestimmtes Symptom. Die zusätzliche Markierung zählt Journaleinträge mit einer entsprechenden Nennung. Ein Symptom zählt pro Eintrag höchstens einmal; mehrere Einträge am selben Tag bleiben mehrere Beobachtungen.
+Unter **Monat wählen & Anzeige anpassen → Symptome hervorheben** wählst du alle erfassten Symptome oder ein bestimmtes Symptom. Die zusätzliche Markierung zählt Journaleinträge mit einer entsprechenden Nennung. Ein Symptom zählt pro Eintrag höchstens einmal; mehrere Einträge am selben Tag bleiben mehrere Beobachtungen.
 
 Der aufklappbare Bereich **Wochenrückblick & Messwerte** zeigt die Kalenderwoche von Montag bis Sonntag, in der der ausgewählte Tag liegt. Über seine Pfeile wechselst du wochenweise; die Tageskarten öffnen den jeweiligen Kalendertag. Erfasste Tage, Tage ohne Eintrag und zukünftige Tage werden getrennt angezeigt. Fehlende Angaben bedeuten keine Beschwerdefreiheit. Archivierte Einträge sind ausgeblendet.
 
-Tippe auf ein Symptom, um die Originaleinträge dieser Woche mit genau dieser Symptomangabe zu öffnen. Der allgemeine Link zeigt alle Einträge der Woche. Die Messwertübersicht enthält jeweils den letzten Wert, die Anzahl der Messungen sowie bei mehreren Messungen den ersten Wert und die Spanne. Unterschiedliche Einheiten bleiben getrennt. Strukturierte Angaben zu Stimmung, Energie, Schlaf und Symptomstärke folgen mit F02; sie werden nicht aus Notizen abgeleitet.
+Tippe auf ein Symptom, um die Originaleinträge dieser Woche mit genau dieser Symptomangabe zu öffnen. Der allgemeine Link zeigt alle Einträge der Woche. Die Messwertübersicht enthält jeweils den letzten Wert, die Anzahl der Messungen sowie bei mehreren Messungen den ersten Wert und die Spanne. Unterschiedliche Einheiten bleiben getrennt. Strukturierte Angaben zu Stimmung, Energie, Schlaf und Beschwerdestärke stehen aus den Tages-Check-ins gesondert im Rückblick. Sie werden nicht aus Notizen abgeleitet; siehe [Tages-Check-in](#tages-check-in-und-wochenrückblick).
 
 ## Eigene Informationen erfassen
 
@@ -89,7 +92,7 @@ Unter **Journalliste & Verlauf** kannst du suchen und nach Tag, Symptom und Zeit
 
 Frühere Serververbindungen werden nicht mehr gestartet. Alte Geräte-Links lösen keine Netzwerkverbindung aus; gespeicherte Schlüssel und ausstehende Daten bleiben im vollständigen Backup erhalten. Eine neue Weitergabe erfolgt über **Daten & Backup**. Ein älteres Gerät muss die neue App-Version bewusst laden; alte Versionen können sonst weiter ihren bisherigen Dienst verwenden.
 
-Unterstützt werden bis zu 1.000 Einträge und insgesamt ungefähr 512 KiB pro Datenstand; vorher kann der Browser-Speicher voll sein. Ein Speicherversuch bricht dann mit einem Hinweis ab, ohne vorhandene Einträge zu kürzen. Der lokale Sicherungsverlauf ist auf 20 Stände und ungefähr 2 MiB begrenzt. Backups deshalb zusätzlich aufbewahren.
+Unterstützt werden bis zu 1.000 Einträge und insgesamt ungefähr 512 KiB pro Profil-/Journaldatenstand; vorher kann der Browser-Speicher voll sein. Ein Speicherversuch bricht dann mit einem Hinweis ab, ohne vorhandene Einträge zu kürzen. Termine und Terminnotizen haben einen zusätzlichen Bereich bis 128 KiB; das vollständige verschlüsselte Paket ist ebenfalls begrenzt (AgDR-0025). Der lokale Profil-/Journal-Sicherungsverlauf ist auf 20 Stände und ungefähr 2 MiB begrenzt. Backups deshalb zusätzlich aufbewahren.
 
 ## Lebensmittel und Aktivitäten offline nachschlagen
 
@@ -118,6 +121,34 @@ Unter **Kalender → Journalliste & Verlauf → Ausgewählte Bereiche teilen** o
 **Wehe beginnt · Start** speichert den Beginn sofort. **Wehe endet · Speichern** protokolliert die Dauer und gegebenenfalls den Abstand von Beginn zu Beginn als Journalmessung. Offene Messungen bleiben nach Neuladen erhalten. Bei vergessenem Stoppen unter **Endzeit korrigieren** den tatsächlichen Zeitpunkt wählen. Versehentliche Messungen lassen sich im Kalender behalten und von der Musterübersicht ausschließen. Beim Browser-Schließen wird nichts im Hintergrund überwacht; die Anzeige rekonstruiert die Zeit aus dem gespeicherten Beginn.
 
 Ab **22+0** bei eigenen Angaben erscheint ein schwebender Schnellzugriff, bei offener Messung immer. Der Tracker ist auch früher über die genannten Bereiche erreichbar. Die Grenze ist eine Bedienentscheidung und keine individuelle Aussage über Lebensfähigkeit. Die App erkennt ausschließlich aufgezeichnete **Zeitmuster**, keine bestätigten Geburtswehen. Für erstes und weiteres Kind gelten unterschiedliche Orientierungen. Bei Verdacht auf vorzeitige Wehen vor 37+0 oder bei Warnzeichen direkt die Betreuung kontaktieren, nicht auf ein Muster warten. Kontakte stehen neben den Hinweisen bereit. Quellen und technische Grenzen: [AgDR-0019](docs/agdr/0019-kontakte-und-wehentracker.md); die App verlinkt BIÖG, IQWiG und Uniklinik Düsseldorf mit Prüfdatum 18.11.2026.
+
+## Termine, Notizen und Fragen für Hebamme / Gynäkologie
+
+Unter **Vorsorge → Termine, Notizen & Fragen** einen Termin mit Datum, optionaler Uhrzeit und Ort anlegen. **Notiz / Frage sammeln** funktioniert auch ohne Termin. Freie Notizen, Frage/Antwort oder selbst notierte Ergebnisse sind wählbar; nächste Schritte und der Status **besprochen** sind optional. Antworten werden von dir eingetragen. Eine Antwort setzt den Status nicht automatisch.
+
+Am Termin **Notiz / Frage ergänzen** oder vorhandene Notizen aufklappen. Derselbe Eintrag erscheint in der **Notiz- & Fragensammlung**, mit Suche nach Frage, Antwort, nächsten Schritten oder Termintitel. **Nur offene Fragen** zeigt noch nicht als besprochen markierte Fragen. Beim Bearbeiten lässt sich eine vorher unzugeordnete Frage einem Termin zuweisen. Archivieren ist umkehrbar; ein archivierter Termin löscht seine Notizen nicht. Ältere Termine sind aufklappbar, archivierte über die entsprechende Auswahl auffindbar.
+
+Im **Kalender** einen Tag auswählen: eigene Termine, zugehörige Notizen und Antworten stehen vor den aufklappbaren medizinischen Vorsorgefenstern. **Termin planen** übernimmt den ausgewählten Tag; geplante Termine dürfen zukünftig sein, das tatsächliche Notizdatum bleibt bis heute. Die kompakteren Tagesfelder zeigen **T** für eigene Termine und **J** für Journaleinträge, bei mehreren jeweils die Anzahl. **V** steht nur am Beginn eines Vorsorgefensters. **Monat wählen & Anzeige anpassen** öffnet Monatswähler, optionale Bereichshervorhebung und Symptomfilter. Die Legende steht vor dem Raster; keine flächendeckenden täglichen Vorsorgestriche mehr.
+
+Termine und Notizen bleiben lokal und offline nutzbar. Sie sind in vollständigen Backups und verschlüsselten Geräte-Ständen enthalten; beide Smartphones benötigen dafür die aktuelle App-Version. Ein älterer Stand darf vorhandene Termine oder Notizen nicht still entfernen oder zurücksetzen. Backups nur mit diesem Zusatzbereich lassen sich auch ohne Schwangerschaftsprofil wiederherstellen. Die Wiederherstellung eines vollständigen älteren Backups ohne Termine zeigt den fehlenden Bereich in der Vorschau und verlangt vorher eine aktuelle Sicherung.
+
+Beim **ausgewählten Bericht** sind **Terminnotizen & Antworten** und **Termindaten inkl. Uhrzeit / Ort** getrennt und zunächst abgewählt. Nur Notizen wählen gibt keine zugehörigen Termintitel/-daten oder Orte mit. Werden beide Bereiche gewählt, kann die Verknüpfung auch auf einen Termin außerhalb des Notizzeitraums zeigen; die Vorschau nennt diese Regel. Einzelne Notizen und Termine bleiben auslassbar. Ein vollständiges Backup ist davon getrennt. Datenquelle sind eigene Eingaben; keine automatische medizinische Bewertung. Architektur, Größenlimits, Formatversion und Prüflücken: [AgDR-0025](docs/agdr/0025-termine-fragensammlung-und-klarerer-kalender.md).
+
+## Wochenreise: Für dich und dein Baby
+
+In der **Wochenreise** eine SSW wählen und zwischen den gleichwertigen Reitern **Dein Baby** und **Für dich** wechseln. Beide verwenden dieselbe Woche. Über **Überblick → Wocheninfos für dich ansehen** direkt die aktuelle Mutterinfo öffnen. Die Wochenvorschau ändert deine gespeicherte Berechnungsgrundlage nicht.
+
+**Für dich** enthält die vorhandenen Körpertexte und Wochenimpulse sowie aufklappbare Themen zu Alltag, Schlaf, Gefühlen und Unterstützung. Die Texte gelten für die ausdrücklich angezeigte Phase; sie sagen nicht voraus, was du persönlich spüren musst. Eine Reflexionsfrage und der Tages-Check-in führen zur eigenen Beobachtung, ohne etwas automatisch zu speichern.
+
+Jedes Vertiefungsthema verlinkt passende Quellen. Neue Vertiefungen wurden am **18.11.2026** geprüft; vorhandene Körpertexte behalten den gesondert angezeigten Stand **17.11.2026**. Der NDR-Ernährungsartikel ergänzt gezielt „Alltag & Essen“ neben Netzwerk Gesund ins Leben. Alle Inhalte und Quellenzuordnungen funktionieren offline, nur Originalseiten brauchen Internet. Entscheidungen, Grenzen und Prüfnachweise: [AgDR-0024](docs/agdr/0024-fuer-dich-und-mobile-layoutkorrekturen.md).
+
+## Tages-Check-in und Wochenrückblick
+
+Im **Überblick → Tages-Check-in** oder im **Kalender → Check-in für diesen Tag** eine Beobachtung anlegen. Datum und Uhrzeit unterscheiden mehrere Einträge desselben Tages. Alle Felder sind zunächst leer und optional: Stimmung und Energie jeweils 1–5, Schlafdauer 0–24 Stunden innerhalb der letzten 24 Stunden inklusive Nickerchen, stärkste Beschwerden jetzt 0–10. Die Bedeutungen stehen direkt im Formular. Die Skalen dienen der persönlichen Erinnerung und sind keine medizinischen Tests. Notizen, Symptome, Tags und weitere Messwerte lassen sich aufklappen und ergänzen.
+
+Ein Check-in ist ein normaler Journaleintrag: bearbeiten, archivieren, wiederherstellen, sichern und verschlüsselt weitergeben funktionieren über dieselben Wege. Unter **Journalliste → Suchen & filtern → Eintragsart** ausschließlich Check-ins anzeigen. Der **Wochenrückblick** nennt erste/letzte Angaben, Anzahl, unterschiedliche Tage und fehlende Angaben; Tage ohne Check-in bleiben von fehlenden Feldern innerhalb einer Beobachtung unterscheidbar. Mehrere Schlafwerte mit überlappenden Zeiträumen werden nicht addiert. Über den Original-Link die Check-ins der Woche öffnen.
+
+Im **Journalauszug** ist **Tages-Check-in** ein eigener, zunächst abgewählter Bereich. **Weitere Messwerte** enthält diese vier strukturierten Angaben nicht. Notizen, Symptome und Tags sind weiterhin gesondert wählbar. Vollständige Geräte-Stände und Backups enthalten dagegen das ganze Journal. Neue Funktionen werden durch ein bewusstes PWA-Update verfügbar. Quellenherkunft der Beobachtungen sind deine eigenen Eingaben; Skalen-, Kompatibilitäts- und Prüfentscheidungen: [AgDR-0023](docs/agdr/0023-tages-check-in-und-strukturierter-rueckblick.md).
 
 ## Geräte-Stände ohne Server
 
@@ -177,6 +208,9 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0020: Serverloser Geräteabgleich](docs/agdr/0020-serverloser-geraeteabgleich.md)
 - [AgDR-0021: Übersichtliche Hauptbereiche](docs/agdr/0021-uebersichtliche-hauptbereiche.md)
 - [AgDR-0022: Smartphone-Nahübertragung und kompakte Links](docs/agdr/0022-smartphone-nahuebertragung-und-kompakte-links.md)
+- [AgDR-0023: Tages-Check-in und strukturierter Rückblick](docs/agdr/0023-tages-check-in-und-strukturierter-rueckblick.md)
+- [AgDR-0024: Für dich und mobile Layoutkorrekturen](docs/agdr/0024-fuer-dich-und-mobile-layoutkorrekturen.md)
+- [AgDR-0025: Termine, Fragensammlung und klarerer Kalender](docs/agdr/0025-termine-fragensammlung-und-klarerer-kalender.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -203,7 +237,7 @@ Verschlüsselte **Geräte-Stand-Links** sind eigenständige Kopien mit getrennte
 - `styles.css`, `src/layout.js`, `src/navigation.js`: Responsive Gestaltung, gemeinsame Layout-Erkennung und mobile App-Navigation.
 - `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
 - `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
-- `tests/`: insgesamt **147 Tests** für Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `tests/`: insgesamt **186 Tests** für Termine, gemeinsame Notizen/Q&A, geschützte Weitergabe, Tages-Check-in, strukturierte Wochenrückblicke, getrenntes Teilen, Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
 - `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.
