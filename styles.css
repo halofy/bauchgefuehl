@@ -60,7 +60,7 @@ h1 em{font-weight:400;color:#6b7d58}
 #mode-actions .button{font-size:11px;min-height:38px;padding:8px 13px}
 .notice{background:#f6e7d5;border:1px solid #dec2a2;border-radius:8px;padding:12px 17px;margin-bottom:16px;font-size:13px}
 .summary-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(300px,1fr);gap:22px}
-.pregnancy-card{background:var(--green);color:#f6f4e9;border-radius:13px;position:relative;overflow:hidden;padding:30px 32px 24px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;min-height:348px}
+.pregnancy-card{background-color:var(--green);background-image:linear-gradient(0deg,#284d40 0%,rgba(40,77,64,.98) 24%,rgba(40,77,64,0) 64%),linear-gradient(90deg,#1c4035 0%,rgba(28,64,53,.97) 36%,rgba(28,64,53,0) 72%),radial-gradient(ellipse 75% 90% at 82% 29%,#d6ddc7 0%,#b0c0a2 28%,#789879 56%,#284d40 95%);color:#f6f4e9;border-radius:13px;position:relative;overflow:hidden;padding:30px 32px 24px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;min-height:348px}
 .week-summary{z-index:1;position:relative}
 .pill{display:inline-flex;align-items:center;gap:7px;border-radius:30px;padding:5px 12px;font-size:10px;font-weight:550;line-height:1.6}
 .pill-light{color:#e1e8d7;background:rgba(212,230,196,.12);border:1px solid rgba(230,240,217,.15)}
@@ -73,7 +73,7 @@ h1 em{font-weight:400;color:#6b7d58}
 .info-button{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;padding:4px;color:inherit}
 .info-button svg{width:14px;height:14px}
 .baby-art{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;margin:-14px -15px -1px 0}
-.baby-art>svg{width:100%;height:237px;stroke:none}
+.baby-art>.development-image{width:100%;height:237px;stroke:none}
 .baby-art>span{font:italic 12px/1.4 var(--serif);color:#cbd8bd;margin-top:0}
 .pregnancy-progress{grid-column:1/-1;margin-top:24px}
 .pregnancy-progress>div:first-child{display:flex;justify-content:space-between;align-items:center;color:#d0dcca;font-size:9px;letter-spacing:.1px}
@@ -252,8 +252,8 @@ input[type=file]{font-size:11px;width:100%}
 .danger{color:#a05d4b}
 .toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:13px 21px;border-radius:9px;background:#284d40;color:#fffefa;box-shadow:0 8px 35px #18352430;font-size:12px;z-index:100;max-width:calc(100% - 32px);text-align:center;width:max-content}
 .noscript{position:fixed;inset:0;background:var(--paper);z-index:101;display:grid;place-items:center;padding:30px;font-size:18px;text-align:center}
-@media(min-width:1400px){.page-intro{padding-top:53px;padding-bottom:35px}.pregnancy-card{min-height:368px}.baby-art>svg{height:250px}.ssw-number{font-size:90px}.card-eyebrow{margin-top:28px}}
-@media(max-width:1000px){.header-inner,.page-shell{padding-left:25px;padding-right:25px}.main-nav{gap:20px;margin-left:0}.brand{font-size:27px}.header-inner{gap:16px}.summary-grid{grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr);gap:17px}.pregnancy-card{padding:25px 23px 21px}.ssw-number{font-size:74px;gap:9px}.baby-art>svg{height:210px}.baby-art>span{font-size:10px}.week-explanation{font-size:10px}.due-card,.data-card{padding-left:21px;padding-right:21px}.due-card h2{font-size:25px}.development{padding:22px}.body-card{padding:22px}.body-card h3{font-size:21px}.journey-grid{gap:17px}.current-label{font-size:9px}.knowledge-grid{gap:24px}.milestone{padding:17px}.milestone h3{font-size:12px}.wellbeing-card{padding:25px}.today{display:none}}
+@media(min-width:1400px){.page-intro{padding-top:53px;padding-bottom:35px}.pregnancy-card{min-height:368px}.baby-art>.development-image{height:250px}.ssw-number{font-size:90px}.card-eyebrow{margin-top:28px}}
+@media(max-width:1000px){.header-inner,.page-shell{padding-left:25px;padding-right:25px}.main-nav{gap:20px;margin-left:0}.brand{font-size:27px}.header-inner{gap:16px}.summary-grid{grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr);gap:17px}.pregnancy-card{padding:25px 23px 21px}.ssw-number{font-size:74px;gap:9px}.baby-art>.development-image{height:210px}.baby-art>span{font-size:10px}.week-explanation{font-size:10px}.due-card,.data-card{padding-left:21px;padding-right:21px}.due-card h2{font-size:25px}.development{padding:22px}.body-card{padding:22px}.body-card h3{font-size:21px}.journey-grid{gap:17px}.current-label{font-size:9px}.knowledge-grid{gap:24px}.milestone{padding:17px}.milestone h3{font-size:12px}.wellbeing-card{padding:25px}.today{display:none}}
 :where(.app-layout) .header-inner{height:76px;flex-wrap:wrap;gap:0;position:relative}
 :where(.app-layout) .brand{font-size:27px}
 :where(.app-layout) .brand-mark svg{width:28px}
@@ -278,7 +278,7 @@ input[type=file]{font-size:11px;width:100%}
 :where(.app-layout) .pregnancy-card{min-height:335px;padding:25px}
 :where(.app-layout) .ssw-number{font-size:87px}
 :where(.app-layout) .baby-art{margin:-15px -7px 0 0}
-:where(.app-layout) .baby-art>svg{height:235px}
+:where(.app-layout) .baby-art>.development-image{height:235px}
 :where(.app-layout) .baby-art>span{font-size:11px}
 :where(.app-layout) .card-eyebrow{margin-top:24px}
 :where(.app-layout) .week-explanation{font-size:11px}
@@ -342,7 +342,7 @@ input[type=file]{font-size:11px;width:100%}
 :where(.app-layout) .site-footer .text-link{font-size:9px}
 :where(.app-layout) .week-summary .estimate-label{font-size:8px}
 :where(.app-layout) .pregnancy-progress>div:first-child{font-size:9px}
-@media(max-width:420px){.page-shell,.header-inner{padding-left:18px;padding-right:18px}.header-share{font-size:10px;padding:8px 10px}.brand{font-size:25px}.main-nav{gap:35px}h1{font-size:38px}.summary-grid{gap:14px}.pregnancy-card{padding:23px 20px;grid-template-columns:1.05fr .95fr;min-height:310px}.ssw-number{font-size:75px}.ssw-plus{font-size:29px}.baby-art>svg{height:205px}.baby-art>span{font-size:9px;text-align:center}.week-explanation{font-size:10px;max-width:155px}.card-eyebrow{font-size:8px;letter-spacing:1.4px}.pregnancy-progress{margin-top:20px}.pregnancy-progress>div:first-child{font-size:8px}.due-card{padding:17px 14px}.due-card h2{font-size:22px}.card-topline .eyebrow{font-size:7px;letter-spacing:.8px}.data-card{padding:13px 14px}.data-card .card-heading h2{font-size:11px}.side-summary{gap:12px;grid-template-columns:1.1fr 1fr}.section-heading h2{font-size:25px}.development h3{font-size:24px}.development-bottom{padding:12px}.development-bottom p{font-size:9px}.section-heading .text-link{max-width:83px}.current-label{font-size:9px;margin-left:8px}dialog{padding:23px;max-height:calc(100dvh - 24px)}dialog h2{font-size:30px}.dialog-heading{margin-bottom:17px}}
+@media(max-width:420px){.page-shell,.header-inner{padding-left:18px;padding-right:18px}.header-share{font-size:10px;padding:8px 10px}.brand{font-size:25px}.main-nav{gap:35px}h1{font-size:38px}.summary-grid{gap:14px}.pregnancy-card{padding:23px 20px;grid-template-columns:1.05fr .95fr;min-height:310px}.ssw-number{font-size:75px}.ssw-plus{font-size:29px}.baby-art>.development-image{height:205px}.baby-art>span{font-size:9px;text-align:center}.week-explanation{font-size:10px;max-width:155px}.card-eyebrow{font-size:8px;letter-spacing:1.4px}.pregnancy-progress{margin-top:20px}.pregnancy-progress>div:first-child{font-size:8px}.due-card{padding:17px 14px}.due-card h2{font-size:22px}.card-topline .eyebrow{font-size:7px;letter-spacing:.8px}.data-card{padding:13px 14px}.data-card .card-heading h2{font-size:11px}.side-summary{gap:12px;grid-template-columns:1.1fr 1fr}.section-heading h2{font-size:25px}.development h3{font-size:24px}.development-bottom{padding:12px}.development-bottom p{font-size:9px}.section-heading .text-link{max-width:83px}.current-label{font-size:9px;margin-left:8px}dialog{padding:23px;max-height:calc(100dvh - 24px)}dialog h2{font-size:30px}.dialog-heading{margin-bottom:17px}}
 @media(prefers-reduced-motion:reduce){html,.week-list{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
 
 /* Personal journal */
@@ -463,7 +463,7 @@ html:where(.app-layout){scroll-padding-top:88px}
 :where(.app-layout) .card,:where(.app-layout) .pregnancy-card,:where(.app-layout) .mode-banner,:where(.app-layout) .journal-entry,:where(.app-layout) .wellbeing-card{border-radius:18px}
 :where(.app-layout) .pregnancy-card{min-height:300px}
 :where(.app-layout) .ssw-number{font-size:76px}
-:where(.app-layout) .baby-art>svg{height:205px}
+:where(.app-layout) .baby-art>.development-image{height:205px}
 :where(.app-layout) #mode-actions{width:100%}
 :where(.app-layout) #mode-actions .button{min-height:44px;font-size:13px;padding:10px 14px}
 :where(.app-layout) .banner-copy strong{font-size:13px}
@@ -498,7 +498,7 @@ html:where(.app-layout){scroll-padding-top:88px}
 :where(.app-layout) dialog>p,:where(.app-layout) #sync-dialog p{font-size:14px}
 :where(.app-layout) dialog .button{min-height:48px;font-size:14px}
 :where(.app-layout) .toast{bottom:calc(88px + env(safe-area-inset-bottom));font-size:14px}
-@media(max-width:360px){.brand{font-size:23px}.header-inner{gap:4px}.page-shell{padding-left:14px;padding-right:14px}.side-summary{grid-template-columns:1fr}.baby-art>svg{height:175px}.ssw-number{font-size:64px}.pregnancy-card{padding:20px 16px}.baby-art>span{font-size:8px}.nav-link{font-size:9px}}
+@media(max-width:360px){.brand{font-size:23px}.header-inner{gap:4px}.page-shell{padding-left:14px;padding-right:14px}.side-summary{grid-template-columns:1fr}.baby-art>.development-image{height:175px}.ssw-number{font-size:64px}.pregnancy-card{padding:20px 16px}.baby-art>span{font-size:8px}.nav-link{font-size:9px}}
 .calculation-example{background:var(--sage);border:1px solid #d5decc;border-radius:12px;padding:18px;margin:18px 0;color:var(--ink)}
 .calculation-example h3{font:600 14px/1.5 var(--sans);margin-bottom:12px}
 .calculation-example ol{padding-left:22px;margin:0}
@@ -798,3 +798,38 @@ html:where(.app-layout){scroll-padding-top:88px}
 :where(.app-layout) .today-focus,:where(.app-layout) .companion-panel{padding:20px}
 @media(max-width:380px){.header-inner .brand{font-size:22px}.header-inner .brand-mark{display:none}.header-inner{gap:5px}.companion-panel{padding:18px}}
 @media print{.app-back{display:none}}
+/* The whole illustration moves gently; reduced motion remains static. */
+.summary-grid > .today-focus{margin:0}
+@media(prefers-reduced-motion:no-preference){
+  .development-drift{animation:development-float 7s ease-in-out infinite}
+  .mobile-inactive .development-drift{animation-play-state:paused}
+}
+@keyframes development-float{
+  0%,100%{transform:translateY(2px) rotate(-1deg)}
+  50%{transform:translateY(-2px) rotate(1deg)}
+}
+@media(prefers-reduced-motion:reduce){.development-drift{animation:none;transform:none}}
+/* Soft local PNG illustrations, shared across a whole displayed week. */
+.development-image{display:grid;place-items:center;aspect-ratio:1;min-width:0;max-width:100%;background:radial-gradient(ellipse at center,rgba(204,219,187,.18),transparent 68%);border-radius:50%}
+.development-image .development-drift{width:100%;height:100%;display:grid;place-items:center;transform-origin:50% 50%;transform-box:border-box}
+.development-image img{display:block;width:100%;height:100%;max-height:100%;object-fit:contain}
+.baby-art>.development-image{width:100%;height:237px;aspect-ratio:auto}
+.growth-art{max-width:300px}.growth-art>.development-image{width:100%}
+:where(.app-layout) .baby-art>.development-image{height:205px}
+@media(max-width:360px){.baby-art>.development-image{height:175px}}
+
+/* Keep the supplied originals; crop their footer, frame the motif, then soften its edge. */
+.development-image--weekly{aspect-ratio:1;background:none;border-radius:50%}
+.development-mask{--art-zoom:1.04;position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:44% 56% 48% 52% / 54% 42% 58% 46%;-webkit-mask-image:url('./images/development-mask.svg');mask-image:url('./images/development-mask.svg');-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:100% 100%;mask-size:100% 100%}
+@supports (mask-image:url('./images/development-mask.svg')) or (-webkit-mask-image:url('./images/development-mask.svg')){.development-mask{border-radius:0}}
+.development-mask[data-framing="early"]{--art-zoom:1.65}
+.development-mask[data-framing="growing"]{--art-zoom:1.45}
+.development-mask[data-framing="maturing"]{--art-zoom:1.18}
+.development-image--weekly img{position:absolute;top:calc((1 - var(--art-zoom)) * 50%);left:calc((1 - var(--art-zoom)) * 50%);width:calc(100% * var(--art-zoom));height:calc(120% * var(--art-zoom));max-width:none;max-height:none;object-fit:cover;object-position:center top;border-radius:0}
+.baby-art{margin:0;gap:12px;align-self:center}
+:where(.app-layout) .baby-art{margin:0}
+.baby-art>.development-image--weekly{width:100%;height:auto;max-width:212px;aspect-ratio:1}
+.baby-art>span{position:static;display:block;max-width:240px;margin:0;text-align:center;text-wrap:balance}
+
+/* Tint bright, near-neutral paper in the green card; keep warm illustration colors. */
+.baby-art .development-image--weekly img{filter:url(#development-paper-tone)}

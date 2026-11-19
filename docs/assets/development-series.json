@@ -1,0 +1,346 @@
+{
+  "date": "2026-11-19",
+  "source": "Vom Nutzer bereitgestellt: embryo_aquarell_42_bilder.zip",
+  "archive_sha256": "573312b98e13a0762b7558ad0cc932bf2650ef6366db0646ed93d5a0253b4367",
+  "mapping": "woche_01.png bis woche_42.png werden unverändert der 1. bis 42. deutschen SSW zugeordnet. Dateinamen sind keine medizinische Verifikation.",
+  "images": [
+    {
+      "week": 1,
+      "file": "images/development/woche_01.png",
+      "bytes": 1617732,
+      "sha256": "f49d7b1c41e011300cfaf41f19277b68c58846161101d8c029d033c03de42d56",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 2,
+      "file": "images/development/woche_02.png",
+      "bytes": 1624857,
+      "sha256": "2fd4d6b3a6c27546d5a2089d9b099b9e396dc8a734f39939065fe7a62ccfeccd",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 3,
+      "file": "images/development/woche_03.png",
+      "bytes": 1607528,
+      "sha256": "8ec62c8ab684c97117435fc51f4fafa2e007d2a0d0dd0da9829566c5e2e125d6",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 4,
+      "file": "images/development/woche_04.png",
+      "bytes": 1637545,
+      "sha256": "33ab8c7fdfdf94a60fbf1df2e70b6e029974ea36ee2372ec3ebaf03326362767",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 5,
+      "file": "images/development/woche_05.png",
+      "bytes": 1543995,
+      "sha256": "826823868657ff135ba0f143167a025184de0c6b397433a46667c513c7ca5923",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 6,
+      "file": "images/development/woche_06.png",
+      "bytes": 1562794,
+      "sha256": "660a27beff222d95ad10cdb329dd5996d31aed71fdbfa869b70f486b33f5aab8",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 7,
+      "file": "images/development/woche_07.png",
+      "bytes": 1588623,
+      "sha256": "903e0f824287e4b560469eebebf5ced7ed9c3847fe783adc520859ca234cd977",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 8,
+      "file": "images/development/woche_08.png",
+      "bytes": 1610311,
+      "sha256": "46ad63bf6069d7f54f483f6cbb17aa7256e2cdfc5583d894a7e8c43f83ded767",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 9,
+      "file": "images/development/woche_09.png",
+      "bytes": 1517363,
+      "sha256": "5485591268c63a2af6a75d936956c173510384c76f75da0fef9e62be7ad05ca0",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 10,
+      "file": "images/development/woche_10.png",
+      "bytes": 1523227,
+      "sha256": "e931a7628ae067786a38ebb0b44f015ba8b99815c2818e987cb3a14c2f8a1fa1",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 11,
+      "file": "images/development/woche_11.png",
+      "bytes": 1527019,
+      "sha256": "4c33cbab2d88a9bcb8562f42ee3dd3a226aa592730a97fc31fe2185858ea3c1c",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 12,
+      "file": "images/development/woche_12.png",
+      "bytes": 1532493,
+      "sha256": "1a44b185696f00939ac956d3efeff4db034cdb2264e0b26690745b329a5d0ab5",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 13,
+      "file": "images/development/woche_13.png",
+      "bytes": 1537544,
+      "sha256": "e297992fa5472f446f27bd3386fa197dbf6e197bedbb3d74c60623e62955c93d",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 14,
+      "file": "images/development/woche_14.png",
+      "bytes": 1542215,
+      "sha256": "66de40f3af870a49d985a86c32c503ba7e77b349805625f05ee34555e92b387f",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 15,
+      "file": "images/development/woche_15.png",
+      "bytes": 1548317,
+      "sha256": "004d7e6b147a41a1d90d8676a11e772b4ba734ba4594674fc4754ab1130761a1",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 16,
+      "file": "images/development/woche_16.png",
+      "bytes": 1554129,
+      "sha256": "e94b6388a031b35e1aa31ff3e9233c09efc45be662a1515ce4870608cca46c42",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 17,
+      "file": "images/development/woche_17.png",
+      "bytes": 1558974,
+      "sha256": "f6193209f4b2280ff650b8e0360196987bfc01d67d2e17dfc3c8386327bf0294",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 18,
+      "file": "images/development/woche_18.png",
+      "bytes": 1566690,
+      "sha256": "88f74f349744b790044c5aa364fc4e4f600cf702c2945f214bb3015c8b7064e2",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 19,
+      "file": "images/development/woche_19.png",
+      "bytes": 1574902,
+      "sha256": "b5393f06ddd6262c78d768a423dc3d9798b81686a1ed70deb0b7344d5a19bb31",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 20,
+      "file": "images/development/woche_20.png",
+      "bytes": 1582516,
+      "sha256": "79282f42ee0a1773756322bfbc0ac34929e1f6b4cdacf4999f107d496e0e94c9",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 21,
+      "file": "images/development/woche_21.png",
+      "bytes": 1587665,
+      "sha256": "4ed0b13ae1a4c08626235c7295884c9f6201996491bcf1da5e5cc9feb3c1be4d",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 22,
+      "file": "images/development/woche_22.png",
+      "bytes": 1595382,
+      "sha256": "5cecff52d94551ae62f37ecfbe5c8e515f8aa70dd609fee8bc2e84e3c4137fd1",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 23,
+      "file": "images/development/woche_23.png",
+      "bytes": 1602257,
+      "sha256": "aae7093cc1040b08e3c4e08bb05fcbe91910865a6f02c94a50dd9d3d23bea383",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 24,
+      "file": "images/development/woche_24.png",
+      "bytes": 1608937,
+      "sha256": "cd22228a54cdff30417962e575d9a61ee23be301e126d2b9c46e918d7a85c759",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 25,
+      "file": "images/development/woche_25.png",
+      "bytes": 1616832,
+      "sha256": "5ad49af1a610a451d5abccd14dcb55867bb7e9c6c97d5e968fb8ec5c5b0c6df9",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 26,
+      "file": "images/development/woche_26.png",
+      "bytes": 1626217,
+      "sha256": "1b5881885192ad964e806ec2f4a0680e8eb9ac34b5612bd1309bf47b0567a385",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 27,
+      "file": "images/development/woche_27.png",
+      "bytes": 1635364,
+      "sha256": "458cade57f2b642b92701ceb5a29bbd5b13303f8935ebe9ef928279ea2dae77c",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 28,
+      "file": "images/development/woche_28.png",
+      "bytes": 1641604,
+      "sha256": "33dc8431796f1e5090ca9098394a05a054bd1773b5f843c646d5390d89bb6ce1",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 29,
+      "file": "images/development/woche_29.png",
+      "bytes": 1651300,
+      "sha256": "f334bf66c358ead4b4cdde5662cd55a253e72c11077ded0baf8d041485a8af22",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 30,
+      "file": "images/development/woche_30.png",
+      "bytes": 1659021,
+      "sha256": "49758aefbf6f1849520ba4256d82c26267e5780b86cd3297b584f940f51f3c12",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 31,
+      "file": "images/development/woche_31.png",
+      "bytes": 1664300,
+      "sha256": "6ad19a77ad45100f29d254cb522c912087c93a32ef74962ec518bbeb00f7e924",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 32,
+      "file": "images/development/woche_32.png",
+      "bytes": 1674944,
+      "sha256": "abb1831f932a51e5bda01b1cfc8a2af1f888c027a94c88189c1894c2879a636d",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 33,
+      "file": "images/development/woche_33.png",
+      "bytes": 1670954,
+      "sha256": "d14ca6d8f922c1cd677a980e0fb470a1d11d7cc58a422187f11b04ce7d55800d",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 34,
+      "file": "images/development/woche_34.png",
+      "bytes": 1678459,
+      "sha256": "ce3577b3e3d01b3d6e5810fc2e621ee27deaa29d48f6d87b0f62f3d573a91de2",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 35,
+      "file": "images/development/woche_35.png",
+      "bytes": 1686411,
+      "sha256": "53249696bdcc9322976e9ad3e1c82e41b11b219c85e611e9dc070608adbc11bf",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 36,
+      "file": "images/development/woche_36.png",
+      "bytes": 1693707,
+      "sha256": "e8a18dc632df8cbb7fdf7ba598b44a5475e0edf4752b12db7b4d850812ff8493",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 37,
+      "file": "images/development/woche_37.png",
+      "bytes": 1702835,
+      "sha256": "12a49d38d64ce143a532b0f4da7f8949509458ba2af7d9adb08c3bf9126cbbb3",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 38,
+      "file": "images/development/woche_38.png",
+      "bytes": 1713150,
+      "sha256": "644ca030a873d6e15c6ead0a2a416005afd6ee35ee4f929b17c4b791ed6eeca6",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 39,
+      "file": "images/development/woche_39.png",
+      "bytes": 1721969,
+      "sha256": "3f8b973be0e456b97e30cdb11e805604c6e2e25a7020c9015288714d1a94a302",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 40,
+      "file": "images/development/woche_40.png",
+      "bytes": 1730334,
+      "sha256": "8fc440f682c7156a2c97dc49d0b1ae1902ae8eec92b6c532f001f203d7e46982",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 41,
+      "file": "images/development/woche_41.png",
+      "bytes": 1733376,
+      "sha256": "36cea454dee65d101d9b968029dfbbb14ca9daac743628bfe8099f0f1f106da3",
+      "width": 1200,
+      "height": 1320
+    },
+    {
+      "week": 42,
+      "file": "images/development/woche_42.png",
+      "bytes": 1737920,
+      "sha256": "808c323911239e297ed2faaf8a76c21862a0b2e5385d3fee20b865f72f52b37f",
+      "width": 1200,
+      "height": 1320
+    }
+  ],
+  "archive_retained": false,
+  "archive_retention_note": "Das Quellarchiv ist seit der Bereinigung am 19.11.2026 nicht mehr im Arbeitsverzeichnis erforderlich; alle 42 extrahierten Originale sind bytegleich geprüft. Siehe AgDR-0040. Der Archivname und die Prüfsumme bleiben als Herkunftsnachweis bestehen."
+}

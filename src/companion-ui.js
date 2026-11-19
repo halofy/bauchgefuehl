@@ -1,9 +1,10 @@
+import { getAppLayout, arrangeOverviewFocus } from './layout.js';
 import { projectCompanion, companionBody, companionDocument } from './companion-report.js';
 import { getMotherContent } from './mother.js';
 import { COMPANION_KEY, readCompanion, writeCompanion, normalizeCompanion, changeCompanion, PLAN_AREAS, GROWTH_KINDS } from './companion.js';
 import { todayISO, formatDate, addDays, dayNumber } from './dates.js';
 import { todayFocus } from './trends.js';
-import { growthAt, developmentSvg, measurementContext, GROWTH_REVIEWED } from './growth.js';
+import { growthAt, developmentImage, measurementContext, GROWTH_REVIEWED } from './growth.js';
 import { symptomHelp, helpForSymptom, SYMPTOM_REVIEWED } from './symptoms.js';
 import { escapeHtml as e, projectReport, reportBody, reportDocument } from './report.js';
 const number = value => new Intl.NumberFormat('de-DE',{ maximumFractionDigits:1 }).format(value);
@@ -12,7 +13,9 @@ const button = (label,attrs='') => `<button type="button" class="button button-o
 const dialog = (id,title,body) => `<dialog id="${id}" role="dialog" aria-modal="true" aria-labelledby="${id}-title"><div class="dialog-heading"><h2 id="${id}-title">${title}</h2><button type="button" class="icon-button" data-companion-close="${id}" aria-label="Schließen">×</button></div>${body}</dialog>`;
 export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, canEdit, onChange, onRefresh = () => {}, openPanel, openNote, editNote, openBirth, openJournal }) {
   const $ = id => document.getElementById(id);
-  let growthContext = null;
+  const layout = getAppLayout();
+  const arrangeFocus = () => arrangeOverviewFocus(document, layout.matches);
+  layout.subscribe(arrangeFocus);
   let data, problem = '', busy = false, dirty = false, lastWeek = 1, lastDays = 0;
   let editingPlan=null, editingGrowth=null;
   let sessionAppointment = null, selectedNotes = new Set(), selectedEntries = new Set();
@@ -20,7 +23,7 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
   read();
   $('mode-banner').insertAdjacentHTML('afterend',`<section id="today-focus" class="card today-focus" aria-labelledby="today-focus-title"><p class="eyebrow">DEIN TAG AUF EINEN BLICK</p><h2 id="today-focus-title">Heute für mich.</h2><div id="today-focus-content"></div></section><section id="postpartum-summary" class="card" hidden><p class="eyebrow">DEIN NEUER ABSCHNITT</p><h2>Nach der Geburt. Für dich.</h2><p id="postpartum-age"></p><p>Dein Journal, deine Fragen und Kontakte begleiten dich weiter. Die Schwangerschaft bleibt als Rückblick erhalten.</p></section>`);
   $('personal-care-panel').insertAdjacentHTML('beforebegin',`<section id="personal-plan" class="card companion-panel"><p class="eyebrow">WÜNSCHE &amp; UNTERSTÜTZUNG</p><h2>Geburt und Wochenbett planen.</h2><p>Was ist dir wichtig? Wer kann dich konkret entlasten?</p><div class="care-toolbar">${button('Wunsch / Aufgabe ergänzen','id="plan-add"')}${button('Ausgewählt drucken / teilen','id="plan-export"')}</div><div id="plan-summary"></div><details class="more-panel"><summary>Planung nach Bereichen ansehen</summary><div id="plan-list"></div></details><details class="more-panel"><summary>Geburt eintragen / Phase ändern</summary><form id="phase-form"><label>Geburtsdatum (freiwillig)<input id="phase-date" type="date"></label><p class="field-hint">Der Wechsel erfolgt nur durch dich. Es werden keine bisherigen Angaben gelöscht oder neu datiert. Ein leeres Datum führt zur Schwangerschaftsansicht zurück.</p><button class="button button-primary" type="submit">Phase bewusst speichern</button></form></details><p id="companion-error" class="form-error" role="alert" hidden></p><details class="more-panel"><summary>Hintergrund &amp; Quellen · geprüft am 18.11.2026</summary><p>Eigene Wünsche können das Gespräch mit dem Geburtsteam vorbereiten. Für die erste Zeit nach der Geburt kannst du praktische Hilfe festhalten. Die Vorschläge sind freiwillige Planungshilfen.</p>${source('https://www.familienplanung.de/schwangerschaft/geburt/geburtsvorbereitung/wie-kann-ich-mich-auf-die-geburt-vorbereiten/','BIÖG: Geburtsvorbereitung')}${source('https://www.gesundheitsinformation.de/nach-der-geburt-wochenbett.html','IQWiG: Wochenbett')}</details></section>`);
-  $('journey-baby-panel').insertAdjacentHTML('beforeend',`<section id="growth-panel" class="growth-panel"><h3>Wachsen, Schritt für Schritt.</h3><label>Tag innerhalb dieser SSW<input id="growth-day" type="range" min="0" max="6" value="0" step="1"></label><p id="growth-day-label"></p><div id="growth-art" class="growth-art"></div><div id="growth-reference"></div><div id="growth-personal"></div><div class="care-toolbar">${button('Untersuchungsmaß erfassen','id="growth-add"')}</div><details class="more-panel"><summary>Deine Untersuchungswerte</summary><div id="growth-list"></div></details><p class="content-note">Schematische Darstellung, nicht maßstabsgetreu. Allgemeine Orientierungswerte sind keine persönliche Wachstumsprognose. Untersuchungswerte werden daneben eingeordnet, nicht fortgeschrieben und ändern die SSW nicht. Redaktionell geprüft: ${GROWTH_REVIEWED}.</p></section>`);
+  $('journey-baby-panel').insertAdjacentHTML('beforeend',`<section id="growth-panel" class="growth-panel"><h3>Wachsen, Schritt für Schritt.</h3><p id="growth-week-label" class="content-note"></p><div id="growth-art" class="growth-art"></div><div id="growth-reference"></div><div id="growth-personal"></div><div class="care-toolbar">${button('Untersuchungsmaß erfassen','id="growth-add"')}</div><details class="more-panel"><summary>Deine Untersuchungswerte</summary><div id="growth-list"></div></details><p class="content-note">Illustrative Aquarellserie: ein Bild je SSW, nicht maßstabsgetreu. Bildquelle: bereitgestelltes Archiv „embryo_aquarell_42_bilder.zip“. Die Motive sind künstlerisch und keine medizinisch geprüfte Entwicklungsreihe. Die Haltung zeigt keine tatsächliche Kindslage. Allgemeine Orientierungswerte sind keine persönliche Wachstumsprognose. Untersuchungswerte werden daneben eingeordnet, nicht fortgeschrieben und ändern die SSW nicht. Redaktionell geprüft: ${GROWTH_REVIEWED}.</p></section>`);
   $('wissen').insertAdjacentHTML('afterbegin',`<section id="symptom-help" class="card companion-panel"><p class="eyebrow">DEINE BESCHWERDEN NACHSCHLAGEN</p><h2>Was kann mir helfen?</h2><p>Allgemeine Orientierung für die Schwangerschaft. Bei akuter Unsicherheit dein Behandlungsteam kontaktieren.</p><label>Beschwerde auswählen<select id="symptom-help-select">${symptomHelp.map(x=>`<option value="${e(x.key)}">${e(x.title)}</option>`).join('')}</select></label><div id="symptom-help-content"></div></section>`);
   document.body.insertAdjacentHTML('beforeend',
     dialog('plan-dialog','Deine Planung.',`<form id="plan-form"><fieldset id="plan-fields" class="care-form-fields"><label>Bereich<select id="plan-area">${Object.entries(PLAN_AREAS).map(([key,label])=>`<option value="${key}">${label}</option>`).join('')}</select></label><label>Wunsch oder Aufgabe<textarea id="plan-text" rows="4" maxlength="3000" required></textarea></label><label>Wer unterstützt dich? (freiwillig)<input id="plan-person" maxlength="120"></label><p id="plan-error" class="form-error" role="alert" hidden></p><button class="button button-primary full-width">Lokal speichern</button></fieldset></form>`)+
@@ -61,6 +64,7 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
     $('phase-form').querySelector('button').disabled=!visible||!canEdit();
     const postpartum=!!visible?.birthDate;
     document.body.classList.toggle('postpartum-mode',postpartum);
+    arrangeFocus();
     $('postpartum-summary').hidden=!postpartum;
     if(postpartum) $('postpartum-age').textContent=`Geburt am ${formatDate(data.birthDate)} · ${dayNumber(todayISO())-dayNumber(data.birthDate)} Tage seit der Geburt. Deine Beobachtungen bleiben freiwillig.`;
     $('plan-list').replaceChildren();
@@ -92,18 +96,16 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
     const plan=document.createElement('button');plan.type='button';plan.className='text-link';plan.textContent='Meine Planung';plan.addEventListener('click',()=>openPanel('vorsorge','personal-plan'));actions.append(plan);box.append(actions);
   }
   function renderGrowth(week=lastWeek,days=lastDays){
-    const context=`${week}:${days}`;
-    if(growthContext!==context){$('growth-day').value=Math.floor(days/7)===week-1?Math.max(0,days%7):0;growthContext=context;}
     lastWeek=week;lastDays=days;
-    const offset=Number($('growth-day').value),age=(week-1)*7+offset;
+    const age=(week-1)*7;
     if(own()&&data?.birthDate)$('selected-current').textContent=`Schwangerschaftsrückblick · Geburt am ${formatDate(data.birthDate)}`;
-    $('growth-day-label').textContent=`${Math.floor(age/7)}+${age%7} · ${week}. SSW${age===days?' · heutiger Stand':''}`;
-    $('growth-art').innerHTML=developmentSvg(age);
+    $('growth-week-label').textContent=`${week}. SSW · Größenorientierung zum Wochenbeginn (${week-1}+0)`;
+    $('growth-art').innerHTML=developmentImage(week);
     const ref=growthAt(age);
     $('growth-reference').innerHTML=ref?`<p class="growth-length">≈ ${number(ref.cm)} cm</p><p>${ref.kind==='crl'?'Scheitel bis Steiß (SSL)':'Scheitel bis Ferse (Gesamtlänge)'}</p><p class="field-hint">${ref.interpolated?'Rechnerische Zwischenstufe zwischen zwei NHS-Orientierungswerten.':ref.held?'Letzter SSL-Orientierungswert bei 19+0; kein Vergleich mit Gesamtlänge.':'Allgemeiner NHS-Orientierungswert.'} Größenbild am Ausgangspunkt: ${e(ref.comparison)}. Gegenstände unterscheiden sich in ihrer Größe.</p>${ref.sources.map(url=>source(url,'NHS: Größenangabe')).join('')}`:`<p>${age<42?'Für diese frühe Phase zeigen wir keine belastbare Längenangabe.':'Nach 40+0 wird keine weitere Größe hochgerechnet.'}</p>`;
-    // Replace the old four-week phase comparison with the selected day's estimate.
+    // One consistent size orientation per displayed week; examination dates retain their precise context.
     $('phase-size').textContent=ref?`Ungefähr ${number(ref.cm)} cm`:'Entwicklung in deinem Tempo';
-    $('phase-comparison').textContent=ref?`${ref.kind==='crl'?'SSL':'Gesamtlänge'} · Orientierung für ${Math.floor(age/7)}+${age%7}`:'Größenangaben und eigene Untersuchungswerte findest du hier.';
+    $('phase-comparison').textContent=ref?`${ref.kind==='crl'?'SSL':'Gesamtlänge'} · Orientierung zum Beginn der ${week}. SSW`:'Größenangaben und eigene Untersuchungswerte findest du hier.';
     const values=own()&&data?data.growth.filter(x=>!x.deletedAt).sort((a,b)=>b.date.localeCompare(a.date)||b.updatedAt.localeCompare(a.updatedAt)):[];
     const latest=values[0];
     $('growth-personal').replaceChildren();
@@ -116,7 +118,6 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
 
     if(!values.length){const empty=document.createElement('p');empty.textContent='Noch keine aktiven Untersuchungswerte.';$('growth-list').prepend(empty);}
   }
-  $('growth-day').addEventListener('input',()=>renderGrowth());
   function renderHelp(){ const item=helpForSymptom($('symptom-help-select').value);if(!item)return; $('symptom-help-content').innerHTML=`<h3>${e(item.title)}</h3><p>${e(item.help)}</p><h4>Wann Kontakt aufnehmen?</h4><p>${e(item.contact)}</p><p class="content-note">Keine Diagnose oder persönliche Entwarnung. Für die Zeit nach der Geburt bitte die Nachsorge ansprechen. Geprüft am ${SYMPTOM_REVIEWED}.</p>${source(item.source,'Fachquelle zu diesem Hinweis')}<div class="care-toolbar">${button('Als Frage vormerken','id="symptom-question"')}${button('Hilfe &amp; Kontakte','id="symptom-contacts"')}</div>`; $('symptom-question').disabled=!canEdit()||!own(); $('symptom-question').addEventListener('click',()=>{openPanel('vorsorge','personal-care-panel');openNote(null,`Was kann mir bei ${item.title} helfen?`);});$('symptom-contacts').addEventListener('click',openBirth); }
   $('symptom-help-select').addEventListener('change',renderHelp);
   function openHelp(label){const help=helpForSymptom(label);if(help){$('symptom-help-select').value=help.key;renderHelp();}else{$('symptom-help-content').textContent='Für diesen Begriff ist keine geprüfte Karte vorhanden. Bitte wähle ein Thema oder besprich deine Beobachtung mit deiner Hebamme oder Praxis.';}openPanel('wissen','symptom-help');}

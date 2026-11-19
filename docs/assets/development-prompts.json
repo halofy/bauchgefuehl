@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-19",
+  "method": "Built-in image_gen.imagegen; transparent_background: true",
+  "purpose": "KI-generierte redaktionelle Illustration, keine anatomische Referenz oder persönliche Prognose.",
+  "images": [
+    {
+      "prompt": "Use case: illustration-story. Asset type: transparent PNG illustration for a warm, calm pregnancy companion app called bauchgefühl. Create ONE elegant hand-painted gouache / soft watercolor illustration of a peacefully curled unborn baby around the middle of pregnancy, approximately week 24, seen in side profile with its face gently turned down and hands tucked near the cheek. Soft natural proportions, round but not oversized head, plump gentle forms, a tiny subtle closed eyelid, minimal facial detail, hands and feet mostly tucked in, not splayed. A short soft curved umbilical cord may remain connected to the abdomen. Warm muted peach, apricot and cream colors, delicate paper-like texture and very soft shading, almost no outline. Tasteful contemporary editorial illustration, comforting and tender, designed to read at 180px. Not a medical diagram, not photorealistic, not 3D, not glossy, not creepy, not alien-like, no exaggerated forehead, no big cartoon eyes, no angular joints, no detailed fingers, no hard dark contours. Isolated centered single figure with generous transparent padding on all sides; completely transparent background, no uterus, no placenta, no circular frame, no decorative objects, no lettering, no labels. Face points left. All limbs stay softly connected; natural peaceful silhouette.",
+      "former_file": "docs/assets/retired-development/growing-24.png",
+      "bytes": 1219436,
+      "sha256": "6a1b8c99df2b6f6ea4021f57942fdc139f9df82811146ad9e8faab721167d0c3",
+      "former_style_reference": null
+    },
+    {
+      "prompt": "Use case: illustration-story. Create ONE separate transparent PNG development illustration for a calm pregnancy app. The attached image is a STYLE REFERENCE, not a medical measurement: match its warm peach/apricot and cream, fine gouache/watercolor paper texture, soft natural lighting, tender quiet mood, subtle closed eyelid if a face exists, very little contour and absolutely no technical anatomy or exaggerated alien-like face. Side profile facing left, centered, complete subject with generous transparent padding. No labels, words, numbers, background, uterus, placenta, frame or decorative objects. Not photorealistic, not 3D, not glossy, not a medical diagram. Limbs softly folded, fingers unobtrusive, never splayed. Keep a coherent series with the reference, not a resized copy. For the very beginning: a simple symbolic cluster of four to six warm luminous rounded cells, like delicate translucent watercolor pearls nestled together, organic and peaceful. This is a symbolic beginning, not a fetus. No human face, no limbs, no sperm, no literal anatomy. Small soft pearl-like cells form ONE compact centered cluster.",
+      "former_file": "docs/assets/retired-development/beginning.png",
+      "bytes": 718727,
+      "sha256": "7d1b616eba908e56a2e151a51418261caab6d00028dda91ef8269eeb6805694c",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    },
+    {
+      "prompt": "Use case: illustration-story. Create ONE separate transparent PNG development illustration for a calm pregnancy app. The attached image is a STYLE REFERENCE, not a medical measurement: match its warm peach/apricot and cream, fine gouache/watercolor paper texture, soft natural lighting, tender quiet mood, subtle closed eyelid if a face exists, very little contour and absolutely no technical anatomy or exaggerated alien-like face. Side profile facing left, centered, complete subject with generous transparent padding. No labels, words, numbers, background, uterus, placenta, frame or decorative objects. Not photorealistic, not 3D, not glossy, not a medical diagram. Limbs softly folded, fingers unobtrusive, never splayed. Keep a coherent series with the reference, not a resized copy. For an early embryonic phase around week 8: ONE tiny gently curved C-shaped embryo, softly rounded head end, smooth little body tapering into its curled end, subtle small limb buds tucked close, no detailed human face, no eyes, no skeleton, no red organs, no medical dissection. Charming and tender in the same watercolor medium, never worm-like or eerie.",
+      "former_file": "docs/assets/retired-development/embryo-08.png",
+      "bytes": 775852,
+      "sha256": "e59de746d980adc13f0fec2575344d5c6bc9548b15af4e254da0e6cf78c507b7",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    },
+    {
+      "prompt": "Create a single warm, reassuring watercolor editorial illustration for a pregnancy companion app: early development, a delicate small body and a proportionally rounded head. Use the attached image as the visual style reference: soft muted peach and cream, delicate gouache texture, minimal facial detail, calm closed eyes, gentle natural proportions and softly connected limbs. Peaceful side profile facing left. A tasteful educational prenatal illustration, simplified and friendly, without medical diagrams or internal anatomy. Center the complete figure with generous transparent padding. Transparent background, no text, no frame, no decorative elements. Give this phase its own natural curled pose, within the same coherent visual family.",
+      "former_file": "docs/assets/retired-development/early-12.png",
+      "bytes": 822211,
+      "sha256": "d10c5470a3f1b8339f953a01c998d5214ad536700c27e24c5ed13b5d60f1351f",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    },
+    {
+      "prompt": "Create a single warm, reassuring watercolor editorial illustration for a pregnancy companion app: growing baby, balanced proportions and a slender gently curled body. Use the attached image as the visual style reference: soft muted peach and cream, delicate gouache texture, minimal facial detail, calm closed eyes, gentle natural proportions and softly connected limbs. Peaceful side profile facing left. A tasteful educational prenatal illustration, simplified and friendly, without medical diagrams or internal anatomy. Center the complete figure with generous transparent padding. Transparent background, no text, no frame, no decorative elements. Give this phase its own natural curled pose, within the same coherent visual family.",
+      "former_file": "docs/assets/retired-development/growing-20.png",
+      "bytes": 1055705,
+      "sha256": "e0885f1f099ce61a06408b96dff22340abe5e7aabdabf1cd3913490f6c4b0a10",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    },
+    {
+      "prompt": "Create a single warm, reassuring watercolor editorial illustration for a pregnancy companion app: later development, fuller cheeks, rounded torso and folded knees. Use the attached image as the visual style reference: soft muted peach and cream, delicate gouache texture, minimal facial detail, calm closed eyes, gentle natural proportions and softly connected limbs. Peaceful side profile facing left. A tasteful educational prenatal illustration, simplified and friendly, without medical diagrams or internal anatomy. Center the complete figure with generous transparent padding. Transparent background, no text, no frame, no decorative elements. Give this phase its own natural curled pose, within the same coherent visual family.",
+      "former_file": "docs/assets/retired-development/maturing-32.png",
+      "bytes": 1461581,
+      "sha256": "96fad057cb18180f1c86ed69ca70b93c00b6bbb75de738f657e2288898614504",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    },
+    {
+      "prompt": "Create a single warm, reassuring watercolor editorial illustration for a pregnancy companion app: around the due date, a mature peaceful baby with a full rounded body and compact folded posture. Use the attached image as the visual style reference: soft muted peach and cream, delicate gouache texture, minimal facial detail, calm closed eyes, gentle natural proportions and softly connected limbs. Peaceful side profile facing left. A tasteful educational prenatal illustration, simplified and friendly, without medical diagrams or internal anatomy. Center the complete figure with generous transparent padding. Transparent background, no text, no frame, no decorative elements. Give this phase its own natural curled pose, within the same coherent visual family.",
+      "former_file": "docs/assets/retired-development/ready-40.png",
+      "bytes": 1358101,
+      "sha256": "f3d67178bb86cdd579c213952728cbefb68f70c7ca123236180fe35adc0c6cce",
+      "former_style_reference": "docs/assets/retired-development/growing-24.png"
+    }
+  ],
+  "status": "Abgelöst durch die vom Nutzer bereitgestellte Wochenserie; historische Herkunft. Die sieben ungenutzten PNG-Dateien wurden am 19.11.2026 gemäß AgDR-0040 entfernt; frühere Dateinamen und Prompts bleiben dokumentiert."
+}

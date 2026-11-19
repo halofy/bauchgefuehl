@@ -7,18 +7,19 @@ function worker(scope = 'https://example.test/bauchgefuehl/sw.js') {
   const events = {};
   const entries = new Map();
   const opened = [];
+  const downloads = [];
   let skipped = 0;
   let claimed = 0;
-  const cache = { async addAll(urls) { for (const url of urls) entries.set(url, { url }); }, async match(key) { return entries.get(key); } };
+  const cache = { async addAll(urls) { for (const request of urls) { downloads.push(request); const url=request.url || request; entries.set(url, { url }); } }, async match(key) { return entries.get(key); } };
   const deleted = [];
   const context = {
-    URL, Set, Promise,
+    URL, Request, Set, Promise,
     self: { location: { href: scope }, addEventListener(type, cb) { events[type] = cb; }, skipWaiting() { skipped++; }, clients: { async claim() { claimed++; } } },
     caches: { async open(name) { opened.push(name); return cache; }, async keys() { return ['other-app', ...['a','b','c'].map(x => 'bauchgefuehl:/bauchgefuehl/:' + x)]; }, async delete(name) { deleted.push(name); } },
     fetch() { throw new Error('Offline'); },
   };
   vm.runInNewContext(source, context);
-  return { entries, opened, deleted, events, skipped: () => skipped, claimed: () => claimed,
+  return { entries, opened, downloads, deleted, events, skipped: () => skipped, claimed: () => claimed,
     async install() { let work; events.install({ waitUntil(p) { work = p; } }); await work; },
     fetch(path, { mode = 'cors', method = 'GET' } = {}) { let response; events.fetch({ request: { url: new URL(path, scope).href, mode, method }, respondWith(p) { response = p; } }); return response; },
   };
@@ -42,9 +43,11 @@ test('offline navigation and modules work at a Pages subpath', async () => {
   const w = worker(); await w.install();
   assert.equal((await w.fetch('./', { mode: 'navigate' })).url, 'https://example.test/bauchgefuehl/index.html');
   assert.equal((await w.fetch('./src/journal-ui.js')).url, 'https://example.test/bauchgefuehl/src/journal-ui.js');
-  for (const name of ['companion.js', 'companion-ui.js', 'companion-report.js', 'growth.js', 'symptoms.js', 'trends.js', 'backup.js', 'care.js', 'care-ui.js', 'mother.js', 'mother-ui.js', 'checkin.js', 'guide-data.js', 'guide.js', 'guide-ui.js', 'report.js', 'report-ui.js', 'birth.js', 'birth-ui.js', 'device-transfer.js', 'devices-ui.js']) {
+  for (const name of ['development-art.js', 'companion.js', 'companion-ui.js', 'companion-report.js', 'growth.js', 'symptoms.js', 'trends.js', 'backup.js', 'care.js', 'care-ui.js', 'mother.js', 'mother-ui.js', 'checkin.js', 'guide-data.js', 'guide.js', 'guide-ui.js', 'report.js', 'report-ui.js', 'birth.js', 'birth-ui.js', 'device-transfer.js', 'devices-ui.js']) {
     assert.equal((await w.fetch(`./src/${name}`)).url, `https://example.test/bauchgefuehl/src/${name}`);
   }
+  const {DEVELOPMENT_ILLUSTRATIONS}=await import('../src/development-art.js');
+  for(const frame of DEVELOPMENT_ILLUSTRATIONS){const path=`./images/development/${frame.id}.png`;assert.equal((await w.fetch(path)).url,`https://example.test/bauchgefuehl/images/development/${frame.id}.png`);}
   assert.match(w.opened[0], /bauchgefuehl:\/bauchgefuehl\/:/);
 });
 test('sync, credentials in query URLs, third-party and mutation requests bypass the cache', async () => {
@@ -59,4 +62,9 @@ test('updates wait for explicit acceptance and prune only older caches in their 
   let work; w.events.activate({ waitUntil(p) { work=p; } }); await work;
   assert.equal(w.claimed(),1);
   assert.deepEqual(w.deleted,['bauchgefuehl:/bauchgefuehl/:a','bauchgefuehl:/bauchgefuehl/:b']);
+});
+
+test('a release installation bypasses stale HTTP-cache responses for every app file',async()=>{
+  const w=worker();await w.install();assert.ok(w.downloads.length>0);
+  for(const request of w.downloads){assert.ok(request instanceof Request);assert.equal(request.cache,'reload');assert.equal(new URL(request.url).origin,'https://example.test');}
 });

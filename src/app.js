@@ -1,6 +1,6 @@
 import { setupCompanion } from './companion-ui.js';
 import { COMPANION_KEY, COMPANION_HISTORY_KEY } from './companion.js';
-import { developmentSvg } from './growth.js';
+import { developmentImage } from './growth.js';
 import { explainCalculation } from './calculation-explanation.js';
 import { setupAppNavigation, showAppPanel } from './navigation.js';
 import { setupPwa } from './pwa.js';
@@ -113,7 +113,7 @@ function renderMode() {
 function renderSummary() {
   const data = calculatePregnancy(state.profile, today);
   const fromDueDate = data.method === 'due-date';
-  $('.baby-art').innerHTML = developmentSvg(data.gestationalDays) + '<span>Schematische Entwicklung · nicht maßstabsgetreu</span>';
+  $('.baby-art').innerHTML = developmentImage(Math.max(1,Math.min(42,data.weekNumber))) + '<span>Illustrative Entwicklung · nicht maßstabsgetreu</span>';
   $('#greeting').innerHTML = companionUi?.isPostpartum() ? 'Ein neuer Abschnitt.<br><em>Raum für dich.</em>' : 'Da wächst etwas<br><em>Wunderbares.</em>';
   $('#estimate-label-text').textContent = fromDueDate ? 'Vom ET zurückgerechnet · 28-Tage-Basis' : 'Zyklusangepasste Schätzung';
   $('#profile-method').textContent = fromDueDate ? 'ET · 28-Tage-Basis' : 'Periode & Zyklus';

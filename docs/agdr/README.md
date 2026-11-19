@@ -35,6 +35,10 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0027](0027-verschluesselte-vollsicherung.md) | Passwortverschlüsselte exakte Vollsicherung mit Historien, Master und offener Messung | Umgesetzt; Rundlauf und Fehlerfälle geprüft |
 | [AgDR-0028](0028-mobile-zurueck-navigation.md) | Browser-Zurück für Bereiche, Dialoge und geschützte Entwürfe | Umgesetzt; Safari-Entwurf und Verlaufssimulation geprüft |
 | [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) | Entwicklungsstufen, quellenbezogene Zwischenwerte und eigene Untersuchungsmaße | Umgesetzt; Modell geprüft, physische Geräte offen |
+| [AgDR-0040](0040-bereinigung-ungenutzter-dateien.md) | Ungenutzte Bilddateien und alte Sync-Oberfläche entfernen, Herkunft erhalten | Umgesetzt; Prüfnachweise siehe Record |
+| [AgDR-0041](0041-entwicklungsvisualisierung.md) | Entwicklungsvisualisierung: 42 Wochenbilder, Ausschnitt, Maske, Kartenverlauf, Bewegung und mobile Anordnung; enthält Verlauf 0030–0039 | Umgesetzt; gemeinsame Dokumentation, App unverändert |
+
+Die Nummern **0030–0039** sind in AgDR-0041 zusammengeführt; ihre vollständigen Texte und Prüfnachweise stehen dort im aufklappbaren Verlauf. Die Nummern bleiben reserviert.
 
 ## Fortschreiben
 

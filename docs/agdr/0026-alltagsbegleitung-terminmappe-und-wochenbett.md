@@ -50,3 +50,8 @@ Automatisierte Tests für Planung, Archive/Wiederherstellung, Messarten, fehlerh
 - 356 eindeutige statische HTML-IDs; relative Modul-/Dokumentlinks, Gleichheit von Quelldateien und Build sowie 47 Offline-Dateien einschließlich aller neuen Module geprüft. `git diff --check` ohne Fehler.
 - Safari-Stichproben: synthetische Grundlage, gespeicherter Planungsentwurf mit abgelehntem Verwerfen beim Browser-Zurück, explizites PWA-Update, gespeicherter Untersuchungswert mit Herkunftstext und getrennter Anzeige, angelegter eigener Termin und interne Vollbackup-Verschlüsselungsprüfung. Für den Terminmappen-/Notizdialog lieferte die native AX-Abfrage zeitweise keinen Inhalt; zusätzliche Fokusbehandlung wurde eingebaut, danach aber kein vollständiger manueller Gesamtdurchlauf wiederholt.
 - Nicht behauptet: physische iPhone-/Android-Prüfung, installierte PWA-Systemgesten, Screenreader-Gesamtlauf, Betriebssystem-Dateiablage/-Import oder Druck/PDF-Gesamtlauf. Die letzten Fokus-/Sitzungs-/Kontextkorrekturen sind durch Syntax-/Modellprüfungen abgesichert, nicht durch einen neuen vollständigen Browserlauf. Keine Veröffentlichung oder ausdrückliche nachträgliche Nutzerfreigabe.
+
+
+## Darstellungsfortschreibung vom 19.11.2026
+
+Die mobile Platzierung der Heute-Karte wird am 19.11.2026 durch [AgDR-0030](0041-entwicklungsvisualisierung.md#agdr-0030) abgelöst: direkt unter der grünen SSW-Karte. Im Wochenbett bleibt sie außerhalb der ausgeblendeten Schwangerschaftszusammenfassung sichtbar.

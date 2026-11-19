@@ -1,12 +1,12 @@
 # Feature-Liste
 
-Stand: **18.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von bauchgefühl. Die Liste wurde vom Nutzer beauftragt; Prioritäten und Abschlusskriterien sind Vorschläge des Agenten. Begründungen und Herkunft: [AgDR-0012](agdr/0012-roadmap-und-ssw-pruefung.md).
+Stand: **19.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von bauchgefühl. Die Liste wurde vom Nutzer beauftragt; Prioritäten und Abschlusskriterien sind Vorschläge des Agenten. Begründungen und Herkunft: [AgDR-0012](agdr/0012-roadmap-und-ssw-pruefung.md).
 
 **Verbindliche Nutzeranforderung:** Alle Funktionen sind für alle kostenlos. Es gibt kein Bezahl-Premium. Neue Funktionen funktionieren offline und datensparsam; Quellen und Prüfstand werden angegeben. Für begrenztes Teilen werden Bereiche aus dem weitergegebenen Inhalt entfernt. Siehe [AgDR-0016](agdr/0016-kostenlos-offline-und-selektives-teilen.md).
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
-**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0029 abgeglichen:** F01–F06, F09, F12–F16 und F18–F23 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F08, F10 und F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0041 abgeglichen:** F01–F06, F09, F12–F16 und F18–F23 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F08, F10 und F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs; „umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
 
 ## Geklärt und bereits vorhanden
 
@@ -97,14 +97,14 @@ Die vorherige Empfehlung enthielt fünf nummerierte Vorschläge plus Vollsicheru
 
 | Paket | Feature | Stand |
 | --- | --- | --- |
-| 1 | **F19 · Heute für mich**: nächster Termin, offene Fragen, notierte Schritte und ein aufklappbarer Wochenimpuls | [x] Umgesetzt |
+| 1 | **F19 · Heute für mich**: nächster Termin, offene Fragen, notierte Schritte und ein aufklappbarer Wochenimpuls; mobil direkt unter der grünen SSW-Karte | [x] Umgesetzt |
 | 2 | **F05 erweitert · Terminmappe**: Gesprächsmodus mit Auswahl eigener Fragen/Antworten und letzter 28 Tage Journal, Vorschau und Druckdatei | [x] Umgesetzt; eigener PDF-Generator weiterhin F07 offen |
 | 3 | **F20 · Beschwerdenhilfe**: sechs Offline-Karten, direkte Journal-Verknüpfung, Frage vormerken und Kontakte | [x] Umgesetzt, Quellen und Prüfstand je Karte |
 | 4 | **F09/F06 · Geburt und Wochenbett**: persönliche Planung, ausgewählte Ausgabe und ausdrückliche neue Phase | [x] Umgesetzt |
 | 5 | **F04 · Persönliche Verläufe**: Zeitraum, Ausgangswert, Differenz und Originalnotizen | [x] Umgesetzt |
 | 6 | **F21 · Verschlüsselte Vollsicherung**: Passwortbestätigung, intern geprüfter Export, entschlüsselte Vorschau und exakte Wiederherstellung einschließlich Verläufen und Master | [x] Umgesetzt; echte Geräte-/Dateidialogprüfung offen |
 | 7 | **F22 · App-Zurück**: Bereichsverlauf, Dialoge zuerst, Entwurfsabfrage und mobiler Übersichtseinstieg | [x] Umgesetzt; Betriebssystem-Gesten auf Geräten offen |
-| 8 | **F23 · Entwicklung und Untersuchungsmaße**: schematische Stufen, Tagesvorschau, quellenbezogene Größenstufen, eigene Maße ohne automatische Umdatierung | [x] Umgesetzt; vollständiger physischer Eingabeablauf offen |
+| 8 | **F23 · Entwicklung und Untersuchungsmaße**: 42 lokal gespeicherte Aquarellbilder aus dem bereitgestellten Archiv, eines je SSW mit organischer Ausblendung und separater Wochenanzeige, mit dezenter, reduzierbarer Bewegung, eine feste Größenorientierung je SSW ohne Tagesauswahl, quellenbezogene Größenstufen, eigene Maße ohne automatische Umdatierung | [x] Umgesetzt; vollständiger physischer Eingabeablauf offen |
 
 Entscheidungen und tatsächliche Prüflücken: [AgDR-0026](agdr/0026-alltagsbegleitung-terminmappe-und-wochenbett.md), [AgDR-0027](agdr/0027-verschluesselte-vollsicherung.md), [AgDR-0028](agdr/0028-mobile-zurueck-navigation.md), [AgDR-0029](agdr/0029-entwicklung-und-untersuchungsmasse.md). Signierter Geräteinhalt v3 enthält Planung/Phase/Untersuchungswerte; beide Smartphones vor neuer Weitergabe aktualisieren. Der manuelle Geräteabgleich wird dadurch nicht automatisch.
 
@@ -140,3 +140,7 @@ Entscheidungen und tatsächliche Prüflücken: [AgDR-0026](agdr/0026-alltagsbegl
 Die frühere Kennzeichnung als „Premium-Kandidat“ wurde durch die ausdrückliche Nutzerentscheidung abgelöst: **Alle heutigen und zukünftigen Funktionen sind kostenlos für alle.** Die Prioritäten bestimmen nur die Umsetzungsreihenfolge.
 
 **Nächste Schritte nach dem beauftragten Paket:** Hauptabläufe auf den eigenen iPhone-/Android-Geräten einschließlich installierter PWA, Zurück-Geste, Entwurfsschutz, Vollsicherung/Wiederherstellung und ausgewählter Druckdatei erproben. F07 bleibt für eine direkte beziehungsweise vollständig geprüfte PDF-Ausgabe offen, F17 für die direkte Geräteverbindung. Weitere Produktfeatures sind F08, F10 und F11; sie gehören nicht automatisch zum jetzt beauftragten Paket.
+
+Entwicklungsvisualisierung: 42 bereitgestellte Wochenbilder, ausgeblendete Bildnummer, ruhige asymmetrische Maske, Waldgrün-Salbei-Verlauf, selektive Papiergrundtönung und reduzierte Bewegung. Keine Tagesauswahl und keine Aussage zur tatsächlichen Kindslage; die mobile Tageskarte steht unter der grünen SSW-Karte. Gültiger Stand und Verlauf der früheren Darstellungs-Records 0030–0039: [AgDR-0041](agdr/0041-entwicklungsvisualisierung.md).
+
+Ungenutzte alte Illustrationen und Server-Sync-Oberfläche entfernt; aktuelle Bilder, Offline-Funktionen und Altstand-Wiederherstellung bleiben erhalten: [AgDR-0040](agdr/0040-bereinigung-ungenutzter-dateien.md).

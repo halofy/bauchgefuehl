@@ -25,3 +25,12 @@ let layout;
 export function getAppLayout() {
   return layout ||= createAppLayout(window);
 }
+
+// Move the existing card, keeping DOM reading order, event handlers and open details intact.
+export function arrangeOverviewFocus(document, mobile) {
+  const focus = document.getElementById('today-focus');
+  const anchor = document.body.classList.contains('postpartum-mode')
+    ? document.getElementById('postpartum-summary')
+    : mobile ? document.querySelector('.summary-grid > .pregnancy-card') : document.getElementById('mode-banner');
+  if (focus && anchor && anchor.nextElementSibling !== focus) anchor.insertAdjacentElement('afterend', focus);
+}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <radialGradient id="wash" cx="49%" cy="49%" r="64%">
+      <stop offset="0" stop-color="white" stop-opacity=".96"/>
+      <stop offset=".5" stop-color="white" stop-opacity=".96"/>
+      <stop offset=".65" stop-color="white" stop-opacity=".93"/>
+      <stop offset=".8" stop-color="white" stop-opacity=".72"/>
+      <stop offset=".94" stop-color="white" stop-opacity=".3"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="feather" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <path fill="url(#wash)" filter="url(#feather)" d="M149 18
+    C223 13 279 65 281 139
+    C285 212 236 277 157 281
+    C82 288 23 236 18 163
+    C12 89 65 23 149 18Z"/>
+</svg>

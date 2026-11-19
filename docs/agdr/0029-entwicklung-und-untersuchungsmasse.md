@@ -6,6 +6,8 @@
 - **Betroffene Dateien:** [growth.js](../../src/growth.js), [companion.js](../../src/companion.js), [companion-ui.js](../../src/companion-ui.js), [growth.test.js](../../tests/growth.test.js)
 - **Ersetzt / ergänzt:** Ersetzt die unveränderte dekorative Babyzeichnung und die aktive vierwöchige Größenanzeige aus AgDR-0004. Phasen-Entwicklungstexte und ihre Quellen bleiben erhalten.
 
+> Fortschreibung vom 19.11.2026: [AgDR-0032](0041-entwicklungsvisualisierung.md#agdr-0032) ersetzt Tagesauswahl und SVG-Darstellung durch PNG-Phasenbilder und eine feste Größenorientierung zum Wochenbeginn. Quellenanker, eigene Untersuchungsmaße und Datierung bleiben unverändert.
+
 ## Kontext und Herkunft
 
 Der Nutzer möchte die Embryodarstellung, Größenvergleiche und Zwischenstufen verbessern sowie bekannte Untersuchungsmaße erfassen und einbeziehen. Eine medizinische Wachstumsprognose, automatische Umdatierung oder Perzentilenbewertung wurde nicht verlangt.
@@ -53,3 +55,8 @@ Redaktioneller Prüfstand: **18.11.2026**. Exakte URLs pro Anker in [growth.js](
 - 356 eindeutige statische HTML-IDs; relative Modul-/Dokumentlinks, Gleichheit von Quelldateien und Build sowie 47 Offline-Dateien einschließlich aller neuen Module geprüft. `git diff --check` ohne Fehler.
 - Safari-Stichproben: synthetische Grundlage, gespeicherter Planungsentwurf mit abgelehntem Verwerfen beim Browser-Zurück, explizites PWA-Update, gespeicherter Untersuchungswert mit Herkunftstext und getrennter Anzeige, angelegter eigener Termin und interne Vollbackup-Verschlüsselungsprüfung. Für den Terminmappen-/Notizdialog lieferte die native AX-Abfrage zeitweise keinen Inhalt; zusätzliche Fokusbehandlung wurde eingebaut, danach aber kein vollständiger manueller Gesamtdurchlauf wiederholt.
 - Nicht behauptet: physische iPhone-/Android-Prüfung, installierte PWA-Systemgesten, Screenreader-Gesamtlauf, Betriebssystem-Dateiablage/-Import oder Druck/PDF-Gesamtlauf. Die letzten Fokus-/Sitzungs-/Kontextkorrekturen sind durch Syntax-/Modellprüfungen abgesichert, nicht durch einen neuen vollständigen Browserlauf. Keine Veröffentlichung oder ausdrückliche nachträgliche Nutzerfreigabe.
+
+
+## Darstellungsfortschreibung vom 19.11.2026
+
+Der SVG-Darstellungsteil wird am 19.11.2026 durch [AgDR-0030](0041-entwicklungsvisualisierung.md#agdr-0030) abgelöst: zusammenhängende Figuren, eigene Farbverläufe und dezentes gemeinsames Schweben. Größenberechnungen und Untersuchungswerte bleiben unverändert.

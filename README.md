@@ -27,12 +27,12 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - Klar markierte Beispieldaten, bis eigene Angaben eingetragen sind.
 - **Kontakte & Wehen:** drei Anrufkontakte, dauerhafte Zeitmessung, Kalenderprotokoll und vorsichtige Zeitmusterhinweise mit Quellen.
 - **Master und mitlesendes Gerät ohne Datenserver:** signierte, passwortverschlüsselte Stände bewusst per QR/Link oder Datei weitergeben. Kein automatischer Hintergrund-Sync.
-- **Heute für mich:** nächster eigener Termin, offene Fragen und notierte nächste Schritte, mit aufklappbarem Wochenimpuls.
+- **Heute für mich:** mobil direkt unter der grünen SSW-Karte; nächster eigener Termin, offene Fragen und notierte nächste Schritte, mit aufklappbarem Wochenimpuls.
 - **Terminmappe:** ausgewählte Fragen, Antworten und Journalbeobachtungen gemeinsam für das Gespräch anzeigen und als selbstständige Druckdatei mitnehmen.
 - **Beschwerdenhilfe:** sechs quellenbezogene Offline-Karten direkt aus dem Journal, Fragen vormerken und eigene Kontakte öffnen.
 - **Geburts-/Wochenbettplanung:** eigene Wünsche und Aufgaben, Unterstützungspersonen, Erledigt-Status, umkehrbare Archive und ausgewählte Druckausgabe. Geburtsdatum bewusst eintragen und das Journal nach Geburt weiterführen.
 - **Persönliche Verläufe:** Zeitraum, eigener Ausgangswert, absolute Veränderungen und Notizen mit Zugriff aufs Original; freiwillig auch Check-in-Skalen.
-- **Entwicklung & Untersuchungswerte:** schematische Stufen und tägliche Größen-Zwischenwerte mit NHS-Quellen. Eigene SSL, geschätzte Gesamtlänge/Gewicht, KU, AU und FL datiert erfassen. Gleiche Messarten am Untersuchungstag einordnen, ohne persönliche Prognose oder Änderung der SSW.
+- **Entwicklung & Untersuchungswerte:** 42 lokal gespeicherte Aquarellbilder aus dem bereitgestellten Archiv, eines je SSW mit organischer, weich auslaufender Maske ohne eingebrannte Wochennummer und sanftem Schweben (bei reduzierter Bewegung statisch). Die Wochenreise zeigt ohne Tagesauswahl eine Größenorientierung zum Wochenbeginn mit NHS-Quellen. Eigene SSL, geschätzte Gesamtlänge/Gewicht, KU, AU und FL datiert erfassen. Gleiche Messarten am Untersuchungstag einordnen, ohne persönliche Prognose oder Änderung der SSW.
 - **Zurück-Navigation:** Browser-Zurück beziehungsweise unterstützte Verlaufsgeste schließt zunächst Dialoge mit Entwurfsschutz, dann vorherige Bereiche. Der App-Button nutzt denselben Verlauf.
 - **Verschlüsselte Vollsicherung:** Passwortbestätigung, intern geprüfter Download, Entschlüsselung mit Vorschau und exakte Wiederherstellung einschließlich Kontakte, offener Messung, kompletter Sicherungsverläufe, Planung, Untersuchungswerten und privatem Master-Schlüssel. Alte Klartext-Backups bleiben importierbar.
 
@@ -228,6 +228,8 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0023: Tages-Check-in und strukturierter Rückblick](docs/agdr/0023-tages-check-in-und-strukturierter-rueckblick.md)
 - [AgDR-0024: Für dich und mobile Layoutkorrekturen](docs/agdr/0024-fuer-dich-und-mobile-layoutkorrekturen.md)
 - [AgDR-0025: Termine, Fragensammlung und klarerer Kalender](docs/agdr/0025-termine-fragensammlung-und-klarerer-kalender.md)
+- [AgDR-0040: Bereinigung ungenutzter Dateien](docs/agdr/0040-bereinigung-ungenutzter-dateien.md)
+- [AgDR-0041: Entwicklungsvisualisierung](docs/agdr/0041-entwicklungsvisualisierung.md) — gültiger Stand und Verlauf der früheren Records 0030–0039.
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -247,14 +249,14 @@ Verschlüsselte **Geräte-Stand-Links** sind eigenständige Kopien mit getrennte
 - `src/app.js`: Oberfläche und Interaktionen.
 - `src/device-transfer.js`, `src/devices-ui.js`: serverlose Verschlüsselung, Master-Signatur, Übertragung, Import-Sicherung und Wiederherstellung.
 - `src/birth.js`, `src/birth-ui.js`: Kontakte, persistente Wehenmessungen, Journalprotokoll und Zeitmuster.
-- `src/sync.js`, `src/sync-ui.js`: bisheriges Serverprotokoll; Snapshot-Validierung wird weiterverwendet, die alte Oberfläche nicht mehr gestartet.
+- `src/sync.js`: bisheriges Serverprotokoll und weiterhin benötigte Snapshot-Validierung zur Übernahme und Wiederherstellung alter Datenstände. Die ungenutzte alte Sync-Oberfläche wurde entfernt.
 - `src/qr.js`, `src/vendor/qrcodegen.js`: vollständig lokale QR-Erzeugung mit Nayuki v1.8.0 (MIT-Lizenz im Quelltext).
-- `sync-server/local.js`, `sync-server/sqlite-storage.js`: lokaler Server und dauerhafter SQLite-Speicher.
+- `sync-server/local.js`, `sync-server/sqlite-storage.js`: lokaler Vorschau-Server und SQLite-Speicher; bestehende Altstände bleiben über den dokumentierten historischen Betriebsweg wiederherstellbar.
 - `sync-server/worker.js`, `sync-server/wrangler.jsonc`: gemeinsames Protokoll und optionaler Cloudflare-Adapter.
 - `styles.css`, `src/layout.js`, `src/navigation.js`: Responsive Gestaltung, gemeinsame Layout-Erkennung und mobile App-Navigation.
 - `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
 - `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
-- `tests/`: insgesamt **186 Tests** für Termine, gemeinsame Notizen/Q&A, geschützte Weitergabe, Tages-Check-in, strukturierte Wochenrückblicke, getrenntes Teilen, Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `tests/`: insgesamt **220 Tests** für Termine, gemeinsame Notizen/Q&A, geschützte Weitergabe, Tages-Check-in, strukturierte Wochenrückblicke, getrenntes Teilen, Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
 - `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.
