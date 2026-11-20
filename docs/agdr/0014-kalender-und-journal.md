@@ -7,6 +7,8 @@
 - **Betroffene Dateien:** [Kalendermodell](../../src/calendar.js), [Kalenderoberfläche](../../src/calendar-ui.js), [Journal](../../src/journal-ui.js), [App](../../src/app.js), [HTML](../../index.html), [Stylesheet](../../styles.css), [Offline-Dateien](../../sw.js), [Tests](../../tests/calendar.test.js)
 - **Erweitert:** [AgDR-0009](0009-persoenliches-journal.md), [AgDR-0010](0010-mobile-app-und-pwa.md), [AgDR-0013](0013-app-layout-erkennung.md)
 
+> Die Anordnung des Kalenders und der Zeitraum des Rückblicks wurden in [AgDR-0044](0044-kalender-mit-gemeinsamer-wochenansicht.md) weiterentwickelt.
+
 ## Kontext und Herkunft
 
 Der Nutzer wünscht einen Kalender beziehungsweise Vorausblick, der zeigt, welches Datum welcher SSW entspricht. Wichtige Termine und Meilensteine sollen markiert werden; das Journal kann damit zusammengeführt werden. Die zuvor geklärte SSW-Berechnung bleibt bestehen.
@@ -79,3 +81,7 @@ Offen bleiben physische Geräteprüfung, vollständige Browser-/Screenreader-Mat
 - [Bestehende Berechnung](../../src/pregnancy.js), [Vorsorgethemen](../../src/content.js), [Kalendertests](../../tests/calendar.test.js).
 - [IQWiG: Ultraschalluntersuchungen in der Schwangerschaft](https://www.gesundheitsinformation.de/ultraschalluntersuchungen-in-der-schwangerschaft.html), am 17.11.2026 gelesen; laufende 9.–12., 19.–22. und 29.–32. SSW entsprechen den bestehenden Fenstern 8+0–11+6, 18+0–21+6 und 28+0–31+6.
 - [G-BA: Mutterschafts-Richtlinie](https://www.g-ba.de/richtlinien/19/), am 17.11.2026 geprüft; als bestehende Quelle weiter verlinkt. Keine neuen Vorsorgeleistungen oder klinischen Entscheidungsgrenzen in dieser Änderung eingeführt.
+
+## Fortschreibung vom 20.11.2026
+
+[AgDR-0042](0042-termin-pdf-und-kompakter-vorsorgekalender.md) ergänzt die Untersuchungsfenster und den kompakten Tagesdialog, erklärt den zyklusangepassten Beginn und begrenzt die sichtbare SSW ab 42+0. Die ursprünglichen Prüfnachweise dieses Records beziehen sich auf den damaligen Stand.

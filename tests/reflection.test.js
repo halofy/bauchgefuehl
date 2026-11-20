@@ -2,9 +2,37 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calendarWeek, symptomMentions, weeklySummary } from '../src/reflection.js';
 import { normalizeEntry, archiveEntry, filterEntries, symptomOptions } from '../src/journal.js';
+import { calendarReflectionPeriod } from '../src/calendar.js';
 
 const today = '2026-11-17';
 const entry = (extra = {}) => normalizeEntry({ id: 'synthetic-entry-0001', date: '2026-11-16', time: '09:00', text: 'Synthetischer Rückblick', symptoms: [], metrics: [], tags: [], createdAt: '2026-11-16T10:00:00.000Z', updatedAt: '2026-11-16T10:00:00.000Z', ...extra }, today);
+
+test('week view counts observations within the displayed pregnancy week, even when it starts midweek', () => {
+  const selected = '2026-11-13';
+  const period = calendarReflectionPeriod({ start: '2026-08-05' }, selected);
+  assert.deepEqual(period, { from: '2026-11-11', to: '2026-11-17', weekNumber: 15 });
+  const entries = [
+    entry({ date: '2026-11-10' }),
+    entry({ date: '2026-11-11', id: 'synthetic-entry-0002' }),
+    entry({ date: '2026-11-17', id: 'synthetic-entry-0003' }),
+  ];
+  const result = weeklySummary(entries, selected, today, period);
+  assert.deepEqual(result.entries.map(item => item.date), ['2026-11-11', '2026-11-17']);
+  assert.equal(result.recordedDays, 2);
+});
+
+test('week navigation has a shared boundary when switching from pregnancy to postpartum', () => {
+  const timeline = { start: '2026-08-05' };
+  const birth = '2026-11-13';
+  assert.deepEqual(calendarReflectionPeriod(timeline, '2026-11-12', birth),
+    { from: '2026-11-11', to: '2026-11-12', weekNumber: 15 });
+  assert.deepEqual(calendarReflectionPeriod(timeline, birth, birth),
+    { from: birth, to: '2026-11-15', weekNumber: null });
+  assert.deepEqual(calendarReflectionPeriod(timeline, '2026-08-04'),
+    { from: '2026-08-03', to: '2026-08-04', weekNumber: null });
+  assert.deepEqual(calendarReflectionPeriod(timeline, '2027-05-26'),
+    { from: '2027-05-26', to: '2027-05-30', weekNumber: null });
+});
 
 test('a selected date determines a Monday–Sunday calendar week including year and DST transitions', () => {
   assert.deepEqual(calendarWeek('2026-11-17'), { from: '2026-11-16', to: '2026-11-22' });

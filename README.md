@@ -14,7 +14,7 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - Wochenreise für die **1. bis 42. SSW** mit Entwicklungsinfos, körperlichen Veränderungen und kleinen Impulsen.
 - Vorsorgethemen für Deutschland mit exakten Wochenfenstern, Quellen und lokalen Merkhäkchen.
 - **Persönliches Journal:** datierte Notizen, auswählbare und eigene Symptome, freie Tags sowie Gewicht, Bauch-/Brust-/Hüftumfang, Temperatur und eigene Messgrößen mit Einheit.
-- **Kalender & Vorausblick:** SSW an jedem Datum, Suche in beide Richtungen, alle 42 Wochen mit Datumsbereichen sowie markierte Vorsorgefenster, Trimesterwechsel, Halbzeit und ET. Journaleinträge erscheinen an ihrem Datum im Kalender.
+- **Kalender & Vorausblick:** SSW an jedem Datum, Suche in beide Richtungen, gemeinsame Wochenansicht mit Datumsbereich und Messwerten sowie markierte Vorsorgefenster, Trimesterwechsel, Halbzeit und ET. Journaleinträge erscheinen an ihrem Datum im Kalender.
 - **Symptomkalender & Wochenrückblick:** einzelne Symptome hervorheben; Beobachtungen, erfasste Tage und Messwerte einer Kalenderwoche überblicken und passende Originaleinträge öffnen.
 - **Termine & Fragensammlung:** eigene Termine planen, Notizen und Fragen/Antworten zuordnen und zugleich gesammelt lesen. Ergebnisse, nächste Schritte und Gesprächsstatus selbst erfassen; bewusste Teilberichte.
 - **Für dich:** eigener Reiter neben „Dein Baby“ in der Wochenreise. Körpertexte, Alltag, Schlaf, Gefühle und Unterstützung folgen der ausgewählten Phase; Vertiefungen mit passenden Quellen und Prüfstand.
@@ -28,11 +28,11 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - **Kontakte & Wehen:** drei Anrufkontakte, dauerhafte Zeitmessung, Kalenderprotokoll und vorsichtige Zeitmusterhinweise mit Quellen.
 - **Master und mitlesendes Gerät ohne Datenserver:** signierte, passwortverschlüsselte Stände bewusst per QR/Link oder Datei weitergeben. Kein automatischer Hintergrund-Sync.
 - **Heute für mich:** mobil direkt unter der grünen SSW-Karte; nächster eigener Termin, offene Fragen und notierte nächste Schritte, mit aufklappbarem Wochenimpuls.
-- **Terminmappe:** ausgewählte Fragen, Antworten und Journalbeobachtungen gemeinsam für das Gespräch anzeigen und als selbstständige Druckdatei mitnehmen.
+- **Terminmappe:** formatierte Fragen mit echten Aufzählungen, ausgewählte Antworten und Journalbeobachtungen gemeinsam anzeigen; direkt als lokal erzeugte PDF mit Schreibzeilen oder als HTML-Druckdatei mitnehmen.
 - **Beschwerdenhilfe:** sechs quellenbezogene Offline-Karten direkt aus dem Journal, Fragen vormerken und eigene Kontakte öffnen.
 - **Geburts-/Wochenbettplanung:** eigene Wünsche und Aufgaben, Unterstützungspersonen, Erledigt-Status, umkehrbare Archive und ausgewählte Druckausgabe. Geburtsdatum bewusst eintragen und das Journal nach Geburt weiterführen.
 - **Persönliche Verläufe:** Zeitraum, eigener Ausgangswert, absolute Veränderungen und Notizen mit Zugriff aufs Original; freiwillig auch Check-in-Skalen.
-- **Entwicklung & Untersuchungswerte:** 42 lokal gespeicherte Aquarellbilder aus dem bereitgestellten Archiv, eines je SSW mit organischer, weich auslaufender Maske ohne eingebrannte Wochennummer und sanftem Schweben (bei reduzierter Bewegung statisch). Die Wochenreise zeigt ohne Tagesauswahl eine Größenorientierung zum Wochenbeginn mit NHS-Quellen. Eigene SSL, geschätzte Gesamtlänge/Gewicht, KU, AU und FL datiert erfassen. Gleiche Messarten am Untersuchungstag einordnen, ohne persönliche Prognose oder Änderung der SSW.
+- **Entwicklung & Untersuchungswerte:** Die Wochenreise zeigt für jede der 42 SSW ein eigenes Bildmotiv. Zwei symbolische Zyklusmotive eröffnen die Reihe. Ab der 3. SSW dienen grobe Phasen als Orientierung. Der Überblick zeigt das Motiv zur aktuellen Woche. Alle Motive sind offline verfügbar. Die Wochenreise zeigt ohne Tagesauswahl eine Größenorientierung zum Wochenbeginn mit NHS-Quellen. Eigene SSL, geschätzte Gesamtlänge/Gewicht, KU, AU und FL datiert erfassen. Gleiche Messarten am Untersuchungstag einordnen, ohne persönliche Prognose oder Änderung der SSW.
 - **Zurück-Navigation:** Browser-Zurück beziehungsweise unterstützte Verlaufsgeste schließt zunächst Dialoge mit Entwurfsschutz, dann vorherige Bereiche. Der App-Button nutzt denselben Verlauf.
 - **Verschlüsselte Vollsicherung:** Passwortbestätigung, intern geprüfter Download, Entschlüsselung mit Vorschau und exakte Wiederherstellung einschließlich Kontakte, offener Messung, kompletter Sicherungsverläufe, Planung, Untersuchungswerten und privatem Master-Schlüssel. Alte Klartext-Backups bleiben importierbar.
 
@@ -44,11 +44,11 @@ Die veröffentlichte App auf beiden Geräten über HTTPS öffnen und vollständi
 
 **Überblick → Heute für mich** führt zur nächsten Terminmappe oder den offenen Fragen. **Vorsorge → Geburt und Wochenbett planen** verwaltet Wünsche, Aufgaben und Unterstützung. Dort lässt sich unter **Geburt eintragen / Phase ändern** der Wechsel bewusst speichern und zurücknehmen. Historische Schwangerschaftsdaten bleiben erhalten; Kalender und neue Journaleinträge zeigen nach Geburt Tage seit Geburt. Für die Journalbearbeitung wird weiterhin eine eigene gespeicherte Schwangerschaftsgrundlage benötigt.
 
-**Kalender → Journalliste & Verlauf → Messwertverlauf** bietet Zeitraum, Ausgangsmessung und Notizmarkierungen. **Wissen → Was kann mir helfen?** öffnet die Beschwerdenhilfe. In der **Wochenreise → Dein Baby** lassen sich Tage innerhalb einer SSW und eigene Untersuchungsmaße auswählen.
+**Kalender → Journalliste & Verlauf → Messwertverlauf** bietet Zeitraum, Ausgangsmessung und Notizmarkierungen. **Wissen → Was kann mir helfen?** öffnet die Beschwerdenhilfe. In der **Wochenreise → Dein Baby** stehen Wochenillustration, Größenorientierung und eigene Untersuchungsmaße bereit.
 
 **Überblick → Daten & Backup → Vollständiges Backup & Wiederherstellung:** Sicherungspasswort mit mindestens zwölf Zeichen zweimal eingeben und die verschlüsselte Datei herunterladen. Eine verfügbare Sitzungsfassung von Schwangerschaft/Journal wird zusätzlich mitgesichert und kann bei der Wiederherstellung bewusst bevorzugt werden; standardmäßig werden die gespeicherten Rohdaten wiederhergestellt. Datei und Passwort getrennt aufbewahren; ein vergessenes Passwort lässt sich nicht zurücksetzen. Für Wiederherstellung Datei auswählen, entschlüsseln, Vorschau prüfen und den bestehenden Stand zunächst ebenfalls sichern. Die App bestätigt den gestarteten Download und die interne Entschlüsselungsprüfung, kann den dauerhaften Speicherort aber nicht kontrollieren. Bei beschädigten Rohdaten ist Export zur Rettung möglich; automatische Wiederherstellung bleibt gesperrt, bis die Inhalte geprüft sind.
 
-Die neuen persönlichen Bereiche sind im vollständigen **signierten Geräteinhalt v3** enthalten; beide Smartphones vorher aktualisieren. Ein Geräte-Stand überträgt keinen privaten Master-Schlüssel und ersetzt kein Vollbackup. Teilberichte und Planungsauszüge beginnen ohne Auswahl und enthalten ausschließlich die freigegebenen Inhalte. HTML-Druckdateien bleiben offline lesbar; PDF wird über den jeweiligen Browser-Druckdialog erzeugt.
+Die neuen persönlichen Bereiche sind im vollständigen **signierten Geräteinhalt v3** enthalten; beide Smartphones vorher aktualisieren. Ein Geräte-Stand überträgt keinen privaten Master-Schlüssel und ersetzt kein Vollbackup. Teilberichte und Planungsauszüge beginnen ohne Auswahl und enthalten ausschließlich die freigegebenen Inhalte. HTML-Druckdateien bleiben offline lesbar. Die Terminmappe bietet zusätzlich einen eigenen lokalen PDF-Download mit Antwortzeilen; bei anderen Berichtsarten bleibt die PDF-Funktion des Browser-Druckdialogs verfügbar.
 
 ## Lokal entwickeln und bauen
 
@@ -58,10 +58,10 @@ Für die vollständige PWA zuerst bauen und anschließend die erzeugte App ausli
 
 ```sh
 npm run build
-python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
+npm run dev
 ```
 
-Anschließend `http://localhost:4173` öffnen. Wegen der JavaScript-Module bitte über einen Webserver starten, nicht durch Doppelklick auf `index.html`.
+Die [lokale Vorschau](http://127.0.0.1:4173/vorschau/) lädt den aktuellen Build direkt. Für Installation und Offline-Tests verwende die [lokale PWA](http://127.0.0.1:4173/). Beide Pfade verwenden auf diesem Host denselben lokalen Datenspeicher. Wegen der JavaScript-Module bitte über den Dev-Server starten.
 
 Mit Node.js ab Version 22.13 können Tests und Build ausgeführt werden. Es gibt **keine npm-Abhängigkeiten** und keinen Installationsschritt. Die QR-Bibliothek wird lokal mitgeliefert:
 
@@ -87,9 +87,11 @@ Ein Punkt am Info-Symbol zeigt ein verfügbares Update. **Update laden** lädt d
 
 ## Kalender und Vorausblick
 
-Unter **Kalender → Kalender & Vorausblick** steht die SSW unter jedem Datum. Wähle einen Tag, um passende Vorsorgefenster, Meilensteine und deine Journaleinträge zu sehen. Mit den Pfeilen oder der Monatsauswahl blättern; **Heute** und **Zum ET** springen direkt zum entsprechenden Tag.
+Unter **Kalender** stehen Monatsraster und ausgewählter Tag zusammen. **Tagesdetails** öffnet Termine, Vorsorgefenster und Journal. Ein langes Drücken oder Umschalt+Eingabe auf einem Datum führt ebenfalls dorthin. **Suche & Optionen** enthält Datumssuche, Monatswahl und Markierungsoptionen.
 
-Über **Datum oder SSW nachschlagen** kannst du ein Datum wählen oder volle Wochen und Tage eingeben, zum Beispiel `24+0`. Die aufklappbare Übersicht **Alle 42 SSW mit Datumsbereichen ansehen** zeigt für jede laufende Woche deren Zeitraum. Der Vorausblick darunter gilt ab dem ausgewählten Tag und enthält auch bereits laufende Vorsorgefenster.
+Unter **Suche & Optionen → Datierung und Bedienung** stehen Periodenbeginn und zyklusangepasster Rechenbeginn getrennt. Die SSW-Anzeige endet ab 42+0; die App trägt dadurch keine Geburt ein. Zusätzliche Untersuchungsfenster sind mit Quellen, Prüfstand und der Einordnung als freiwillig oder bedingt zutreffend versehen.
+
+In der **Wochenansicht** kannst du jede der 42 SSW auswählen und ihren Datumsbereich zusammen mit den Einträgen und Messwerten sehen. **Zur Entwicklung** öffnet die passende Woche in der Wochenreise. Vor dem rechnerischen Beginn, nach der Anzeigegrenze und im Wochenbett orientiert sich der Rückblick an der Kalenderwoche.
 
 Vorsorgefenster sind Orientierung, keine vereinbarten Termine. Eigene Termine und Notizen verwaltest du unter Vorsorge und siehst sie am jeweiligen Kalendertag; sie sind von den Vorsorgefenstern getrennt. Die gewählte Datierung bestimmt alle SSW und Zeitfenster. Bei einer Änderung werden die Kalenderangaben neu berechnet; gespeicherte Journalbeobachtungen behalten ihr Datum.
 
@@ -229,7 +231,15 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0024: Für dich und mobile Layoutkorrekturen](docs/agdr/0024-fuer-dich-und-mobile-layoutkorrekturen.md)
 - [AgDR-0025: Termine, Fragensammlung und klarerer Kalender](docs/agdr/0025-termine-fragensammlung-und-klarerer-kalender.md)
 - [AgDR-0040: Bereinigung ungenutzter Dateien](docs/agdr/0040-bereinigung-ungenutzter-dateien.md)
-- [AgDR-0041: Entwicklungsvisualisierung](docs/agdr/0041-entwicklungsvisualisierung.md) — gültiger Stand und Verlauf der früheren Records 0030–0039.
+- [AgDR-0041: Entwicklungsvisualisierung](docs/agdr/0041-entwicklungsvisualisierung.md) — frühere Aquarell-Darstellung und Verlauf der Records 0030–0039.
+- [AgDR-0042: Formatierte Fragen, PDF-Terminmappe und kompakter Vorsorgekalender](docs/agdr/0042-termin-pdf-und-kompakter-vorsorgekalender.md)
+- [AgDR-0043: SVG-Entwicklungsillustrationen nach Bildvorlagen](docs/agdr/0043-svg-entwicklungsillustrationen-nach-vorlagen.md)
+- [AgDR-0044: Kalender mit gemeinsamer Wochenansicht](docs/agdr/0044-kalender-mit-gemeinsamer-wochenansicht.md)
+- [AgDR-0046: Wochenbilder mit grober Phasenzuordnung](docs/agdr/0046-wochenbilder-mit-grober-phasenzuordnung.md)
+- [AgDR-0047: Eigenes Motiv je Schwangerschaftswoche](docs/agdr/0047-eigenes-motiv-je-schwangerschaftswoche.md)
+- [AgDR-0048: Wochenmotive im Überblick](docs/agdr/0048-wochenmotive-im-ueberblick.md)
+- [AgDR-0049: Aquarellmotive für die ersten beiden Wochen](docs/agdr/0049-aquarellmotive-fuer-die-ersten-beiden-wochen.md)
+- [AgDR-0050: Lokale Vorschau des aktuellen Builds](docs/agdr/0050-lokale-vorschau-des-aktuellen-builds.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 
@@ -256,7 +266,7 @@ Verschlüsselte **Geräte-Stand-Links** sind eigenständige Kopien mit getrennte
 - `styles.css`, `src/layout.js`, `src/navigation.js`: Responsive Gestaltung, gemeinsame Layout-Erkennung und mobile App-Navigation.
 - `src/calculation-explanation.js`: Persönliche Rechenschritte aus derselben Berechnung wie die Übersicht.
 - `manifest.webmanifest`, `sw.js`, `src/pwa.js`, `icons/`: Installation, Offline-App-Dateien und bewusste Updates.
-- `tests/`: insgesamt **220 Tests** für Termine, gemeinsame Notizen/Q&A, geschützte Weitergabe, Tages-Check-in, strukturierte Wochenrückblicke, getrenntes Teilen, Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
+- `tests/`: insgesamt **235 Tests** für Termine, gemeinsame Notizen/Q&A, geschützte Weitergabe, Tages-Check-in, strukturierte Wochenrückblicke, getrenntes Teilen, Berechnung, Kalender, Wochenrückblick, Symptomfilter, Offline-Katalog, selektives Teilen, Kontakte, Wehenzeiten, serverlosen Import und Wiederherstellung, persönliche Erklärung, App-Layout, PWA, Journal, Migration, Messwerte, CSV, Masterrechte, Wiederholung, Konflikte, Verschlüsselung, QR und Datenerhalt.
 - `scripts/build.js`: Erstellt die statische Auslieferung samt versioniertem Service Worker in `dist/`. `node scripts/generate-icons.js` erzeugt die mitgelieferten PNG-Icons neu.
 
 Die Informationen ersetzen keine individuelle Betreuung. Quellen und redaktioneller Stand sind in der App und in AgDR-0004 dokumentiert. Der Prüfstatus einschließlich verbleibender Prüflücken steht in AgDR-0005.

@@ -1,3 +1,4 @@
+import { formatText } from './text-format.js';
 import { CARE_KEY, readCare, writeCare, normalizeCare, upsertCare, archiveCare, careCollection, PROVIDERS, NOTE_KINDS } from './care.js';
 import { todayISO, formatDate } from './dates.js';
 
@@ -77,12 +78,13 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
   $('care-new-appointment').addEventListener('click', () => openAppointment());
   $('care-new-note').addEventListener('click', () => openNote());
   for (const id of ['care-search', 'care-open-only', 'care-show-archived']) $(id).addEventListener('input', render);
+  function formatted(text, cls) { const element = node('div', cls); element.innerHTML = formatText(text); return element; }
   function noteCard(note) {
     const card = node('article', 'care-note-card');
     const appointment = data.appointments.find(item => item.id === note.appointmentId);
-    card.append(node('p', 'eyebrow', `${NOTE_KINDS[note.kind]}${note.deletedAt ? ' · ARCHIVIERT' : ''}`), node('h4', '', note.text));
-    if (note.kind === 'qa') card.append(node('p', 'care-answer', note.answer ? `Antwort: ${note.answer}` : 'Noch keine Antwort eingetragen.'));
-    if (note.nextSteps) card.append(node('p', 'care-answer', `Nächste Schritte: ${note.nextSteps}`));
+    card.append(node('p', 'eyebrow', `${NOTE_KINDS[note.kind]}${note.deletedAt ? ' · ARCHIVIERT' : ''}`), formatted(note.text, 'care-note-text formatted-text'));
+    if (note.kind === 'qa') card.append(formatted(note.answer ? `Antwort:\n${note.answer}` : 'Noch keine Antwort eingetragen.', 'care-answer formatted-text'));
+    if (note.nextSteps) card.append(formatted(`Nächste Schritte:\n${note.nextSteps}`, 'care-answer formatted-text'));
     card.append(node('p', 'care-item-meta', `${formatDate(note.date)} · ${note.discussed ? 'Besprochen' : note.kind === 'qa' ? 'Frage noch offen' : 'Noch nicht als besprochen markiert'}`));
     card.append(node('p', 'care-item-meta', appointment ? `Termin: ${formatDate(appointment.date)}${appointment.time ? ', ' + appointment.time : ''} · ${appointment.title}${appointment.deletedAt ? ' (archiviert)' : ''}` : 'Ohne Termin · später zuordenbar'));
     if (appointment) card.append(button('Termin im Kalender', () => openCalendar(appointment.date)));

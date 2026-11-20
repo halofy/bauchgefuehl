@@ -13,12 +13,13 @@ export function symptomMentions(entries, symptom = '') {
   return entries.filter(entry => !entry.deletedAt && (key ? entry.symptoms.some(label => symptomKey(label) === key) : entry.symptoms.length > 0)).length;
 }
 
-export function weeklySummary(entries, date, today) {
-  const { from, to } = calendarWeek(date);
+export function weeklySummary(entries, date, today, period = calendarWeek(date)) {
+  const { from, to } = period;
+  const length = dayNumber(to) - dayNumber(from) + 1;
   dayNumber(today);
   const active = entries.filter(entry => !entry.deletedAt && entry.date >= from && entry.date <= to && entry.date <= today)
     .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time) || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
-  const days = Array.from({ length: 7 }, (_, index) => {
+  const days = Array.from({ length }, (_, index) => {
     const date = addDays(from, index);
     const observations = active.filter(entry => entry.date === date);
     return { date, entries: observations, state: date > today ? 'future' : observations.length ? 'recorded' : 'missing' };

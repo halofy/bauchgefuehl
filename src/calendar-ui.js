@@ -1,5 +1,8 @@
+import { pregnancyAgeLabel } from './pregnancy.js';
+import { setupDayPress } from './day-press.js';
+import { formatText } from './text-format.js';
 import { todayISO, addDays, dayNumber, formatDate } from './dates.js';
-import { pregnancyTimeline, gestationOnDate, dateForSsw, monthStart, shiftMonth, monthDays, timelineEvents, eventsOnDate, entriesOnDate, upcomingEvents, weekRanges } from './calendar.js';
+import { pregnancyTimeline, gestationOnDate, dateForSsw, monthStart, shiftMonth, monthDays, timelineEvents, eventsOnDate, entriesOnDate, upcomingEvents, weekRanges, calendarReflectionPeriod } from './calendar.js';
 import { symptomOptions, isCheckinEntry } from './journal.js';
 import { readCheckin, CHECKIN_FIELDS, checkinValue, isCheckinMetric } from './checkin.js';
 import { symptomMentions } from './reflection.js';
@@ -15,10 +18,14 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   let timeline;
   let events = [];
   let symptom = '';
-  let showCare = false; let showSymptoms = false;
-  const ssw = age => age.status === 'before' ? 'Vor Beginn' : `${age.weeks}+${age.days}`;
-  const afterBirth = date => getMode() !== 'shared' && getBirthDate() && date >= getBirthDate();
-  const dateAge = (date,age) => afterBirth(date) ? `Tag ${dayNumber(date)-dayNumber(getBirthDate())}` : age.status === 'before' ? '–' : ssw(age);
+  let showCare = false;
+  let showSymptoms = false;
+  let pickerKey = '';
+  const ssw = age => pregnancyAgeLabel(age, true);
+  const birthDate = () => getMode() === 'shared' ? null : getBirthDate();
+  const afterBirth = date => birthDate() && date >= birthDate();
+  const getPeriod = () => calendarReflectionPeriod(timeline, selected, birthDate());
+  const dateAge = (date, age) => afterBirth(date) ? `Tag ${dayNumber(date) - dayNumber(birthDate())}` : ssw(age);
   const shortDate = date => formatDate(date, { month: 'short' });
   const button = (label, callback, className = 'text-link') => {
     const element = node('button', className, label); element.type = 'button'; element.addEventListener('click', callback); return element;
@@ -43,15 +50,48 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   $('calendar-open-care').addEventListener('click', openCare);
   const reflection = setupReflection({
     getSelected: () => selected, getToday, getJournal, getSymptom: () => showSymptoms ? symptom : '',
-    chooseDate: date => choose(date, true),
+    getPeriod, chooseDate: date => choose(date), openDay,
     openEntries(from, to, selectedSymptom, type) { showEntriesRange(from, to, selectedSymptom, type); openList(); },
   });
   function choose(date, focus = false) {
     dayNumber(date); monthStart(date.slice(0, 7));
     selected = date; month = date.slice(0, 7); $('calendar-error').hidden = true;
     switchView('calendar'); render();
-    if (focus) document.querySelector(`[data-calendar-date="${selected}"]`)?.focus({ preventScroll: true });
+    if (focus) focusDay();
   }
+  const dayDialog = $('calendar-day-dialog');
+  const optionsDialog = $('calendar-options-dialog');
+  function openDay(date = selected) {
+    if (document.querySelector('dialog[open]')) return;
+    choose(date);
+    dayDialog.showModal();
+    $('calendar-day-close').focus();
+  }
+  function focusDay() {
+    document.querySelector(`[data-calendar-date="${selected}"]`)?.focus({ preventScroll: true });
+  }
+  $('calendar-day-open').addEventListener('click', () => openDay());
+  $('calendar-day-close').addEventListener('click', () => dayDialog.close());
+  dayDialog.addEventListener('close', () => {
+    if (!document.querySelector('dialog[open]') && view === 'calendar' &&
+        !document.activeElement?.closest('button, summary')) focusDay();
+  });
+  dayDialog.addEventListener('click', event => {
+    if (event.target.closest('button:not(#calendar-day-close)')) dayDialog.close();
+  }, true);
+  $('calendar-options-open').addEventListener('click', () => {
+    $('calendar-error').hidden = true;
+    optionsDialog.showModal();
+  });
+  $('calendar-options-close').addEventListener('click', () => optionsDialog.close());
+  $('calendar-week-open').addEventListener('click', () => {
+    $('reflection').scrollIntoView({ block: 'start' });
+    $('reflection-title').focus({ preventScroll: true });
+  });
+  $('calendar-week-select').addEventListener('change', event => {
+    if (event.target.value) choose(event.target.value);
+  });
+  setupDayPress($('calendar-days'),openDay);
   function shift(offset) {
     month = shiftMonth(month, offset); selected = month + '-01'; render();
   }
@@ -62,8 +102,9 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   function error(cause) { $('calendar-error').textContent = cause.message; $('calendar-error').hidden = false; }
   function lookup(date) {
     choose(date);
-    $('calendar-lookup-panel').open = false;
-    document.querySelector(`[data-calendar-date="${selected}"]`)?.focus({ preventScroll: true });
+    optionsDialog.close();
+    $('calendar-month-title').scrollIntoView({ block: 'nearest' });
+    focusDay();
   }
   $('calendar-date-form').addEventListener('submit', event => {
     event.preventDefault(); try { lookup($('calendar-date').value); } catch (cause) { error(cause); }
@@ -72,9 +113,10 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     event.preventDefault(); try { lookup(dateForSsw(timeline, $('calendar-ssw').value)); } catch (cause) { error(cause); }
   });
   $('calendar-month').addEventListener('change', event => {
-    try { choose(monthStart(event.target.value)); } catch (cause) { error(cause); }
+    try { lookup(monthStart(event.target.value)); } catch (cause) { error(cause); }
   });
   $('calendar-days').addEventListener('keydown', event => {
+    if(event.defaultPrevented) return;
     const current = event.target.closest('[data-calendar-date]')?.dataset.calendarDate;
     if (!current) return;
     const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
@@ -90,31 +132,46 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   });
 
   function eventCard(event, date) {
-    const card = node('article', `calendar-event calendar-event-${event.type}`);
+    const card = node('details', `calendar-event calendar-event-${event.type}`);
+    const dates = event.type === 'point' ? shortDate(event.date)
+      : `${event.openEnded ? 'Ab ' : ''}${shortDate(event.date)}${event.openEnded ? '' : ` – ${shortDate(event.endDate)}`}`;
+    const header = node('summary', 'calendar-event-summary');
+    const copy = node('span', 'calendar-event-label');
+    const qualifier = event.category === 'optional' ? ' · freiwillig'
+      : event.category === 'conditional' ? ' · falls zutreffend' : '';
+    copy.append(node('strong', '', event.title), node('span', '', dates + qualifier));
+    header.append(copy);
+    card.append(header);
     const checked = getChecks()[event.id] === true;
-    card.append(node('p', 'eyebrow', event.type === 'care' ? `VORSORGEFENSTER${checked ? ' · FÜR MICH GEKLÄRT' : ''}` : 'MEILENSTEIN'));
-    card.append(node('h4', '', event.title));
-    const dates = event.type === 'point' ? `${shortDate(event.date)} · ${ssw(gestationOnDate(timeline, event.date))}`
-      : `${event.openEnded ? 'Ab ' : ''}${shortDate(event.date)}${event.openEnded ? '' : ` – ${shortDate(event.endDate)}`} · ${event.label}`;
-    card.append(node('p', 'calendar-event-date', dates), node('p', '', event.text));
+    const category = event.category === 'optional' ? 'Freiwillige Diagnostik'
+      : event.category === 'conditional' ? 'Falls zutreffend' : 'Vorsorgefenster';
+    const caption = event.type === 'point' ? 'Meilenstein'
+      : `${category} · ${event.label}${checked ? ' · Für mich geklärt' : ''}`;
+    card.append(node('p', 'calendar-event-date', caption), node('p', '', event.text));
     if (event.source) {
       const source = node('a', 'source-link', 'Quelle zur Vorsorge ↗'); source.href = event.source; source.target = '_blank'; source.rel = 'noopener noreferrer'; card.append(source);
     }
+    if (event.extraSource) { const link=node('a','source-link','G-BA · Voraussetzungen und Kassenleistung');link.href=event.extraSource;link.target='_blank';link.rel='noopener noreferrer';card.append(link); }
+    if(event.reviewed)card.append(node('p','care-item-meta',`Redaktionell geprüft: ${shortDate(event.reviewed)}`));
     if (event.date !== date && event.date >= getToday()) card.append(button('Im Kalender ansehen', () => choose(event.date, true)));
     return card;
   }
 
+  function formatted(text) { const e=node('div','formatted-text'); e.innerHTML=formatText(text);return e; }
   function renderSelected() {
     const age = gestationOnDate(timeline, selected);
-    $('calendar-selected-date').textContent = formatDate(selected, { weekday: 'long' });
-    $('calendar-selected-ssw').textContent = afterBirth(selected) ? `Nach der Geburt · ${dateAge(selected,age)}` : age.status === 'before' ? 'Vor dem rechnerischen Schwangerschaftsbeginn' : `${ssw(age)} · ${age.weekNumber}. SSW${age.status === 'beyond' ? ' · außerhalb der Wocheninfos' : ''}`;
+    const dayLabel = formatDate(selected, { weekday: 'long', year: undefined });
+    const ageLabel = afterBirth(selected) ? `Nach der Geburt · ${dateAge(selected, age)}` : pregnancyAgeLabel(age);
+    $('calendar-selected-date').textContent = dayLabel;
+    $('calendar-selected-ssw').textContent = ageLabel;
+    $('calendar-day-dialog-title').textContent = dayLabel;
+    $('calendar-day-dialog-ssw').textContent = ageLabel;
     const dayEvents = eventsOnDate(events, selected);
     const eventList = $('calendar-day-events'); eventList.replaceChildren();
+    if(age.status === 'beyond' && !afterBirth(selected)) eventList.append(node('p','calendar-limit-note','Die SSW-Anzeige endet bei 42+0. Falls du noch schwanger bist, kontaktiere dein Geburtsteam und kläre Datierung und weiteres Vorgehen. Eine Geburt wird nicht automatisch eingetragen.'));
     if (!afterBirth(selected) && age.status === 'ongoing' && age.days === 0) eventList.append(node('p', 'calendar-week-start', `Eine neue Woche beginnt: ${age.weekNumber}. SSW (${age.weeks}+0).`));
     for (const event of dayEvents) eventList.append(eventCard(event, selected));
     if (!dayEvents.length) eventList.append(node('p', 'calendar-empty', 'Für diesen Tag ist kein Vorsorgefenster oder Meilenstein hinterlegt.'));
-    $('calendar-week-info').hidden = afterBirth(selected) || age.status !== 'ongoing';
-    $('calendar-week-info').onclick = () => showWeek(age.weekNumber);
     $('calendar-open-guide').onclick = () => showGuide(selected);
     const care = getCare();
     const appointments = care ? appointmentsOnDate(care, selected) : [];
@@ -126,7 +183,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
       card.append(node('p', 'care-item-meta', `${notes.length} Notizen · ${notes.filter(note => note.kind === 'qa' && !note.discussed).length} offene Fragen`));
       if (notes.length) {
         const details = document.createElement('details'); details.append(node('summary', '', 'Notizen & Antworten lesen'));
-        for (const note of notes) { const block = node('div', 'calendar-appointment-note'); block.append(node('p', 'journal-note', note.text)); if (note.answer) block.append(node('p', 'journal-note', 'Antwort: ' + note.answer)); if (note.nextSteps) block.append(node('p', 'journal-note', 'Nächste Schritte: ' + note.nextSteps)); block.append(node('p', 'care-item-meta', note.discussed ? 'Besprochen' : 'Noch nicht als besprochen markiert')); details.append(block); }
+        for (const note of notes) { const block = node('div', 'calendar-appointment-note'); block.append(formatted(note.text)); if (note.answer) block.append(formatted('Antwort:\n' + note.answer)); if (note.nextSteps) block.append(formatted('Nächste Schritte:\n' + note.nextSteps)); block.append(node('p', 'care-item-meta', note.discussed ? 'Besprochen' : 'Noch nicht als besprochen markiert')); details.append(block); }
         card.append(details);
       }
       if (canEdit()) card.append(button('Notiz / Frage ergänzen', () => openAppointmentNotes(appointment.id)));
@@ -136,6 +193,20 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     $('calendar-add-appointment').disabled = !canEdit() || !care;
     $('calendar-add-appointment').onclick = () => addAppointment(selected);
     const entries = entriesOnDate(getJournal(), selected);
+    const items = [];
+    if (appointments.length) {
+      const first = appointments[0];
+      const label = [first.time ? `${first.time} Uhr` : '', first.title].filter(Boolean).join(' · ');
+      items.push(`${label}${appointments.length > 1 ? ` · +${appointments.length - 1}` : ''}`);
+    }
+    if (entries.length) items.push(`${entries.length} ${entries.length === 1 ? 'Journaleintrag' : 'Journaleinträge'}`);
+    if (dayEvents.length) {
+      const starting = dayEvents.find(event => event.date === selected);
+      const otherCount = dayEvents.length - Number(!!starting);
+      if (starting) items.push(starting.title);
+      if (otherCount) items.push(`${otherCount} ${starting ? 'weitere ' : ''}${otherCount === 1 ? 'Vorsorgehinweis' : 'Vorsorgehinweise'}`);
+    }
+    $('calendar-day-preview').replaceChildren(...(items.length ? items : ['Keine Termine oder Einträge']).map(label => node('li', '', label)));
     $('calendar-entry-count').textContent = `${entries.length} ${entries.length === 1 ? 'Journaleintrag' : 'Journaleinträge'}`;
     const list = $('calendar-day-journal'); list.replaceChildren();
     for (const entry of entries) {
@@ -163,7 +234,9 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
 
   function render() {
     timeline = pregnancyTimeline(getProfile(), getToday()); events = timelineEvents(timeline);
-    if(getMode() !== 'shared' && getBirthDate()) events=events.filter(x=>x.date<getBirthDate()).map(x=>({...x,...(x.endDate>=getBirthDate()?{endDate:addDays(getBirthDate(),-1),openEnded:false}:{})}));
+    const birth = birthDate();
+    if (birth) events = events.filter(event => event.date < birth).map(event =>
+      event.endDate < birth ? event : { ...event, endDate: addDays(birth, -1), openEnded: false });
     const options = symptomOptions(getJournal());
     const previousLabel = $('calendar-symptom').selectedOptions[0]?.textContent || symptom;
     if (symptom && !options.some(option => option.key === symptom)) options.push({ key: symptom, label: previousLabel });
@@ -172,6 +245,13 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     for (const option of options) { const item = document.createElement('option'); item.value = option.key; item.textContent = option.label; $('calendar-symptom').append(item); }
     $('calendar-symptom').value = symptom; $('calendar-symptom').disabled = !options.length || !showSymptoms;
     $('calendar-basis').textContent = `${getMode() === 'demo' ? 'Beispieldaten' : getMode() === 'shared' ? 'Geteilte Angaben' : 'Deine Angaben'} · ${timeline.method === 'due-date' ? 'ET-Rückrechnung' : 'Periode & Zyklus'} · ET ${shortDate(timeline.dueDate)}`;
+    const profile=getProfile();
+    $('calendar-dating-explanation').textContent=timeline.method==='due-date'
+      ? `Eingetragener ET: ${shortDate(timeline.dueDate)}. 280 Tage zurück ergibt ${shortDate(timeline.start)} als rechnerischen Beginn (0+0).`
+      : `Letzte Periode: ${shortDate(profile.lmp)}. Zyklus: ${profile.cycle} Tage. Anpassung gegenüber 28 Tagen: ${profile.cycle-28 > 0 ? '+' : ''}${profile.cycle-28} Tage. Rechnerischer Beginn (0+0): ${shortDate(timeline.start)}. ${profile.cycle<28 ? 'Bei kürzerem Zyklus liegt 0+0 vor dem Periodenbeginn.' : profile.cycle>28 ? 'Bei längerem Zyklus liegt 0+0 nach dem Periodenbeginn.' : 'Bei 28 Tagen entsprechen sich beide Daten.'}`;
+    const shifted=timeline.method==='period' && profile.cycle!==28;
+    $('calendar-dating-short').hidden=!shifted || ![profile.lmp?.slice(0,7),timeline.start.slice(0,7)].includes(month);
+    $('calendar-dating-short').textContent=shifted ? `0+0: ${shortDate(timeline.start)} (rechnerisch) · Periodenbeginn: ${shortDate(profile.lmp)}. Die Differenz folgt deiner Zykluslänge von ${profile.cycle} Tagen.` : '';
     $('calendar-month-title').textContent = formatDate(month + '-01', { day: undefined, month: 'long', year: 'numeric' });
     $('calendar-month').value = month; $('calendar-date').value = selected;
     $('calendar-prev').disabled = month <= '1900-01'; $('calendar-next').disabled = month >= '2200-12';
@@ -180,7 +260,9 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     const careData = getCare(); $('calendar-care-error').hidden = !!careData;
     const entryDates = new Map();
     for (const entry of getJournal()) if (!entry.deletedAt) entryDates.set(entry.date, (entryDates.get(entry.date) || 0) + 1);
-    for (const date of monthDays(month)) {
+    const cells = monthDays(month);
+    const lastDay = cells.findLastIndex(date => date.slice(0, 7) === month);
+    for (const date of cells.slice(0, Math.ceil((lastDay + 1) / 7) * 7)) {
       const age = gestationOnDate(timeline, date);
       const dayEvents = eventsOnDate(events, date);
       const care = showCare && dayEvents.some(e => e.type === 'care');
@@ -196,7 +278,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
       day.classList.toggle('has-symptom', mentions > 0);
       if (date === today) { day.classList.add('is-today'); day.setAttribute('aria-current', 'date'); }
       day.setAttribute('aria-pressed', String(date === selected));
-      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${afterBirth(date) ? 'Nach der Geburt · '+dateAge(date,age) : age.status === 'before' ? 'vor rechnerischem Beginn' : `SSW ${ssw(age)}, ${age.weekNumber}. Schwangerschaftswoche`}${date === today ? ' · heute' : ''}${labeledEvents.length ? ' · ' + labeledEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
+      day.setAttribute('aria-label', `${formatDate(date, { weekday: 'long' })} · ${afterBirth(date) ? 'Nach der Geburt · '+dateAge(date,age) : pregnancyAgeLabel(age)}${date === today ? ' · heute' : ''}${labeledEvents.length ? ' · ' + labeledEvents.map(e => e.title).join(', ') : ''}${entries ? ` · ${entries} ${entries === 1 ? 'Journaleintrag' : 'Journaleinträge'}` : ''}`);
       if (mentions) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${mentions} Beobachtungen ${symptom ? 'zum ausgewählten Symptom' : 'mit Symptomen'}`);
       if (appointments.length) day.setAttribute('aria-label', day.getAttribute('aria-label') + ` · ${appointments.length} eigene Termine: ${appointments.map(item => `${item.time} ${item.title}`).join(', ')}`);
       day.append(node('span', 'calendar-day-number', String(Number(date.slice(8)))), node('span', 'calendar-day-ssw', dateAge(date,age)));
@@ -210,15 +292,35 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     }
     renderSelected();
     reflection.render();
+    renderWeek(birth);
     const upcoming = $('calendar-upcoming'); upcoming.replaceChildren();
-    for (const event of upcomingEvents(events, selected)) upcoming.append(eventCard(event, ''));
+    $('calendar-upcoming-from').textContent = `Ab ${shortDate(selected)}`;
+    for (const event of upcomingEvents(events, selected)) upcoming.append(eventCard(event, selected));
     if (!upcoming.children.length) upcoming.append(node('p', 'calendar-empty', 'Ab diesem Tag sind keine weiteren Meilensteine oder Vorsorgefenster hinterlegt.'));
-    const weeks = $('calendar-weeks'); weeks.replaceChildren();
-    for (const range of weekRanges(timeline)) {
-      const item = button('', () => choose(range.date, true), 'calendar-week-row');
-      item.append(node('strong', '', `${range.weekNumber}. SSW`), node('span', '', range.ssw), node('span', '', `${shortDate(range.date)} – ${shortDate(range.endDate)}`)); weeks.append(item);
-    }
     switchView(view);
+  }
+
+  function renderWeek(birth) {
+    const period = getPeriod();
+    const picker = $('calendar-week-select');
+    const key = `${timeline.start}/${birth || ''}`;
+    if (pickerKey !== key) {
+      const options = weekRanges(timeline)
+        .filter(range => (!birth || range.date < birth) && range.date >= '1900-01-01' && range.date <= '2200-12-31')
+        .map(range => {
+          const option = node('option', '', `${range.weekNumber}. SSW`);
+          option.value = range.date;
+          return option;
+        });
+      picker.replaceChildren(node('option', '', 'Kalenderwoche'), ...options);
+      picker.firstElementChild.value = '';
+      picker.firstElementChild.disabled = true;
+      pickerKey = key;
+    }
+    picker.value = period.weekNumber ? period.from : '';
+    const development = $('calendar-week-info');
+    development.hidden = !period.weekNumber;
+    development.onclick = () => showWeek(period.weekNumber);
   }
   return { render, showJournal: () => switchView('journal'), showDate: date => choose(date, true) };
 }

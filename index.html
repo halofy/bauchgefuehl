@@ -20,14 +20,6 @@
 <body>
   <a class="skip-link" href="#hauptinhalt">Zum Inhalt springen</a>
   <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <filter id="development-paper-tone" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3 4 4 0 -4" result="paper"/>
-        <feFlood flood-color="#a5b99c" flood-opacity=".5" result="sage"/>
-        <feComposite in="sage" in2="paper" operator="in" result="tint"/>
-        <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="tint"/></feMerge>
-      </filter>
-    </defs>
     <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M12 21V10m0 7C3 18 3 8 3 8s9-1 9 9Zm0-5C12 3 21 3 21 3s1 10-9 9Z"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
@@ -68,7 +60,7 @@
       <div class="summary-grid">
         <article class="pregnancy-card" aria-labelledby="current-week-label">
           <div class="week-summary"><div class="pill pill-light"><span class="status-dot"></span><span id="trimester">2. Trimester</span></div><p class="card-eyebrow" id="current-week-label">DEINE AKTUELLE SSW</p><div class="ssw-number"><span id="ssw-weeks">18</span><span class="ssw-plus">+</span><span id="ssw-days">3</span></div><p class="week-explanation" id="week-explanation">18 Wochen und 3 Tage · in der 19. SSW</p><p class="estimate-label"><span id="estimate-label-text">Zyklusangepasste Schätzung</span> <button class="info-button" data-action="calculation" aria-label="Berechnung erklären"><svg><use href="#i-info"/></svg></button></p></div>
-          <div class="baby-art" aria-hidden="true"><div class="development-image development-image--weekly"><div class="development-drift"><div class="development-mask" data-framing="growing"><img src="./images/development/woche_19.png" width="1200" height="1320" alt="" decoding="async"></div></div></div><span>Illustrative Entwicklung · nicht maßstabsgetreu</span></div>
+          <div class="baby-art" aria-hidden="true"><span>Illustrative Entwicklung · nicht maßstabsgetreu</span></div>
           <div class="pregnancy-progress"><div><span>Vom ersten Anfang bis zum Kennenlernen</span><strong id="progress-percent">46 %</strong></div><div id="pregnancy-progressbar" class="progress-track" role="progressbar" aria-label="Rechnerischer Fortschritt bis zum ET" aria-valuemin="0" aria-valuemax="100" aria-valuenow="46"><div id="progress-fill" class="progress-fill"></div></div><div class="progress-labels"><span>0+0</span><span>40+0</span></div></div>
         </article>
 
@@ -97,37 +89,95 @@
     </section>
 
     <section id="journal" class="section journal-section" aria-labelledby="journal-title">
-      <div class="section-heading"><div><p class="eyebrow">DEIN KALENDER &amp; JOURNAL</p><h2 id="journal-title">Deine Tage. Dein Überblick.</h2></div><button id="journal-new" class="button button-primary" type="button"><svg><use href="#i-edit"/></svg>Eintrag hinzufügen</button></div>
-      <p id="journal-permission" class="section-description">Symptome, Gedanken und Messwerte an einem Ort.</p>
-      <button type="button" class="button button-outline journal-checkin-button" data-checkin-new>Tages-Check-in erfassen</button>
-      <div class="journal-view-switch" role="group" aria-label="Kalender oder Journal anzeigen"><button id="calendar-view-toggle" type="button" class="selected" aria-pressed="true" aria-controls="calendar-view">Kalender &amp; Vorausblick</button><button id="journal-view-toggle" type="button" aria-pressed="false" aria-controls="journal-list-view">Journalliste &amp; Verlauf</button></div>
+      <div class="calendar-page-header">
+        <h2 id="journal-title">Kalender &amp; Journal</h2>
+        <div class="journal-view-switch" role="group" aria-label="Ansicht wechseln">
+          <button id="calendar-view-toggle" type="button" class="selected" aria-pressed="true" aria-controls="calendar-view">Kalender</button>
+          <button id="journal-view-toggle" type="button" aria-pressed="false" aria-controls="journal-list-view">Journal</button>
+        </div>
+      </div>
       <div id="calendar-view">
-        <p id="calendar-basis" class="content-note"></p>
-        <details id="calendar-lookup-panel" class="calendar-lookup-panel card"><summary>Datum oder SSW nachschlagen</summary><div class="calendar-lookups"><form id="calendar-date-form"><label for="calendar-date">Welcher SSW entspricht ein Datum?<input id="calendar-date" type="date" min="1900-01-01" max="2200-12-31" required></label><button class="button button-outline" type="submit">Datum anzeigen</button></form><form id="calendar-ssw-form"><label for="calendar-ssw">Wann bin ich bei dieser SSW?<input id="calendar-ssw" type="text" placeholder="z. B. 24+0" maxlength="5" required aria-describedby="calendar-ssw-hint"></label><button class="button button-outline" type="submit">SSW nachschlagen</button><p id="calendar-ssw-hint" class="field-hint">Volle Wochen + Tage, von 0+0 bis 42+6.</p></form></div></details>
-        <p id="calendar-error" class="form-error" role="alert" hidden></p>
-        <div class="calendar-layout"><div class="calendar-month-card card">
-          <div class="calendar-month-header"><button id="calendar-prev" type="button" class="icon-button" aria-label="Vorheriger Monat">‹</button><h3 id="calendar-month-title" aria-live="polite"></h3><button id="calendar-next" type="button" class="icon-button" aria-label="Nächster Monat">›</button></div>
-          <div class="calendar-month-actions"><button id="calendar-today" type="button" class="button button-outline">Heute</button><button id="calendar-due" type="button" class="text-link">Zum ET</button><button id="calendar-open-care" type="button" class="text-link">Termine &amp; Fragensammlung ↗</button></div>
-          <details class="calendar-display-controls"><summary>Monat wählen &amp; Anzeige anpassen</summary><label for="calendar-month">Monat wechseln<input id="calendar-month" type="month" min="1900-01" max="2200-12"></label><label class="checkbox-label"><input id="calendar-show-care" type="checkbox">Vorsorgezeiträume im Raster hervorheben</label><label class="checkbox-label"><input id="calendar-show-symptoms" type="checkbox">Symptome hervorheben</label><div class="calendar-symptom-control"><label for="calendar-symptom">Welches Symptom?<select id="calendar-symptom"><option value="">Alle erfassten Symptome</option></select></label><p class="field-hint">Zählt erfasste Nennungen, keine Symptomstärke. Keine Nennung bedeutet keine Aussage über Beschwerden. Bei aktiver Hervorhebung gilt die Auswahl auch im Wochenrückblick.</p></div></details>
-          <p class="calendar-read-hint">Tag auswählen für Termine und Einträge. Die kleine Zeile zeigt die SSW als Wochen + Tage.</p><p id="calendar-care-error" class="form-error" hidden>Eigene Termindaten sind gerade nicht lesbar. Bitte zuerst ein Backup sichern und den Bereich „Vorsorge“ prüfen.</p>
-          <p class="calendar-legend"><span><b class="calendar-mark-appointment">T</b> Eigener Termin</span><span><b class="calendar-mark-journal">J</b> Journaleinträge</span><span><b class="calendar-mark-point">◆</b> Meilenstein</span><span><b class="calendar-mark-care">V</b> Beginn Vorsorgefenster</span></p>
-          <div class="calendar-weekdays" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
-          <div id="calendar-days" class="calendar-days" role="group" aria-labelledby="calendar-month-title"></div>
-          <p class="content-note">Unter jedem Datum: SSW als volle Wochen + Tage. Tage lassen sich auch mit den Pfeiltasten auswählen.</p>
-        </div><aside class="calendar-selected card" aria-labelledby="calendar-selected-date"><p class="eyebrow">DEIN AUSGEWÄHLTER TAG</p><h3 id="calendar-selected-date"></h3><p id="calendar-selected-ssw" class="calendar-selected-ssw" role="status"></p><button id="calendar-week-info" type="button" class="text-link">Entwicklung dieser Woche ansehen ↗</button><button id="calendar-open-guide" type="button" class="text-link">Lebensmittel &amp; Aktivitäten an diesem Tag ↗</button><section class="calendar-personal-day"><div class="calendar-journal-heading"><h4>Deine Termine</h4><button id="calendar-add-appointment" type="button" class="button button-outline">Termin planen</button></div><div id="calendar-day-appointments"></div></section><details class="calendar-care-details"><summary>Vorsorgefenster &amp; Meilensteine an diesem Tag</summary><div id="calendar-day-events"></div></details><div class="calendar-journal-heading"><h4 id="calendar-entry-count"></h4><button id="calendar-add-entry" type="button" class="button button-outline">Eintrag für diesen Tag</button></div><button id="calendar-add-checkin" type="button" class="text-link">Check-in für diesen Tag</button><div id="calendar-day-journal"></div><button id="calendar-open-journal" class="text-link" type="button">In der Journalliste öffnen ↗</button></aside></div>
-        <p class="content-note">Vorsorgefenster sind zeitliche Orientierung und keine vereinbarten Termine. Individuelle Termine besprichst du mit deiner Praxis oder Hebamme. Die Wocheninfos reichen bis einschließlich 41+6 (42. SSW). Bei geänderter Datierung passen sich SSW und Zeitfenster an; Journaleinträge behalten ihr Datum.</p>
-        <details id="reflection-panel" class="more-panel"><summary>Wochenrückblick &amp; Messwerte</summary><section id="reflection" class="reflection card" aria-labelledby="reflection-title">
-          <div class="reflection-header"><button id="reflection-prev" class="icon-button" type="button" aria-label="Vorherige Kalenderwoche">‹</button><div><p class="eyebrow">DEIN WOCHENRÜCKBLICK · MONTAG BIS SONNTAG</p><h3 id="reflection-title"></h3></div><button id="reflection-next" class="icon-button" type="button" aria-label="Nächste Kalenderwoche">›</button></div>
-          <p id="reflection-coverage" class="reflection-coverage"></p><div id="reflection-days" class="reflection-days" role="group" aria-label="Tage des Wochenrückblicks im Kalender öffnen"></div>
-          <p class="content-note">Kein Eintrag bedeutet fehlende Angaben. Auch ein Eintrag ohne Symptomnennung bedeutet nicht automatisch Beschwerdefreiheit. Archivierte Einträge werden hier nicht mitgezählt.</p>
-          <section class="reflection-checkin-section" aria-labelledby="reflection-checkin-title"><h4 id="reflection-checkin-title">Deine Check-ins dieser Woche</h4><p id="reflection-checkin-coverage" class="content-note"></p><div id="reflection-checkins" class="reflection-checkins"></div><button id="reflection-open-checkins" type="button" class="text-link">Original-Check-ins dieser Woche ansehen ↗</button></section>
-          <div class="reflection-columns"><div><h4>Erfasste Symptome</h4><p class="content-note">Die Auswahl über dem Kalender gilt auch hier. Eine Beobachtung entspricht einem Journaleintrag; ein Symptom wird darin höchstens einmal gezählt.</p><div id="reflection-symptoms"></div></div><div><h4>Deine Messwerte dieser Woche</h4><p class="content-note">Alle erfassten Messgrößen, getrennt nach Bezeichnung und Einheit. Ohne medizinische Bewertung.</p><div id="reflection-metrics" class="reflection-metrics"></div></div></div>
-          <button id="reflection-open-entries" class="text-link" type="button">Alle Originaleinträge dieser Woche ansehen ↗</button>
-        </section></details>
-        <details class="calendar-all-weeks card"><summary>Alle 42 SSW mit Datumsbereichen ansehen</summary><div id="calendar-weeks"></div></details>
-        <details class="more-panel"><summary>Vorausblick &amp; Meilensteine</summary><div class="calendar-upcoming-heading"><p class="eyebrow">DEIN VORAUSBLICK</p><h3>Ab dem ausgewählten Tag.</h3></div><div id="calendar-upcoming" class="calendar-upcoming"></div></details>
+        <div class="calendar-layout card">
+          <section class="calendar-month-card" aria-labelledby="calendar-month-title">
+            <div class="calendar-month-header">
+              <button id="calendar-prev" type="button" class="icon-button" aria-label="Vorheriger Monat">‹</button>
+              <h3 id="calendar-month-title" aria-live="polite"></h3>
+              <button id="calendar-next" type="button" class="icon-button" aria-label="Nächster Monat">›</button>
+            </div>
+            <div class="calendar-month-actions">
+              <button id="calendar-today" type="button" class="text-link">Heute</button>
+              <button id="calendar-due" type="button" class="text-link">Zum ET</button>
+              <button id="calendar-options-open" type="button" class="text-link" aria-haspopup="dialog">Suche &amp; Optionen</button>
+            </div>
+            <p id="calendar-dating-short" class="field-hint" hidden></p>
+            <p id="calendar-care-error" class="form-error" role="status" hidden>Termindaten gerade nicht lesbar. Bitte sichere deine Daten und prüfe den Bereich „Vorsorge“.</p>
+            <div class="calendar-weekdays" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+            <div id="calendar-days" class="calendar-days" role="group" aria-labelledby="calendar-month-title"></div>
+            <p class="calendar-legend">
+              <span><b class="calendar-mark-appointment">T</b> Termin</span>
+              <span><b class="calendar-mark-journal">J</b> Journal</span>
+              <span><b class="calendar-mark-care">V</b> Vorsorgebeginn</span>
+              <span><b class="calendar-mark-point">◆</b> Meilenstein</span>
+            </p>
+          </section>
+          <section id="calendar-selected-card" class="calendar-selected" aria-labelledby="calendar-selected-date">
+            <header>
+              <h3 id="calendar-selected-date" tabindex="-1"></h3>
+              <p id="calendar-selected-ssw" class="calendar-selected-ssw"></p>
+            </header>
+            <ul id="calendar-day-preview" class="calendar-day-preview"></ul>
+            <div class="calendar-day-actions">
+              <button id="calendar-day-open" type="button" class="button button-outline" aria-haspopup="dialog">Tagesdetails</button>
+              <button id="calendar-week-open" type="button" class="text-link">Zur Wochenansicht</button>
+            </div>
+          </section>
+        </div>
+        <section id="reflection" class="calendar-week-section" aria-labelledby="reflection-title">
+          <div class="calendar-week-hero">
+            <div class="calendar-week-heading">
+              <p class="eyebrow">WOCHENANSICHT</p>
+              <h3 id="reflection-title" tabindex="-1"></h3>
+              <p id="reflection-period"></p>
+              <div class="calendar-week-navigation" role="group" aria-label="Woche wechseln">
+                <button id="reflection-prev" type="button" class="icon-button" aria-label="Vorherige Woche">‹</button>
+                <label class="calendar-week-picker" for="calendar-week-select">
+                  <span class="sr-only">Schwangerschaftswoche wählen</span>
+                  <select id="calendar-week-select"></select>
+                </label>
+                <button id="reflection-next" type="button" class="icon-button" aria-label="Nächste Woche">›</button>
+              </div>
+              <button id="calendar-week-info" type="button" class="text-link">Zur Entwicklung</button>
+            </div>
+          </div>
+          <div id="reflection-days" class="reflection-days" role="group" aria-label="Tage dieser Woche im Kalender öffnen"></div>
+          <header class="calendar-week-records">
+            <h4>Journal &amp; Messwerte</h4>
+            <p id="reflection-coverage" class="reflection-coverage" role="status"></p>
+          </header>
+          <div class="reflection-columns">
+            <section><h4>Symptome</h4><div id="reflection-symptoms"></div></section>
+            <section><h4>Messwerte</h4><div id="reflection-metrics" class="reflection-metrics"></div></section>
+          </div>
+          <details id="reflection-checkin-panel" class="calendar-week-checkins" hidden>
+            <summary id="reflection-checkin-title">Check-ins</summary>
+            <p id="reflection-checkin-coverage" class="content-note"></p>
+            <div id="reflection-checkins" class="reflection-checkins"></div>
+            <button id="reflection-open-checkins" type="button" class="text-link">Check-ins im Journal öffnen</button>
+          </details>
+          <button id="reflection-open-entries" class="text-link" type="button">Einträge dieser Woche im Journal öffnen</button>
+        </section>
+        <section class="calendar-agenda" aria-labelledby="calendar-agenda-title">
+          <header><h3 id="calendar-agenda-title">Vorsorge im Voraus</h3><button id="calendar-open-care" type="button" class="text-link">Termine &amp; Fragen</button></header>
+          <p id="calendar-upcoming-from" class="content-note"></p>
+          <div id="calendar-upcoming" class="calendar-upcoming"></div>
+        </section>
       </div>
       <div id="journal-list-view" hidden>
+      <div class="journal-list-actions">
+        <button id="journal-new" class="button button-primary" type="button">Eintrag hinzufügen</button>
+        <button type="button" class="button button-outline" data-checkin-new>Check-in erfassen</button>
+      </div>
+      <p id="journal-permission" class="content-note"></p>
       <details id="journal-filter-panel" class="journal-filter-panel card" open><summary>Suchen &amp; filtern <span id="journal-filter-count"></span><span class="detail-plus" aria-hidden="true">+</span></summary><div class="journal-filters"><label class="journal-search-label" for="journal-search">Suchen<input id="journal-search" type="search" placeholder="Notiz, Symptom, Tag oder Messgröße …"></label><label for="journal-type">Eintragsart<select id="journal-type"><option value="">Alle Einträge</option><option value="checkin">Tages-Check-ins</option></select></label><label for="journal-tag">Tag<select id="journal-tag"><option value="">Alle Tags</option></select></label><label for="journal-symptom">Symptom<select id="journal-symptom"><option value="">Alle Symptome</option></select></label><label for="journal-from">Von<input id="journal-from" type="date"></label><label for="journal-to">Bis<input id="journal-to" type="date"></label><label class="checkbox-label journal-archive-toggle"><input id="journal-archived" type="checkbox">Archivierte anzeigen</label><button id="journal-reset" type="button" class="button button-outline">Filter zurücksetzen</button></div></details>
       <div class="journal-toolbar"><span id="journal-count" role="status">0 Einträge</span><div class="journal-export-actions"><button type="button" class="text-link" data-action="report">Ausgewählte Bereiche teilen ↗</button><button id="journal-export" type="button" class="text-link">Gefilterte Einträge als CSV exportieren ↗</button></div></div>
       <div class="journal-layout"><div id="journal-entries" class="journal-entries"></div><details id="journal-trend-panel" class="journal-trend-panel card" open><summary>Messwertverlauf<span class="detail-plus" aria-hidden="true">+</span></summary><aside class="journal-trend"><p class="eyebrow">DEIN MESSWERTVERLAUF</p><label for="journal-metric">Messgröße<select id="journal-metric"></select></label><h3 id="journal-latest-value">Noch kein Messwert</h3><div id="journal-chart" class="journal-chart"></div><p id="journal-chart-caption"></p><details id="journal-metric-table" hidden><summary>Messwerte als Tabelle ansehen</summary><table><caption>Messwerte der gefilterten, nicht archivierten Einträge</caption><thead><tr><th scope="col">Datum</th><th scope="col">Zeit</th><th scope="col">Wert</th></tr></thead><tbody id="journal-metric-table-body"></tbody></table></details></aside></details></div>
@@ -214,8 +264,46 @@
     </form>
   </dialog>
   <button id="contraction-fab" class="contraction-fab" type="button" hidden>◷ Wehen messen</button>
+  <dialog id="calendar-day-dialog" class="calendar-day-dialog" aria-labelledby="calendar-day-dialog-title">
+    <div class="dialog-heading"><h2 id="calendar-day-dialog-title">Tagesdetails</h2><button id="calendar-day-close" type="button" class="icon-button" aria-label="Tagesdetails schließen">×</button></div>
+    <p id="calendar-day-dialog-ssw" class="calendar-selected-ssw"></p>
+    <section class="calendar-dialog-section" aria-labelledby="calendar-appointments-title">
+      <header><h3 id="calendar-appointments-title">Termine</h3><button id="calendar-add-appointment" type="button" class="text-link">Termin planen</button></header>
+      <div id="calendar-day-appointments"></div>
+    </section>
+    <section class="calendar-dialog-section" aria-labelledby="calendar-day-care-title">
+      <h3 id="calendar-day-care-title">Vorsorge &amp; Meilensteine</h3><div id="calendar-day-events"></div>
+    </section>
+    <section class="calendar-dialog-section" aria-labelledby="calendar-entry-count">
+      <header><h3 id="calendar-entry-count">Journal</h3><button id="calendar-add-entry" type="button" class="text-link">Eintrag hinzufügen</button></header>
+      <div id="calendar-day-journal"></div>
+      <div class="calendar-dialog-links"><button id="calendar-add-checkin" type="button" class="text-link">Check-in erfassen</button><button id="calendar-open-journal" type="button" class="text-link">Im Journal öffnen</button></div>
+    </section>
+    <button id="calendar-open-guide" type="button" class="text-link">Lebensmittel &amp; Aktivitäten an diesem Tag</button>
+  </dialog>
+  <dialog id="calendar-options-dialog" class="calendar-day-dialog" aria-labelledby="calendar-options-title">
+    <div class="dialog-heading"><h2 id="calendar-options-title">Suche &amp; Optionen</h2><button id="calendar-options-close" type="button" class="icon-button" aria-label="Optionen schließen">×</button></div>
+    <div class="calendar-options-grid">
+      <form id="calendar-date-form"><label for="calendar-date">Zu einem Datum<input id="calendar-date" type="date" min="1900-01-01" max="2200-12-31" required></label><button class="button button-outline" type="submit">Datum anzeigen</button></form>
+      <form id="calendar-ssw-form"><label for="calendar-ssw">Datum aus SSW berechnen<input id="calendar-ssw" type="text" placeholder="z. B. 24+0" maxlength="5" required aria-describedby="calendar-ssw-hint"></label><p id="calendar-ssw-hint" class="field-hint">Volle Wochen + Tage, von 0+0 bis 42+0.</p><button class="button button-outline" type="submit">SSW nachschlagen</button></form>
+    </div>
+    <p id="calendar-error" class="form-error" role="alert" hidden></p>
+    <div class="calendar-dialog-section">
+      <label for="calendar-month">Monat wechseln<input id="calendar-month" type="month" min="1900-01" max="2200-12"></label>
+      <label class="checkbox-label"><input id="calendar-show-care" type="checkbox">Vorsorgezeiträume hervorheben</label>
+      <label class="checkbox-label"><input id="calendar-show-symptoms" type="checkbox">Symptome hervorheben</label>
+      <label for="calendar-symptom">Welches Symptom?<select id="calendar-symptom"><option value="">Alle erfassten Symptome</option></select></label>
+      <p class="field-hint">Hervorgehoben werden Nennungen aus deinem Journal. Die Auswahl filtert auch die Symptome in der Wochenansicht.</p>
+    </div>
+    <details class="calendar-dialog-section">
+      <summary>Datierung und Bedienung</summary>
+      <p id="calendar-basis" class="content-note"></p><p id="calendar-dating-explanation" class="content-note"></p>
+      <p class="content-note">Ab 42+0 endet die SSW-Anzeige. Für deine Betreuung gilt die ärztliche Datierung. Vorsorgefenster helfen bei der Planung. Die tatsächlichen Termine besprichst du mit deiner Praxis oder Hebamme.</p>
+      <p class="content-note">Langes Drücken, das Kontextmenü oder Umschalt + Eingabe öffnen die Tagesdetails. Mit den Pfeiltasten wechselst du das Datum.</p>
+    </details>
+  </dialog>
   <dialog id="care-appointment-dialog" aria-labelledby="care-appointment-title"><div class="dialog-heading"><span class="icon-box sage"><svg><use href="#i-calendar"/></svg></span><button id="care-appointment-close" type="button" class="icon-button" aria-label="Terminentwurf schließen"><svg><use href="#i-close"/></svg></button></div><h2 id="care-appointment-title">Dein Termin.</h2><form id="care-appointment-form" novalidate><fieldset id="care-appointment-fields" class="care-form-fields"><label for="care-appt-title">Bezeichnung<input id="care-appt-title" type="text" maxlength="120" placeholder="z. B. Gespräch bei der Hebamme" required></label><div class="journal-date-row"><label for="care-appt-date">Datum<input id="care-appt-date" type="date" min="1900-01-01" max="2200-12-31" required></label><label for="care-appt-time">Uhrzeit · optional<input id="care-appt-time" type="time"></label></div><label for="care-appt-provider">Terminart<select id="care-appt-provider"><option value="midwife">Hebamme</option><option value="gyn">Gynäkologie</option><option value="other">Anderer Termin</option></select></label><label for="care-appt-location">Ort / Praxis · optional<input id="care-appt-location" type="text" maxlength="160"></label><p id="care-appointment-error" class="form-error" role="alert" hidden></p><button type="submit" class="button button-primary full-width">Termin speichern</button></fieldset></form></dialog>
-  <dialog id="care-note-dialog" aria-labelledby="care-note-title"><div class="dialog-heading"><span class="icon-box sage"><svg><use href="#i-edit"/></svg></span><button id="care-note-close" type="button" class="icon-button" aria-label="Notizentwurf schließen"><svg><use href="#i-close"/></svg></button></div><h2 id="care-note-title">Für dein Gespräch.</h2><form id="care-note-form" novalidate><fieldset id="care-note-fields" class="care-form-fields"><label for="care-note-kind">Eintragsart<select id="care-note-kind"><option value="qa">Frage &amp; Antwort</option><option value="note">Freie Notiz</option><option value="result">Ergebnis / Befund</option></select></label><label for="care-note-appointment">Zugeordneter Termin<select id="care-note-appointment"></select></label><label for="care-note-date">Datum deiner Notiz<input id="care-note-date" type="date" min="1900-01-01" required></label><label id="care-note-text-label" for="care-note-text">Deine Frage</label><textarea id="care-note-text" rows="4" maxlength="4000" required></textarea><label id="care-note-answer-label" for="care-note-answer">Antwort · optional<textarea id="care-note-answer" rows="4" maxlength="3000"></textarea></label><label for="care-note-next">Besprochene nächste Schritte · optional<textarea id="care-note-next" rows="3" maxlength="3000"></textarea></label><label class="checkbox-label"><input id="care-note-discussed" type="checkbox">Als besprochen markieren</label><p class="field-hint">Eine Antwort und der Status „besprochen“ sind getrennte Angaben. Ohne Zuordnung bleibt die Frage in deiner Sammlung und kann später einem Termin zugewiesen werden.</p><p id="care-note-error" class="form-error" role="alert" hidden></p><button type="submit" class="button button-primary full-width">Notiz / Frage speichern</button></fieldset></form></dialog>
+  <dialog id="care-note-dialog" aria-labelledby="care-note-title"><div class="dialog-heading"><span class="icon-box sage"><svg><use href="#i-edit"/></svg></span><button id="care-note-close" type="button" class="icon-button" aria-label="Notizentwurf schließen"><svg><use href="#i-close"/></svg></button></div><h2 id="care-note-title">Für dein Gespräch.</h2><form id="care-note-form" novalidate><fieldset id="care-note-fields" class="care-form-fields"><label for="care-note-kind">Eintragsart<select id="care-note-kind"><option value="qa">Frage &amp; Antwort</option><option value="note">Freie Notiz</option><option value="result">Ergebnis / Befund</option></select></label><label for="care-note-appointment">Zugeordneter Termin<select id="care-note-appointment"></select></label><label for="care-note-date">Datum deiner Notiz<input id="care-note-date" type="date" min="1900-01-01" required></label><label id="care-note-text-label" for="care-note-text">Deine Frage</label><textarea id="care-note-text" rows="4" maxlength="4000" required></textarea><label id="care-note-answer-label" for="care-note-answer">Antwort · optional<textarea id="care-note-answer" rows="4" maxlength="3000"></textarea></label><label for="care-note-next">Besprochene nächste Schritte · optional<textarea id="care-note-next" rows="3" maxlength="3000"></textarea></label><label class="checkbox-label"><input id="care-note-discussed" type="checkbox">Als besprochen markieren</label><p class="field-hint">Eine Antwort und der Status „besprochen“ sind getrennte Angaben. Ohne Zuordnung bleibt die Frage in deiner Sammlung und kann später einem Termin zugewiesen werden.</p><p class="field-hint">Aufzählungen: jede Zeile mit „- “ beginnen. Nummerierte Listen: „1. “, „2. “. Absätze mit einer Leerzeile trennen.</p><p id="care-note-error" class="form-error" role="alert" hidden></p><button type="submit" class="button button-primary full-width">Notiz / Frage speichern</button></fieldset></form></dialog>
   <dialog id="birth-dialog" aria-labelledby="birth-title"><div class="dialog-heading"><span class="icon-box sage"><svg><use href="#i-heart"/></svg></span><button class="icon-button" data-close="birth-dialog" aria-label="Schließen"><svg><use href="#i-close"/></svg></button></div>
     <p class="eyebrow">KONTAKTE &amp; SELBST GEMESSENE ZEITEN</p><h2 id="birth-title">Kontakte &amp; Wehen.</h2><p>Deine Anrufkontakte sind jederzeit erreichbar. Die Telefon-App öffnet sich erst, wenn du einen Kontakt antippst. Die App ruft niemanden automatisch an.</p>
     <p id="birth-error" class="form-error" role="alert" hidden></p>

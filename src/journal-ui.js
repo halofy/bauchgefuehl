@@ -202,7 +202,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     $('#journal-filter-count').textContent = filterCount ? String(filterCount) + " aktiv" : '';
     $('#journal-reset').disabled = !filterCount;
     $('#journal-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'Eintrag' : 'Einträge'}`;
-    $('#journal-permission').textContent = canEdit() ? 'Deine Beobachtungen, ohne Bewertung. Verbundene Geräte lesen deine Einträge mit.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls den aktiven Master. Vorhandene Einträge bleiben lesbar.';
+    $('#journal-permission').textContent = canEdit() ? 'Deine Einträge werden auf diesem Gerät gespeichert.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls den aktiven Master. Vorhandene Einträge bleiben lesbar.';
     $('#entry-save').disabled = !canEdit();
     $('#journal-export').disabled = !filtered.length;
     const list = $('#journal-entries'); list.replaceChildren();

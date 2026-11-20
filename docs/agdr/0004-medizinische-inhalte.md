@@ -57,3 +57,7 @@ Die verlinkten Quellen wurden im Rahmen der Erstellung online geprüft. Tests be
 
 
 **Erweiterung vom 18.11.2026:** Die aktive schematische Darstellung und Größenanzeige werden durch [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) ergänzt beziehungsweise abgelöst. Ursprüngliche Phasentexte bleiben mit ihrer bisherigen Quellenzuordnung erhalten.
+
+## Fortschreibung vom 20.11.2026
+
+[AgDR-0042](0042-termin-pdf-und-kompakter-vorsorgekalender.md) ergänzt die Untersuchungsfenster und den kompakten Tagesdialog, erklärt den zyklusangepassten Beginn und begrenzt die sichtbare SSW ab 42+0. Die ursprünglichen Prüfnachweise dieses Records beziehen sich auf den damaligen Stand.

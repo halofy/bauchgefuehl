@@ -1,3 +1,7 @@
+const appDirectory = new URL('../', import.meta.url);
+export const isLocalPreview = ['localhost', '127.0.0.1', '[::1]'].includes(appDirectory.hostname)
+  && appDirectory.pathname === '/vorschau/';
+
 export function setupPwa() {
   const $ = id => document.getElementById(id);
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
@@ -33,6 +37,10 @@ export function setupPwa() {
     navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
     registration.waiting.postMessage({ type: 'ACTIVATE_UPDATE' });
   });
+  if (isLocalPreview) {
+    $('app-offline').textContent = 'Die Vorschau lädt den aktuellen lokalen Build. Für Installation und Offline-Tests öffne die App am Stamm der Adresse.';
+    return;
+  }
   if (!('serviceWorker' in navigator) || !window.isSecureContext) {
     $('app-offline').textContent = 'Offline-Nutzung und Installation benötigen einen unterstützten Browser und HTTPS (lokal auch localhost).';
     return;

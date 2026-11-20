@@ -2,7 +2,7 @@ import { cp, mkdir, rm, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist');
-for (const path of ['index.html', 'styles.css', 'src', 'favicon.svg', 'manifest.webmanifest', 'icons', 'images', '.nojekyll']) {
+for (const path of ['index.html', 'styles.css', 'src', 'favicon.svg', 'manifest.webmanifest', 'icons', 'images/stages', '.nojekyll']) {
   await cp(path, `dist/${path}`, { recursive: true });
 }
 const assets = (await readdir('dist', { recursive: true, withFileTypes: true }))

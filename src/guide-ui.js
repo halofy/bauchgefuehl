@@ -1,3 +1,4 @@
+import { pregnancyAgeLabel } from './pregnancy.js';
 import { todayISO, formatDate, dayNumber, calculatePregnancy } from './pregnancy.js';
 import { pregnancyTimeline, gestationOnDate } from './calendar.js';
 import { GUIDE_SOURCES, GUIDE_REVIEWED, GUIDE_LEVELS, guideAdvice, searchGuide, guidePhaseNote } from './guide.js';
@@ -22,7 +23,7 @@ export function setupGuide({ getProfile, getMode, getToday = todayISO }) {
     }
     const mode = getMode() === 'demo' ? 'Beispieldaten' : getMode() === 'shared' ? 'Geteilte Datierung' : 'Deine Datierung';
     const uncertain = calculatePregnancy(getProfile(), getToday()).uncertain;
-    $('guide-context').textContent = age ? `${mode} · ${formatDate(date)} · ${age.status === 'before' ? 'vor rechnerischem Beginn' : `${age.weeks}+${age.days} · ${age.weekNumber}. SSW`}${uncertain ? ' · unsichere Schätzung' : ''}. Der Datumsbezug ist Orientierung, keine persönliche Freigabe.` : 'Ohne gültigen Datumsbezug: vollständige Bedingungen und Phasenhinweise beachten.';
+    $('guide-context').textContent = age ? `${mode} · ${formatDate(date)} · ${pregnancyAgeLabel(age)}${uncertain ? ' · unsichere Schätzung' : ''}. Der Datumsbezug ist Orientierung, keine persönliche Freigabe.` : 'Ohne gültigen Datumsbezug: vollständige Bedingungen und Phasenhinweise beachten.';
     const items = searchGuide({ query: $('guide-search').value, category: $('guide-category').value, level: $('guide-level').value, variants });
     $('guide-count').textContent = `${items.length} Treffer · Redaktionell geprüft: ${formatDate(GUIDE_REVIEWED)}`;
     const results = $('guide-results'); results.replaceChildren();

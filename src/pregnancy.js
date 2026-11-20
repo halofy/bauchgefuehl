@@ -7,6 +7,13 @@ import { normalizeJournal, assertJournalContinuity, MAX_SNAPSHOT_BYTES } from '.
 export const DAY = 86_400_000;
 export const STORAGE_KEY = 'bauchgefuehl.v1';
 export const HISTORY_KEY = 'bauchgefuehl.history.v1';
+// A presentation boundary, not an individual clinical deadline or a change to stored dating.
+export const GESTATION_DISPLAY_LIMIT = 294;
+export function pregnancyAgeLabel(age, compact = false) {
+  if (age.status === 'before') return compact ? '–' : 'Vor dem rechnerischen Beginn';
+  if (age.status === 'beyond') return compact ? '–' : 'Ab 42+0 · Datierung oder Geburt prüfen';
+  return `${age.weeks}+${age.days}${compact ? '' : ` · ${age.weekNumber}. SSW`}`;
+}
 
 export function validateProfile(value, today = todayISO()) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Die Schwangerschaftsdaten sind ungültig.');
@@ -63,7 +70,7 @@ export function calculatePregnancy(profile, today = todayISO()) {
     calendarWeeks: Math.floor(elapsedDays / 7),
     calendarDays: elapsedDays % 7,
     uncertain: !fromDueDate && (p.irregular || p.cycle < 21 || p.cycle > 35),
-    status: gestationalDays < 0 ? 'before' : gestationalDays >= 294 ? 'beyond' : 'ongoing',
+    status: gestationalDays < 0 ? 'before' : gestationalDays >= GESTATION_DISPLAY_LIMIT ? 'beyond' : 'ongoing',
   };
 }
 

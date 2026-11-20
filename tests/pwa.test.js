@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile, access } from 'node:fs/promises';
 const source = await readFile(new URL('../sw.js', import.meta.url), 'utf8');
+test('PDF engine, local Unicode font and interaction modules remain available offline under a Pages subpath',async()=>{
+  const w=worker(); await w.install();
+  for(const path of ['src/appointment-pdf.js','src/text-format.js','src/day-press.js','src/vendor/jspdf.umd.min.js','src/vendor/NotoSans-Regular.ttf']) {
+    const result=await w.fetch(path);assert.equal(result.url,`https://example.test/bauchgefuehl/${path}`);
+  }
+});
 function worker(scope = 'https://example.test/bauchgefuehl/sw.js') {
   const events = {};
   const entries = new Map();
@@ -46,8 +52,12 @@ test('offline navigation and modules work at a Pages subpath', async () => {
   for (const name of ['development-art.js', 'companion.js', 'companion-ui.js', 'companion-report.js', 'growth.js', 'symptoms.js', 'trends.js', 'backup.js', 'care.js', 'care-ui.js', 'mother.js', 'mother-ui.js', 'checkin.js', 'guide-data.js', 'guide.js', 'guide-ui.js', 'report.js', 'report-ui.js', 'birth.js', 'birth-ui.js', 'device-transfer.js', 'devices-ui.js']) {
     assert.equal((await w.fetch(`./src/${name}`)).url, `https://example.test/bauchgefuehl/src/${name}`);
   }
-  const {DEVELOPMENT_ILLUSTRATIONS}=await import('../src/development-art.js');
-  for(const frame of DEVELOPMENT_ILLUSTRATIONS){const path=`./images/development/${frame.id}.png`;assert.equal((await w.fetch(path)).url,`https://example.test/bauchgefuehl/images/development/${frame.id}.png`);}
+  assert.ok([...w.entries.keys()].every(url => !url.includes('/images/development')));
+  const { weeklyMotif } = await import('../src/development-art.js');
+  const weeklyImages = Array.from({ length: 42 }, (_, index) => weeklyMotif(index + 1).src);
+  for (const image of weeklyImages) {
+    assert.equal((await w.fetch(image)).url, new URL(image, 'https://example.test/bauchgefuehl/').href);
+  }
   assert.match(w.opened[0], /bauchgefuehl:\/bauchgefuehl\/:/);
 });
 test('sync, credentials in query URLs, third-party and mutation requests bypass the cache', async () => {

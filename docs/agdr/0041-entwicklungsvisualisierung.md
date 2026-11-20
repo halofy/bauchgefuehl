@@ -1,10 +1,12 @@
 # AgDR-0041: Entwicklungsvisualisierung
 
-- **Status:** Umgesetzt; Dokumentationskonsolidierung des bestehenden App-Stands
+- **Status:** Historischer Stand. Die aktive Bilddarstellung wurde durch [AgDR-0043](0043-svg-entwicklungsillustrationen-nach-vorlagen.md) abgelöst.
 - **Datum:** 2026-11-19
 - **Entscheidende Instanz:** Zusammenfassung ausdrücklich vom Nutzer gewünscht; Gliederung und Abgrenzung durch den Agenten
 - **Betroffene Dateien:** [Bildrenderer](../../src/development-art.js), [Wochenbilder](../../images/development/), [Bildherkunft](../assets/development-series.json), [Bildmaske](../../images/development-mask.svg), [Startansicht](../../index.html), [Styles](../../styles.css), [Layout](../../src/layout.js), [Wochenreise](../../src/companion-ui.js), [Service Worker](../../sw.js), [Bildtests](../../tests/growth.test.js), [PWA-Tests](../../tests/pwa.test.js)
 - **Ersetzt / ergänzt:** Führt die Darstellungsentscheidungen **AgDR-0030 bis AgDR-0039** in diesem Record zusammen. Ihre vollständigen früheren Texte und Prüfnachweise stehen im [historischen Verlauf](#historischer-verlauf). Die alten Nummern bleiben reserviert. [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) bleibt für Größenquellen, Zwischenwerte und eigene Untersuchungsmaße maßgeblich; [AgDR-0040](0040-bereinigung-ungenutzter-dateien.md) dokumentiert die Dateibereinigung.
+
+> Seit dem 20.11.2026 ist [AgDR-0043](0043-svg-entwicklungsillustrationen-nach-vorlagen.md) für die Bilddarstellung maßgeblich. Dieser Record bewahrt die ursprünglichen Entscheidungen und ihren Verlauf.
 
 ## Kontext und Herkunft
 

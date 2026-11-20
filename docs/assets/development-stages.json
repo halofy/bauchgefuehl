@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-20",
+  "origin": "Vom Nutzer bereitgestellte Bildreihe ohne Wochenmetadaten. Dateinummern bezeichnen Reihenfolge.",
+  "format": "WebP, 640 × 640, transparent. Ursprünglicher Bildausschnitt bleibt erhalten.",
+  "files": [
+    {
+      "source": "embryo-stadien-png/embryo-stadium-01.png",
+      "source_sha256": "785072b20e5a9c54768fa82a3d8f4c3420c927e0c0b9c3dc8b21040d03d02197",
+      "delivered": "images/stages/stadium-01.webp",
+      "delivered_sha256": "1e8ad0b34a4f94e06c0d645662ac87adaca43e2a8ba01805bfac5a0d3b8178ac",
+      "bytes": 151526,
+      "ssw": [
+        3,
+        4
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-04.png",
+      "source_sha256": "38a049faefde2359b86801f3a29acd938966db42912d58e7777e3657d6bb89ab",
+      "delivered": "images/stages/stadium-04.webp",
+      "delivered_sha256": "24ff3efa077384779e5fa9967ed5a9c349fd1138909afd40d028c43ef6159169",
+      "bytes": 156568,
+      "ssw": [
+        5,
+        6
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-05.png",
+      "source_sha256": "aa396fcaa6e6b775befe45bfc47581745be1f9e0c3e337fa08da969287e90b03",
+      "delivered": "images/stages/stadium-05.webp",
+      "delivered_sha256": "02e6026ead3312bf7291ac868c28612882666579d9aa09ceaab2a3b0aae38cd9",
+      "bytes": 103558,
+      "ssw": [
+        7,
+        8
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-07.png",
+      "source_sha256": "14b663a6f5f2d93bfee306cf0dcaf2c0da9b1463f1895a88cbf6fe63fe8abcdf",
+      "delivered": "images/stages/stadium-07.webp",
+      "delivered_sha256": "eacd06d2443ca896296f522f5d5494c8195853bf48cf81e8d66988c2633c7912",
+      "bytes": 127060,
+      "ssw": [
+        9,
+        10
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-10.png",
+      "source_sha256": "1ccf3321cb9b879a6cff585fd2843b6d00d65e51be5ff4ea69e579e3d95ffb41",
+      "delivered": "images/stages/stadium-10.webp",
+      "delivered_sha256": "be8a7425f583afcf82654df45d88f5f105681c19a88e3597fdfe0b4d9743a279",
+      "bytes": 102150,
+      "ssw": [
+        11,
+        12
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-15.png",
+      "source_sha256": "638578650d533be3ec03c8389eed8dbffb0e4e0cec58926dffe2f9d701ff3d15",
+      "delivered": "images/stages/stadium-15.webp",
+      "delivered_sha256": "627cd22f768b2dbd6df0634dec289e7f56e0359b14b59abf34d2b5d6b2832feb",
+      "bytes": 107544,
+      "ssw": [
+        13,
+        16
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-19.png",
+      "source_sha256": "33d30af113935c182204e9a9e1901efb2452f824a040b195591fdbaa3e0a9270",
+      "delivered": "images/stages/stadium-19.webp",
+      "delivered_sha256": "d6d5361b595eda139274d39ecbafbaa4b93615d1d8b73ae23299a9fcb30d65d5",
+      "bytes": 95490,
+      "ssw": [
+        17,
+        20
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-23.png",
+      "source_sha256": "eb30ac0f93078195d840732b7244c6da73a6a63cb50f54469a884b6323ef6561",
+      "delivered": "images/stages/stadium-23.webp",
+      "delivered_sha256": "1beb82bf032e98c093c9d3cb5ec634f8da6d792ee6eb1e2769e93787f9904cde",
+      "bytes": 101834,
+      "ssw": [
+        21,
+        24
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-27.png",
+      "source_sha256": "8f864b40025d987d7a9072a37c6ad4905d0862ec483b06e73f542a33215cd000",
+      "delivered": "images/stages/stadium-27.webp",
+      "delivered_sha256": "2b2b602fb7e5e4e2147b3d6ccad3836742533a7afe12e55301314baa17893172",
+      "bytes": 109464,
+      "ssw": [
+        25,
+        28
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-32.png",
+      "source_sha256": "d69dc48a49598c12e01be5c1e581aa8c473a58f9035969addcefcba027628682",
+      "delivered": "images/stages/stadium-32.webp",
+      "delivered_sha256": "1975651ac1b81fa11c6162af5c8fb7f8761600c05f0b76b6c9a03470759ba88e",
+      "bytes": 105454,
+      "ssw": [
+        29,
+        32
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-34.png",
+      "source_sha256": "0d07f4efa59707a40d2b036e2b99ce153a94f049384f4b929cd6859589a34bcb",
+      "delivered": "images/stages/stadium-34.webp",
+      "delivered_sha256": "919e02b48d605956f5d489226262cd1ef98b6522c315460105db6d81bf4735cb",
+      "bytes": 102388,
+      "ssw": [
+        33,
+        36
+      ]
+    },
+    {
+      "source": "embryo-stadien-png/embryo-stadium-40.png",
+      "source_sha256": "c76db1f29ab7599df5d00997f010e4ba4a587f11a47149b31c0274026e72f7dc",
+      "delivered": "images/stages/stadium-40.webp",
+      "delivered_sha256": "806dc5f533808cec8005cb5aac023b459feb283b63030c943f50e7c12bdebcdc",
+      "bytes": 107558,
+      "ssw": [
+        37,
+        42
+      ]
+    }
+  ]
+}

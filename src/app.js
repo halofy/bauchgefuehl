@@ -1,9 +1,10 @@
+import { pregnancyAgeLabel } from './pregnancy.js';
 import { setupCompanion } from './companion-ui.js';
 import { COMPANION_KEY, COMPANION_HISTORY_KEY } from './companion.js';
-import { developmentImage } from './growth.js';
+import { developmentImage, weeklyDevelopmentImage } from './development-art.js';
 import { explainCalculation } from './calculation-explanation.js';
 import { setupAppNavigation, showAppPanel } from './navigation.js';
-import { setupPwa } from './pwa.js';
+import { isLocalPreview, setupPwa } from './pwa.js';
 import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, validateStoredProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
 import { createQrSvg } from './qr.js';
@@ -110,20 +111,35 @@ function renderMode() {
   }
 }
 
+function renderSummaryArt(data = calculatePregnancy(state.profile, today)) {
+  const element = $('.baby-art');
+  element.hidden = data.status === 'beyond';
+  if (element.hidden) {
+    element.replaceChildren();
+    return;
+  }
+  const week = Math.max(1, Math.min(42, data.weekNumber));
+  // Load personal overview art once the app's precache can serve every week.
+  element.innerHTML = state.mode === 'demo' || isLocalPreview || navigator.serviceWorker?.controller
+    ? weeklyDevelopmentImage(week, 'overview')
+    : developmentImage(week, 'overview') + '<span>Schematische Illustration</span>';
+}
+
 function renderSummary() {
   const data = calculatePregnancy(state.profile, today);
   const fromDueDate = data.method === 'due-date';
-  $('.baby-art').innerHTML = developmentImage(Math.max(1,Math.min(42,data.weekNumber))) + '<span>Illustrative Entwicklung · nicht maßstabsgetreu</span>';
+  renderSummaryArt(data);
   $('#greeting').innerHTML = companionUi?.isPostpartum() ? 'Ein neuer Abschnitt.<br><em>Raum für dich.</em>' : 'Da wächst etwas<br><em>Wunderbares.</em>';
   $('#estimate-label-text').textContent = fromDueDate ? 'Vom ET zurückgerechnet · 28-Tage-Basis' : 'Zyklusangepasste Schätzung';
   $('#profile-method').textContent = fromDueDate ? 'ET · 28-Tage-Basis' : 'Periode & Zyklus';
   $('#profile-date-label').textContent = fromDueDate ? 'Eingetragener ET' : 'Letzte Periode';
   $('#due-date-label').textContent = fromDueDate ? 'EINGETRAGENER ET' : 'VORAUSSICHTLICHER ET';
   $('#today-date').textContent = formatDate(today, { weekday: 'long', year: undefined });
-  $('#trimester').textContent = data.status === 'before' ? 'Vor dem rechnerischen Beginn' : `${data.trimester}. Trimester`;
-  $('#ssw-weeks').textContent = data.status === 'before' ? '–' : data.weeks;
-  $('#ssw-days').textContent = data.status === 'before' ? '–' : data.days;
-  $('#week-explanation').textContent = data.status === 'before' ? 'Noch keine sinnvolle SSW-Schätzung' : `${data.weeks} Wochen und ${data.days} ${data.days === 1 ? 'Tag' : 'Tage'} · in der ${data.weekNumber}. SSW`;
+  $('#trimester').textContent = data.status === 'ongoing' ? `${data.trimester}. Trimester` : data.status === 'before' ? 'Vor dem rechnerischen Beginn' : 'Betreuung & Datierung';
+  $('#ssw-weeks').textContent = data.status !== 'ongoing' ? '–' : data.weeks;
+  $('#ssw-days').textContent = data.status !== 'ongoing' ? '–' : data.days;
+  $('#week-explanation').textContent = data.status !== 'ongoing' ? pregnancyAgeLabel(data) : `${data.weeks} Wochen und ${data.days} ${data.days === 1 ? 'Tag' : 'Tage'} · in der ${data.weekNumber}. SSW`;
+  $('.ssw-plus').hidden = data.status !== 'ongoing';
   $('#due-date').textContent = formatDate(data.dueDate);
   const remaining = data.daysUntilDue;
   $('#due-countdown').textContent = remaining > 0 ? `Noch ungefähr ${remaining} Tage bis zum ET` : remaining === 0 ? 'Heute ist der errechnete Termin' : `Der errechnete Termin war vor ${Math.abs(remaining)} ${remaining === -1 ? 'Tag' : 'Tagen'}`;
@@ -215,7 +231,7 @@ function milestoneCard(item, suffix, gestationalDays) {
   }
   const time = document.createElement('div');
   time.className = 'milestone-time';
-  time.textContent = item.label + (gestationalDays > item.end ? ' · Zeitraum vergangen' : '');
+  time.textContent = (item.category === 'optional' ? 'Freiwillig · ' : item.category === 'conditional' ? 'Falls zutreffend · ' : '') + item.label + (gestationalDays > item.end ? ' · Zeitraum vergangen' : '');
   const title = document.createElement('h3');
   title.textContent = item.title;
   const text = document.createElement('p');
@@ -243,13 +259,16 @@ function milestoneCard(item, suffix, gestationalDays) {
     // Update the duplicate checkbox without removing the focused control.
     for (const other of $$(`input[id^="${item.id}-"]`)) other.checked = input.checked;
   });
-  article.append(time, title, text, source, label);
+  article.append(time, title, text, source);
+  if(item.extraSource){const extra=document.createElement('a');extra.className='source-link';extra.href=item.extraSource;extra.target='_blank';extra.rel='noopener noreferrer';extra.textContent='G-BA · Voraussetzungen und Kassenleistung';article.append(extra);}
+  if(item.reviewed){const reviewed=document.createElement('p');reviewed.className='care-item-meta';reviewed.textContent=`Redaktionell geprüft: ${formatDate(item.reviewed)}`;article.append(reviewed);}
+  article.append(label);
   return article;
 }
 
 function renderCare() {
   const days = calculatePregnancy(state.profile, today).gestationalDays;
-  const upcoming = milestones.filter(item => item.end >= days).slice(0, 3);
+  const upcoming = milestones.filter(item => item.end >= days).sort((a,b)=>Number(a.openEnded===true)-Number(b.openEnded===true)||a.start-b.start).slice(0, 3);
   $('#milestones').replaceChildren(...upcoming.map(item => milestoneCard(item, 'next', days)));
   $('#all-milestones').replaceChildren(...milestones.map(item => milestoneCard(item, 'all', days)));
   $('#checklist-note').textContent = state.mode === 'demo' ? 'In der Vorschau sind die Merkhäkchen deaktiviert. Trage deine Daten ein, um sie lokal zu nutzen.' : state.mode === 'shared' ? 'Übernimm die Daten auf diesem Gerät, um eigene Merkhäkchen zu setzen. Häkchen werden nicht geteilt.' : 'Deine Häkchen sind persönliche Merkhilfen, keine medizinische Dokumentation. Sie werden nicht geteilt.';
@@ -377,7 +396,7 @@ $('#method').addEventListener('change', () => {
 function updateFormPreview() {
   try {
     const data = calculatePregnancy(formProfile(), today);
-    $('#form-preview').textContent = data.status === 'before' ? 'Die Berechnung liegt noch vor 0+0. Bitte prüfe deine Angaben.' : `${data.weeks}+${data.days} · ${data.weekNumber}. SSW · ${data.method === 'due-date' ? 'Eingetragener' : 'Geschätzter'} ET: ${formatDate(data.dueDate)}`;
+    $('#form-preview').textContent = data.status === 'before' ? 'Die Berechnung liegt noch vor 0+0. Bitte prüfe deine Angaben.' : `${pregnancyAgeLabel(data)} · ${data.method === 'due-date' ? 'Eingetragener' : 'Geschätzter'} ET: ${formatDate(data.dueDate)}`;
   } catch {
     $('#form-preview').textContent = $('#method').value === 'due-date' ? 'Trage einen gültigen ET ein, um die Rückrechnung zu sehen.' : 'Trage ein gültiges Datum und deine Zykluslänge ein, um die Schätzung zu sehen.';
   }
@@ -513,6 +532,9 @@ $('#week-list').addEventListener('keydown', event => {
   $(`.week-button[data-week="${selectedWeek}"]`).focus({ preventScroll: true });
 });
 setupAppNavigation();
+navigator.serviceWorker?.addEventListener('controllerchange', () => {
+  if (state.mode !== 'demo') renderSummaryArt();
+});
 setupPwa();
 
 function refreshDate() {

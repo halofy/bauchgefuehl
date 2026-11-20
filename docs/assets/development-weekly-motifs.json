@@ -1,0 +1,511 @@
+{
+  "date": "2026-11-20",
+  "origin": "SSW 1–2: symbolische Aquarelle aus ImageGen. SSW 3–42: vom Nutzer bereitgestellte Bildreihe ohne Wochenmetadaten. Dateinummern bezeichnen die Bildreihenfolge.",
+  "format": "WebP, 640 × 640, transparent. Ursprünglicher Bildausschnitt bleibt erhalten.",
+  "files": [
+    {
+      "week": 1,
+      "phase": [
+        1,
+        1
+      ],
+      "origin": "Erstellt mit dem eingebauten ImageGen-Werkzeug. Prompt und Einordnung in AgDR-0049.",
+      "source_sha256": "fa7527b2ba9c240df9db4dc2d25e256ad3c720f4c7ddcfcdcc1b2b88f9ad1839",
+      "delivered": "images/stages/zyklusbeginn.webp",
+      "delivered_sha256": "38eee7d1944e5aaddf0e4d7d1ab19af45b74bef55a457686a108256e46d4dc38",
+      "bytes": 69764
+    },
+    {
+      "week": 2,
+      "phase": [
+        2,
+        2
+      ],
+      "origin": "Erstellt mit dem eingebauten ImageGen-Werkzeug. Prompt und Einordnung in AgDR-0049.",
+      "source_sha256": "48e5191877b73c486254bf0236f4b5483a129e8486ac512fb5f10cdfdc41e688",
+      "delivered": "images/stages/zyklusvorbereitung.webp",
+      "delivered_sha256": "dbb2870e8dc65cfa438643f44a2789edb4a98d9c9d25499410d7a1e10cd46971",
+      "bytes": 63350
+    },
+    {
+      "week": 3,
+      "phase": [
+        3,
+        4
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-01.png",
+      "source_sha256": "785072b20e5a9c54768fa82a3d8f4c3420c927e0c0b9c3dc8b21040d03d02197",
+      "delivered": "images/stages/stadium-01.webp",
+      "delivered_sha256": "1e8ad0b34a4f94e06c0d645662ac87adaca43e2a8ba01805bfac5a0d3b8178ac",
+      "bytes": 151526
+    },
+    {
+      "week": 4,
+      "phase": [
+        3,
+        4
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-02.png",
+      "source_sha256": "9466f83d221731dc2afcfba959e084f3d6005dd2b1b841e2c6f6170813f1fd09",
+      "delivered": "images/stages/stadium-02.webp",
+      "delivered_sha256": "e71ac96c88c43c56fd0f2048e9be055cb757cc8d59925cde963c84e4c71c94ae",
+      "bytes": 150574
+    },
+    {
+      "week": 5,
+      "phase": [
+        5,
+        6
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-03.png",
+      "source_sha256": "f79db09aed8fe4e67460c42d42d7beaf7f45802d8ba9318a48496abe887b775f",
+      "delivered": "images/stages/stadium-03.webp",
+      "delivered_sha256": "593595a387adf291632824bd99d4a00eb82dcc35456ff10893e8271df258ceb5",
+      "bytes": 139442
+    },
+    {
+      "week": 6,
+      "phase": [
+        5,
+        6
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-04.png",
+      "source_sha256": "38a049faefde2359b86801f3a29acd938966db42912d58e7777e3657d6bb89ab",
+      "delivered": "images/stages/stadium-04.webp",
+      "delivered_sha256": "24ff3efa077384779e5fa9967ed5a9c349fd1138909afd40d028c43ef6159169",
+      "bytes": 156568
+    },
+    {
+      "week": 7,
+      "phase": [
+        7,
+        8
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-05.png",
+      "source_sha256": "aa396fcaa6e6b775befe45bfc47581745be1f9e0c3e337fa08da969287e90b03",
+      "delivered": "images/stages/stadium-05.webp",
+      "delivered_sha256": "02e6026ead3312bf7291ac868c28612882666579d9aa09ceaab2a3b0aae38cd9",
+      "bytes": 103558
+    },
+    {
+      "week": 8,
+      "phase": [
+        7,
+        8
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-06.png",
+      "source_sha256": "d5cfae691e79cc23cb6f68326807e22cb2a20f3e8241a48b32080561da258382",
+      "delivered": "images/stages/stadium-06.webp",
+      "delivered_sha256": "605993e3ae0fae55be6c18bd0df99535e17a8cca2a7eb41bb1df68d2213af8fd",
+      "bytes": 146784
+    },
+    {
+      "week": 9,
+      "phase": [
+        9,
+        10
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-07.png",
+      "source_sha256": "14b663a6f5f2d93bfee306cf0dcaf2c0da9b1463f1895a88cbf6fe63fe8abcdf",
+      "delivered": "images/stages/stadium-07.webp",
+      "delivered_sha256": "eacd06d2443ca896296f522f5d5494c8195853bf48cf81e8d66988c2633c7912",
+      "bytes": 127060
+    },
+    {
+      "week": 10,
+      "phase": [
+        9,
+        10
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-09.png",
+      "source_sha256": "d3475414cc2bf274e5d555f502dff099a83ed48f3a481623c5576bfc674d56d5",
+      "delivered": "images/stages/stadium-09.webp",
+      "delivered_sha256": "58d1948838dd871c92aaadca56abf4ab22784926344a8077c33df53024a7710e",
+      "bytes": 115320
+    },
+    {
+      "week": 11,
+      "phase": [
+        11,
+        12
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-10.png",
+      "source_sha256": "1ccf3321cb9b879a6cff585fd2843b6d00d65e51be5ff4ea69e579e3d95ffb41",
+      "delivered": "images/stages/stadium-10.webp",
+      "delivered_sha256": "be8a7425f583afcf82654df45d88f5f105681c19a88e3597fdfe0b4d9743a279",
+      "bytes": 102150
+    },
+    {
+      "week": 12,
+      "phase": [
+        11,
+        12
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-11.png",
+      "source_sha256": "97e96f7c8356c6f03bddccdca70b9cecab885a65b5cfe02e51fe52aed182fda0",
+      "delivered": "images/stages/stadium-11.webp",
+      "delivered_sha256": "02cbbb5eaf0c64e45b7dd0f7f76915c1fef2e909c54b0531e41e41b63ec8a1b6",
+      "bytes": 102716
+    },
+    {
+      "week": 13,
+      "phase": [
+        13,
+        16
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-12.png",
+      "source_sha256": "ec98ca90f0da7b6969e445353bbca0b291b8df133be63e05ca15dcf1d2ae490a",
+      "delivered": "images/stages/stadium-12.webp",
+      "delivered_sha256": "c88dcfcb020f26c4560cf0fddb9d966cd019fdf376e6539c602a6a524a33b667",
+      "bytes": 100992
+    },
+    {
+      "week": 14,
+      "phase": [
+        13,
+        16
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-13.png",
+      "source_sha256": "d958a226b3848eeb1f3f0688cbf183700c31f6efcd36cc2c99ce388aaa7c707b",
+      "delivered": "images/stages/stadium-13.webp",
+      "delivered_sha256": "409ada1d8f097391dbb0d1ff3a2b0a4ab8db6510f985eacb075c3c6a8065918f",
+      "bytes": 98442
+    },
+    {
+      "week": 15,
+      "phase": [
+        13,
+        16
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-14.png",
+      "source_sha256": "e790b8db42a459431c4dcab5a1d28bfcbfd4f91cb448fce0f36e9a5228c9108c",
+      "delivered": "images/stages/stadium-14.webp",
+      "delivered_sha256": "87e5cd217bc0eae6583bcfa259449585d172662c5170af9d3211b1c788199156",
+      "bytes": 102348
+    },
+    {
+      "week": 16,
+      "phase": [
+        13,
+        16
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-15.png",
+      "source_sha256": "638578650d533be3ec03c8389eed8dbffb0e4e0cec58926dffe2f9d701ff3d15",
+      "delivered": "images/stages/stadium-15.webp",
+      "delivered_sha256": "627cd22f768b2dbd6df0634dec289e7f56e0359b14b59abf34d2b5d6b2832feb",
+      "bytes": 107544
+    },
+    {
+      "week": 17,
+      "phase": [
+        17,
+        20
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-16.png",
+      "source_sha256": "d3bcec2f49f96cdfa90241cf0828ef2043f95eb0c252211fba019ad8eb5cb7c3",
+      "delivered": "images/stages/stadium-16.webp",
+      "delivered_sha256": "9538f759583873021aec1b4bd5fc30b5c5a31f2ba128009b0c6a2fa761e60ea1",
+      "bytes": 94792
+    },
+    {
+      "week": 18,
+      "phase": [
+        17,
+        20
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-17.png",
+      "source_sha256": "12dd9b38b34f32cfbecd078449ec415d7798cea587a9bf65c56113639aaefe05",
+      "delivered": "images/stages/stadium-17.webp",
+      "delivered_sha256": "a75a4e9e80f66a366c9e5252f22c526950acf75a1aff50e9c2487fe7cb7f4b3f",
+      "bytes": 95596
+    },
+    {
+      "week": 19,
+      "phase": [
+        17,
+        20
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-18.png",
+      "source_sha256": "8257b8cdfd75b8fb98e239e0ab97685b7e14a2597e4f1a09d495666f5a06e4ac",
+      "delivered": "images/stages/stadium-18.webp",
+      "delivered_sha256": "1fcc9640795acba9d8445b59afa1dc102128cb5b7ab217bc74d9f02d468c49fe",
+      "bytes": 93356
+    },
+    {
+      "week": 20,
+      "phase": [
+        17,
+        20
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-19.png",
+      "source_sha256": "33d30af113935c182204e9a9e1901efb2452f824a040b195591fdbaa3e0a9270",
+      "delivered": "images/stages/stadium-19.webp",
+      "delivered_sha256": "d6d5361b595eda139274d39ecbafbaa4b93615d1d8b73ae23299a9fcb30d65d5",
+      "bytes": 95490
+    },
+    {
+      "week": 21,
+      "phase": [
+        21,
+        24
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-20.png",
+      "source_sha256": "1a564a32b37fbe46a1ef12030fa83261d67971cc04295c65453457e0dc6417e3",
+      "delivered": "images/stages/stadium-20.webp",
+      "delivered_sha256": "8a7936e0dfe2d008e8680244d204c627ee9488576b9bd170edbe648d6bcced94",
+      "bytes": 92990
+    },
+    {
+      "week": 22,
+      "phase": [
+        21,
+        24
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-21.png",
+      "source_sha256": "5d032a0decb74d72f33ac997eeddb9f9ef5d81b3e96183f007e42d7ccd64ccfd",
+      "delivered": "images/stages/stadium-21.webp",
+      "delivered_sha256": "f4ac8f520af744bf0e3a1e40620a69a7e7afeaccebc952ae4064a8fbd79b1e4d",
+      "bytes": 103178
+    },
+    {
+      "week": 23,
+      "phase": [
+        21,
+        24
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-22.png",
+      "source_sha256": "5f12c42b6c8a85d23cf0524fdf3ab1d654ec59b108edd34b91c62172436b5273",
+      "delivered": "images/stages/stadium-22.webp",
+      "delivered_sha256": "979676f902a459c6fb7c4b023550bb1d9c27ef884fe0f12b033ff6c322a438cc",
+      "bytes": 105594
+    },
+    {
+      "week": 24,
+      "phase": [
+        21,
+        24
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-23.png",
+      "source_sha256": "eb30ac0f93078195d840732b7244c6da73a6a63cb50f54469a884b6323ef6561",
+      "delivered": "images/stages/stadium-23.webp",
+      "delivered_sha256": "1beb82bf032e98c093c9d3cb5ec634f8da6d792ee6eb1e2769e93787f9904cde",
+      "bytes": 101834
+    },
+    {
+      "week": 25,
+      "phase": [
+        25,
+        28
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-24.png",
+      "source_sha256": "8c44a01052030acbb829d28426181ed810d7c1093d7c447c2deef5b213a3aba3",
+      "delivered": "images/stages/stadium-24.webp",
+      "delivered_sha256": "92925282a224b3979449e3255be64f8e45d763c886b2fde18e38b73d63f30148",
+      "bytes": 100782
+    },
+    {
+      "week": 26,
+      "phase": [
+        25,
+        28
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-25.png",
+      "source_sha256": "38bce48e5b778823d4640335a22084c1f658f21bd89b557c59538bc28821ee81",
+      "delivered": "images/stages/stadium-25.webp",
+      "delivered_sha256": "0f7ac6118f4298bbc8ef823b9e931d91da09c17c2a0d29d31836da293bde64f3",
+      "bytes": 107350
+    },
+    {
+      "week": 27,
+      "phase": [
+        25,
+        28
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-26.png",
+      "source_sha256": "4cc0d570f85a0a15ad653d282bcbd9f2b8f591dafbc45987ec4e868e892c3b66",
+      "delivered": "images/stages/stadium-26.webp",
+      "delivered_sha256": "c2510d44ebbdb4b8d340d62367b59c32ccfccc30e0a6c56cdfb82ff911e81e44",
+      "bytes": 107280
+    },
+    {
+      "week": 28,
+      "phase": [
+        25,
+        28
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-27.png",
+      "source_sha256": "8f864b40025d987d7a9072a37c6ad4905d0862ec483b06e73f542a33215cd000",
+      "delivered": "images/stages/stadium-27.webp",
+      "delivered_sha256": "2b2b602fb7e5e4e2147b3d6ccad3836742533a7afe12e55301314baa17893172",
+      "bytes": 109464
+    },
+    {
+      "week": 29,
+      "phase": [
+        29,
+        32
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-28.png",
+      "source_sha256": "30d544191d0e71c75ab3c46540eaf9ce603d97f09cb5ab7240a990ac3bb69af3",
+      "delivered": "images/stages/stadium-28.webp",
+      "delivered_sha256": "308697927fb4987604347bc536cfcb29fd097a8304fd976c037e87cc0c9ae9fd",
+      "bytes": 108432
+    },
+    {
+      "week": 30,
+      "phase": [
+        29,
+        32
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-29.png",
+      "source_sha256": "22f492eef0398312cea902b2e3e1e60baeea32165ea8e72e50db2c43e12bd98f",
+      "delivered": "images/stages/stadium-29.webp",
+      "delivered_sha256": "f6e180ac04d58840ab9058ebb3e329c81083c66dd53fff58dce777dd2e198a62",
+      "bytes": 105538
+    },
+    {
+      "week": 31,
+      "phase": [
+        29,
+        32
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-30.png",
+      "source_sha256": "44fe5894dcc30d773c58dd98ee3e40224fb50753f3b3412926fce57786ede082",
+      "delivered": "images/stages/stadium-30.webp",
+      "delivered_sha256": "4bec5907084cbf1bc88cbd1af67d35e326fdfa48a1bb1760e97369e8db280b4e",
+      "bytes": 106236
+    },
+    {
+      "week": 32,
+      "phase": [
+        29,
+        32
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-31.png",
+      "source_sha256": "28f489f41f9075460cf6534dbf53146c6083fdc72f51dc84e411447acf993195",
+      "delivered": "images/stages/stadium-31.webp",
+      "delivered_sha256": "be5f7a15eb2dbe7ddd73e8a26cb337d6bfc9932e63ac232fa0d936786b1143f4",
+      "bytes": 107946
+    },
+    {
+      "week": 33,
+      "phase": [
+        33,
+        36
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-32.png",
+      "source_sha256": "d69dc48a49598c12e01be5c1e581aa8c473a58f9035969addcefcba027628682",
+      "delivered": "images/stages/stadium-32.webp",
+      "delivered_sha256": "1975651ac1b81fa11c6162af5c8fb7f8761600c05f0b76b6c9a03470759ba88e",
+      "bytes": 105454
+    },
+    {
+      "week": 34,
+      "phase": [
+        33,
+        36
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-33.png",
+      "source_sha256": "116267f2904a77e52fc18c96299791a1df074535373aa128cab89f6e849aec62",
+      "delivered": "images/stages/stadium-33.webp",
+      "delivered_sha256": "19c4395d2276e6bdc9d48f6640d17795708ac91d4886c68c62a4e8f323442d73",
+      "bytes": 96624
+    },
+    {
+      "week": 35,
+      "phase": [
+        33,
+        36
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-34.png",
+      "source_sha256": "0d07f4efa59707a40d2b036e2b99ce153a94f049384f4b929cd6859589a34bcb",
+      "delivered": "images/stages/stadium-34.webp",
+      "delivered_sha256": "919e02b48d605956f5d489226262cd1ef98b6522c315460105db6d81bf4735cb",
+      "bytes": 102388
+    },
+    {
+      "week": 36,
+      "phase": [
+        33,
+        36
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-35.png",
+      "source_sha256": "88e0794953a131b27763921641143ec79638740731cc0d1dc1143ae344eaa133",
+      "delivered": "images/stages/stadium-35.webp",
+      "delivered_sha256": "220e046a352376229396850465cdef711d901a119f03f9908a7a7f5e021ec274",
+      "bytes": 100964
+    },
+    {
+      "week": 37,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-37.png",
+      "source_sha256": "2171c7cac47eaa4b9d485fe7ff5e0af94f7b2a9da2f9c2997ce42813fcf2bf71",
+      "delivered": "images/stages/stadium-37.webp",
+      "delivered_sha256": "7049fcfc8fb7bbf50caa7f1b50869b31a6e5585eb696b94cec1183ca1edc12cc",
+      "bytes": 99490
+    },
+    {
+      "week": 38,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-38.png",
+      "source_sha256": "b97378ba7e195eb964c0e479c3b0979d75b97b366fc8afa9f141d8e7a6a401b6",
+      "delivered": "images/stages/stadium-38.webp",
+      "delivered_sha256": "f483d7b88e3282726c4ce22ba0e33e30b1042058c52f39a7257cd461581b681e",
+      "bytes": 105616
+    },
+    {
+      "week": 39,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-39.png",
+      "source_sha256": "b20d1a88228af897988e34a0a5088670ccf38260d33f687e33edbaf69e497ef1",
+      "delivered": "images/stages/stadium-39.webp",
+      "delivered_sha256": "2cb2fdb37390e140774f5c22600e33dff23ca2bb7120f74006d12860584a3ffc",
+      "bytes": 106406
+    },
+    {
+      "week": 40,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-40.png",
+      "source_sha256": "c76db1f29ab7599df5d00997f010e4ba4a587f11a47149b31c0274026e72f7dc",
+      "delivered": "images/stages/stadium-40.webp",
+      "delivered_sha256": "806dc5f533808cec8005cb5aac023b459feb283b63030c943f50e7c12bdebcdc",
+      "bytes": 107558
+    },
+    {
+      "week": 41,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-41.png",
+      "source_sha256": "0642a9f44c51470510628c2497731732d0887fa8e584b3f88019eebc1bd38cb5",
+      "delivered": "images/stages/stadium-41.webp",
+      "delivered_sha256": "d5e586f6484b50f1c6a4c2807fcfaf39e7604cacfe0bef6673859fb9dd00d9f1",
+      "bytes": 102224
+    },
+    {
+      "week": 42,
+      "phase": [
+        37,
+        42
+      ],
+      "source": "embryo-stadien-png/embryo-stadium-42.png",
+      "source_sha256": "22c07b81e501b3d167d38416941ea616484d9005e914112c7cb8409b2ef68f87",
+      "delivered": "images/stages/stadium-42.webp",
+      "delivered_sha256": "b4c650308200245b9692ac87f9f9763502d4f4277847e37cf13624bce8ff38f2",
+      "bytes": 102926
+    }
+  ]
+}

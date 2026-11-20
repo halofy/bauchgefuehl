@@ -36,7 +36,16 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0028](0028-mobile-zurueck-navigation.md) | Browser-Zurück für Bereiche, Dialoge und geschützte Entwürfe | Umgesetzt; Safari-Entwurf und Verlaufssimulation geprüft |
 | [AgDR-0029](0029-entwicklung-und-untersuchungsmasse.md) | Entwicklungsstufen, quellenbezogene Zwischenwerte und eigene Untersuchungsmaße | Umgesetzt; Modell geprüft, physische Geräte offen |
 | [AgDR-0040](0040-bereinigung-ungenutzter-dateien.md) | Ungenutzte Bilddateien und alte Sync-Oberfläche entfernen, Herkunft erhalten | Umgesetzt; Prüfnachweise siehe Record |
-| [AgDR-0041](0041-entwicklungsvisualisierung.md) | Entwicklungsvisualisierung: 42 Wochenbilder, Ausschnitt, Maske, Kartenverlauf, Bewegung und mobile Anordnung; enthält Verlauf 0030–0039 | Umgesetzt; gemeinsame Dokumentation, App unverändert |
+| [AgDR-0041](0041-entwicklungsvisualisierung.md) | Entwicklungsvisualisierung: 42 Wochenbilder, Ausschnitt, Maske, Kartenverlauf, Bewegung und mobile Anordnung; enthält Verlauf 0030–0039 | Bilddarstellung abgelöst durch [AgDR-0043](0043-svg-entwicklungsillustrationen-nach-vorlagen.md) |
+| [AgDR-0042](0042-termin-pdf-und-kompakter-vorsorgekalender.md) | Formatierte Fragen, lokale PDF-Terminmappe, kompakte Tagesdetails, zusätzliche Untersuchungsfenster und begrenzte SSW-Anzeige | Umgesetzt; Quellen und Prüfgrenzen im Record |
+| [AgDR-0043](0043-svg-entwicklungsillustrationen-nach-vorlagen.md) | Neue SVG-Entwicklungsreihe nach den bereitgestellten Bildvorlagen | Teilweise abgelöst durch AgDR-0046 und AgDR-0048 |
+| [AgDR-0044](0044-kalender-mit-gemeinsamer-wochenansicht.md) | Kompakter Kalender, SSW-Datumsbereich und Rückblick in gemeinsamer Wochenansicht | Umgesetzt |
+| [AgDR-0045](0045-sanftere-fruehe-svg-uebergaenge.md) | Sanftere frühe SVG-Übergänge und weniger Gesichtslinien | Teilweise abgelöst durch AgDR-0046 und AgDR-0048 |
+| [AgDR-0046](0046-wochenbilder-mit-grober-phasenzuordnung.md) | Zwölf lokale Motive aus der gelieferten Bildreihe mit ungefähren SSW-Bereichen | Bildstaffelung abgelöst durch AgDR-0047 |
+| [AgDR-0047](0047-eigenes-motiv-je-schwangerschaftswoche.md) | Eigenes Offline-Bildmotiv je Woche ab der 3. SSW mit grober Entwicklungsphase | Umgesetzt, Nutzertest offen |
+| [AgDR-0048](0048-wochenmotive-im-ueberblick.md) | Wochenmotive auch auf der grünen SSW-Karte im Überblick | Umgesetzt |
+| [AgDR-0049](0049-aquarellmotive-fuer-die-ersten-beiden-wochen.md) | Symbolische Aquarelle für die 1. und 2. SSW in beiden Ansichten | Umgesetzt |
+| [AgDR-0050](0050-lokale-vorschau-des-aktuellen-builds.md) | Aktuellen lokalen Build unter `/vorschau/` mit demselben Datenspeicher anzeigen | Umgesetzt |
 
 Die Nummern **0030–0039** sind in AgDR-0041 zusammengeführt; ihre vollständigen Texte und Prüfnachweise stehen dort im aufklappbaren Verlauf. Die Nummern bleiben reserviert.
 

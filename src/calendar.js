@@ -1,6 +1,7 @@
-import { calculatePregnancy } from './pregnancy.js';
+import { calculatePregnancy, GESTATION_DISPLAY_LIMIT } from './pregnancy.js';
 import { addDays, dayNumber } from './dates.js';
-import { milestones } from './content.js';
+import { milestones, TERM_SOURCE, CARE_REVIEWED } from './content.js';
+import { calendarWeek } from './reflection.js';
 
 export function pregnancyTimeline(profile, today) {
   const current = calculatePregnancy(profile, today);
@@ -10,12 +11,35 @@ export function pregnancyTimeline(profile, today) {
 
 export function gestationOnDate(timeline, date) {
   const age = dayNumber(date) - dayNumber(timeline.start);
-  return { age, weeks: Math.floor(age / 7), days: ((age % 7) + 7) % 7, weekNumber: Math.floor(age / 7) + 1, status: age < 0 ? 'before' : age >= 294 ? 'beyond' : 'ongoing' };
+  return { age, weeks: Math.floor(age / 7), days: ((age % 7) + 7) % 7, weekNumber: Math.floor(age / 7) + 1, status: age < 0 ? 'before' : age >= GESTATION_DISPLAY_LIMIT ? 'beyond' : 'ongoing' };
+}
+
+export function calendarReflectionPeriod(timeline, date, birthDate = null) {
+  const age = gestationOnDate(timeline, date);
+  const afterBirth = birthDate && date >= birthDate;
+  if (age.status === 'ongoing' && !afterBirth) {
+    const from = addDays(date, -age.days);
+    const weekEnd = addDays(from, 6);
+    const to = birthDate && birthDate <= weekEnd ? addDays(birthDate, -1) : weekEnd;
+    return { from, to, weekNumber: age.weekNumber };
+  }
+  let { from, to } = calendarWeek(date);
+  if (afterBirth) {
+    if (from < birthDate) from = birthDate;
+  } else if (age.status === 'before') {
+    if (to >= timeline.start) to = addDays(timeline.start, -1);
+    if (birthDate && to >= birthDate) to = addDays(birthDate, -1);
+  } else {
+    const limit = addDays(timeline.start, GESTATION_DISPLAY_LIMIT);
+    if (from < limit) from = limit;
+    if (birthDate && to >= birthDate) to = addDays(birthDate, -1);
+  }
+  return { from, to, weekNumber: null };
 }
 
 export function dateForSsw(timeline, value) {
   const match = /^(\d{1,2})\+([0-6])$/.exec(value.trim());
-  if (!match || Number(match[1]) > 42) throw new Error('Bitte volle Wochen + Tage eingeben, zum Beispiel 24+0 (0+0 bis 42+6).');
+  if (!match || Number(match[1]) * 7 + Number(match[2]) > GESTATION_DISPLAY_LIMIT) throw new Error('Bitte volle Wochen + Tage eingeben, zum Beispiel 24+0 (0+0 bis zur Anzeigegrenze 42+0).');
   return addDays(timeline.start, Number(match[1]) * 7 + Number(match[2]));
 }
 
@@ -41,12 +65,14 @@ export function monthDays(month) {
 }
 
 export function timelineEvents(timeline) {
-  const care = milestones.map(item => ({ ...item, type: 'care', date: addDays(timeline.start, item.start), endDate: addDays(timeline.start, Math.min(item.end, 293)), openEnded: item.label.startsWith('Ab ') }));
+  const care = milestones.map(item => ({ ...item, type: 'care', date: addDays(timeline.start, item.start), endDate: addDays(timeline.start, Math.min(item.end, GESTATION_DISPLAY_LIMIT - 1)), openEnded: item.openEnded ?? item.label.startsWith('Ab ') }));
   const points = [
     { id: 'trimester-2', start: 98, title: 'Beginn des 2. Trimesters', text: '14+0 nach der Darstellungskonvention dieser App.' },
     { id: 'halfway', start: 140, title: 'Rechnerische Halbzeit', text: '20+0 · die Hälfte der rechnerischen 40 Wochen.' },
     { id: 'trimester-3', start: 196, title: 'Beginn des 3. Trimesters', text: '28+0 nach der Darstellungskonvention dieser App.' },
     { id: 'due-date', start: 280, title: 'Voraussichtlicher Geburtstermin', text: '40+0 · ein rechnerischer Termin, keine Vorhersage des Geburtstags.' },
+    { id: 'induction-discussion', start: 287, title: 'Einleitung und weitere Betreuung besprechen', text: 'Ab 41+0 wird häufig eine Einleitung angeboten. Falls du noch schwanger bist, Kontroll- und Geburtsplan mit dem Geburtsteam abstimmen.', source: TERM_SOURCE, reviewed: CARE_REVIEWED },
+    { id: 'display-limit', start: GESTATION_DISPLAY_LIMIT, title: '42+0 · Betreuung und Datierung klären', text: 'Falls die Schwangerschaft noch besteht: jetzt mit dem Geburtsteam in Kontakt sein. Ab 42+0 wird dringend empfohlen, mit einer Einleitung nicht länger zu warten. Die App zählt ab hier keine weiteren SSW; sie legt keinen individuellen Geburtstermin fest.', source: TERM_SOURCE, reviewed: CARE_REVIEWED },
   ].map(item => ({ ...item, type: 'point', date: addDays(timeline.start, item.start), endDate: addDays(timeline.start, item.start) }));
   return [...care, ...points].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
 }
@@ -62,7 +88,7 @@ export function entriesOnDate(entries, date) {
 
 export function upcomingEvents(events, from, limit = 6) {
   dayNumber(from);
-  return events.filter(event => event.endDate >= from).sort((a, b) => (a.date < from ? from : a.date).localeCompare(b.date < from ? from : b.date) || a.date.localeCompare(b.date)).slice(0, limit);
+  return events.filter(event => event.endDate >= from).sort((a, b) => Number(!!a.openEnded) - Number(!!b.openEnded) || (a.date < from ? from : a.date).localeCompare(b.date < from ? from : b.date) || Number(a.category === 'optional') - Number(b.category === 'optional') || a.date.localeCompare(b.date)).slice(0, limit);
 }
 
 export function weekRanges(timeline) {

@@ -1,12 +1,36 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { addDays, dayNumber } from '../src/dates.js';
-import { calculatePregnancy } from '../src/pregnancy.js';
+import { calculatePregnancy, pregnancyAgeLabel } from '../src/pregnancy.js';
 import { pregnancyTimeline, gestationOnDate, dateForSsw, monthStart, shiftMonth, monthDays, timelineEvents, eventsOnDate, entriesOnDate, upcomingEvents, weekRanges } from '../src/calendar.js';
 
 const today = '2026-11-17';
 const period = { method: 'period', lmp: '2026-07-09', cycle: 30 };
 const timeline = pregnancyTimeline(period, today);
+
+test('a 24-day cycle has a distinct calculated beginning; the observed period is not moved or overwritten',()=>{
+  const profile={method:'period',lmp:'2025-08-16',cycle:24}, before=JSON.stringify(profile);
+  const t=pregnancyTimeline(profile,'2025-09-20');
+  assert.equal(t.start,'2025-08-12');assert.equal(gestationOnDate(t,'2025-08-16').age,4);
+  assert.equal(gestationOnDate(t,'2025-09-20').age,39);assert.equal(JSON.stringify(profile),before);
+});
+test('SSW presentation ends at 42+0 while raw dates remain available for existing records',()=>{
+  assert.equal(pregnancyAgeLabel(gestationOnDate(timeline,addDays(timeline.start,293))), '41+6 · 42. SSW');
+  for(const day of [294,300,800]){
+    const age=gestationOnDate(timeline,addDays(timeline.start,day));
+    assert.equal(age.age,day);assert.equal(pregnancyAgeLabel(age,true),'–');assert.equal(pregnancyAgeLabel(age),'Ab 42+0 · Datierung oder Geburt prüfen');
+  }
+});
+test('additional investigations retain exact windows, voluntary or conditional status, sources and review date',()=>{
+  const events=timelineEvents(timeline);
+  for(const [id,start,end] of [['first-trimester','11+0','13+6'],['detailed-ultrasound','18+0','21+6'],['antibody-repeat','23+0','26+6'],['anti-d','27+0','29+6']]){
+    const item=events.find(x=>x.id===id);assert.equal(item.date,dateForSsw(timeline,start));assert.equal(item.endDate,dateForSsw(timeline,end));assert.ok(item.source.startsWith('https://'));assert.equal(item.reviewed,'2026-11-20');
+    assert.ok(eventsOnDate(events,item.date).includes(item));assert.ok(!eventsOnDate(events,addDays(item.endDate,1)).includes(item));
+  }
+  for(const [id,start] of [['nipt','10+0'],['chorionic-villus','11+0'],['amniocentesis','15+0'],['fetal-rhesus','11+0']]){
+    const item=events.find(x=>x.id===id);assert.equal(item.date,dateForSsw(timeline,start));assert.equal(item.openEnded,true);assert.ok(['optional','conditional'].includes(item.category));assert.ok(!eventsOnDate(events,addDays(item.date,-1)).includes(item));
+  }
+});
 
 test('calendar projects from the existing calculation, consistently for cycle and ET methods', () => {
   assert.equal(timeline.start, '2026-07-11');
@@ -22,7 +46,7 @@ test('calendar projects from the existing calculation, consistently for cycle an
 test('short and long cycles map dates and SSW in both directions without another adjustment', () => {
   for (const cycle of [21, 24, 28, 30, 35]) {
     const t = pregnancyTimeline({ ...period, cycle }, today);
-    for (let age = 0; age <= 299; age++) {
+    for (let age = 0; age <= 294; age++) {
       const text = `${Math.floor(age / 7)}+${age % 7}`;
       const date = dateForSsw(t, text);
       assert.equal(dayNumber(date) - dayNumber(t.start), age);
@@ -43,7 +67,7 @@ test('calendar age boundaries distinguish completed weeks, ordinal week, and con
 
 test('SSW lookup rejects ambiguous ordinal-only values and impossible day numbers', () => {
   assert.equal(dateForSsw(timeline, ' 24+0 '), addDays(timeline.start, 168));
-  for (const input of ['24', '24. SSW', '24+7', '43+0', '-1+0', '1.5+0', '', '24+0oops']) assert.throws(() => dateForSsw(timeline, input));
+  for (const input of ['24', '24. SSW', '24+7', '42+1', '42+6', '43+0', '-1+0', '1.5+0', '', '24+0oops']) assert.throws(() => dateForSsw(timeline, input));
 });
 
 test('month cells start on Monday and include leap day and adjacent months', () => {
@@ -87,7 +111,8 @@ test('future overview includes ongoing care windows and skips expired windows', 
   const list = upcomingEvents(events, today);
   assert.equal(list[0].id, 'scan-2');
   assert.ok(!list.some(e => e.id === 'scan-1')); assert.ok(list.some(e => e.id === 'halfway')); assert.ok(list.length <= 6);
-  assert.deepEqual(upcomingEvents(events, dateForSsw(timeline, '42+0')), []);
+  assert.deepEqual(upcomingEvents(events, dateForSsw(timeline, '42+0')).map(e=>e.id), ['display-limit']);
+  assert.deepEqual(upcomingEvents(events, addDays(dateForSsw(timeline, '42+0'), 1)), []);
 });
 
 test('42 week ranges are contiguous and use ordinal weeks independently of full weeks', () => {

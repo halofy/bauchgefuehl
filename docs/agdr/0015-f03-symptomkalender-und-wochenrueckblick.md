@@ -7,6 +7,8 @@
 - **Betroffene Dateien:** [Rückblickmodell](../../src/reflection.js), [Rückblickoberfläche](../../src/reflection-ui.js), [Journalmodell](../../src/journal.js), [Journaloberfläche](../../src/journal-ui.js), [Kalenderoberfläche](../../src/calendar-ui.js), [App](../../src/app.js), [HTML](../../index.html), [Stylesheet](../../styles.css), [Offline-Dateien](../../sw.js), [Tests](../../tests/reflection.test.js)
 - **Erweitert:** [AgDR-0009](0009-persoenliches-journal.md), [AgDR-0012](0012-roadmap-und-ssw-pruefung.md), [AgDR-0014](0014-kalender-und-journal.md)
 
+> Die Anordnung des Kalenders und der Zeitraum des Rückblicks wurden in [AgDR-0044](0044-kalender-mit-gemeinsamer-wochenansicht.md) weiterentwickelt.
+
 ## Kontext und Herkunft
 
 Der Nutzer möchte beim Kalender und der Journalintegration „auch weiteres von F03“ einarbeiten lassen. F03 umfasst laut Feature-Liste einen Symptomkalender, einen Wochenrückblick, nachvollziehbare Originaleinträge und einen korrekten Umgang mit fehlenden beziehungsweise archivierten Angaben. Strukturierte Stimmung, Energie, Schlaf und Symptomstärke hängen dort von F02 ab.
