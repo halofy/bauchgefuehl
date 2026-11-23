@@ -53,7 +53,7 @@ test('layout changes notify consumers after styling changes and preserve user ch
 test('navigation follows the shared mode, retains the selected panel and switches back to desktop scrolling', async () => {
   const env = environment(true);
   const layout = createAppLayout(env.view);
-  const ids = ['ueberblick', 'wochenreise', 'journal', 'vorsorge', 'wissen'];
+  const ids = ['ueberblick', 'wochenreise', 'fuer-dich', 'kalender', 'vorsorge', 'wissen'];
   const scrolled = [];
   const panels = new Map(ids.map(id => [id, { classList: classes(), querySelector: () => ({ focus() {} }), scrollIntoView() { scrolled.push(id); } }]));
   const buttons = ids.map(id => ({ dataset: { scroll: id }, classList: classes(), setAttribute() {}, removeAttribute() {}, addEventListener(type, callback) { this.click = callback; } }));
@@ -65,11 +65,11 @@ test('navigation follows the shared mode, retains the selected panel and switche
   };
   const source = (await readFile(new URL('../src/navigation.js', import.meta.url), 'utf8')).replace(/^import .*;\n/m, '').replaceAll('export function ', 'function ');
   vm.runInNewContext(source + '\nsetupAppNavigation();', context);
-  buttons[2].click();
-  assert.equal(panels.get('journal').classList.contains('mobile-inactive'), false);
-  for (const id of ids.filter(id => id !== 'journal')) assert.equal(panels.get(id).classList.contains('mobile-inactive'), true);
+  buttons.find(button => button.dataset.scroll === 'fuer-dich').click();
+  assert.equal(panels.get('fuer-dich').classList.contains('mobile-inactive'), false);
+  for (const id of ids.filter(id => id !== 'fuer-dich')) assert.equal(panels.get(id).classList.contains('mobile-inactive'), true);
   env.setMatches(false);
-  assert.deepEqual(scrolled, ['journal']);
+  assert.deepEqual(scrolled, ['fuer-dich']);
   env.setMatches(true);
-  assert.equal(panels.get('journal').classList.contains('mobile-inactive'), false);
+  assert.equal(panels.get('fuer-dich').classList.contains('mobile-inactive'), false);
 });

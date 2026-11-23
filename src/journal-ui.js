@@ -1,32 +1,39 @@
 import { helpForSymptom } from './symptoms.js';
 import { personalTrend } from './trends.js';
-import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv, symptomOptions, isCheckinEntry } from './journal.js';
-import { CHECKIN_FIELDS, readCheckin, isCheckinMetric, checkinField, checkinValue, upsertCheckin } from './checkin.js';
+import { METRICS, SYMPTOMS, parseLabels, parseMeasurement, formatMeasurementInput, normalizeMetric, upsertEntry, archiveEntry, filterEntries, metricKey, metricSeries, journalCsv, symptomOptions, isCheckinEntry } from './journal.js';
+import { CHECKIN_FIELDS, readCheckin, isCheckinMetric, checkinField, checkinValue, checkinMetrics, upsertCheckin } from './checkin.js';
 import { todayISO, formatDate, dayNumber, addDays } from './dates.js';
-import { getAppLayout } from './layout.js';
+const standardMetricKinds = ['weight', 'belly', 'chest', 'hips'];
 
-export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate, onOpen = () => {}, symptomHelp = () => {} }) {
+export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify, weekOnDate, symptomHelp = () => {} }) {
   const $ = selector => document.querySelector(selector);
   const node = (tag, className = '', text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
   const number = value => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(value);
   let editing = null;
-  let checkinMode = false;
   let rows = [];
   let dirty = false;
   let filtered = [];
   $('#journal-metric').parentElement.insertAdjacentHTML('afterend', '<div class="trend-controls"><label class="checkbox-label"><input id="trend-checkins" type="checkbox">Auch Check-in-Skalen anzeigen</label><label>Zeitraum<select id="trend-period"><option value="all">Alle gefilterten Messungen</option><option value="28">Letzte 28 Tage</option><option value="90">Letzte 90 Tage</option></select></label><label>Persönlicher Ausgangswert<select id="trend-baseline"><option value="">Erster Wert im Zeitraum</option></select></label><p id="trend-difference" class="field-hint"></p><label class="checkbox-label"><input id="trend-notes" type="checkbox">Notizen im Verlauf markieren</label><div id="trend-annotations"></div></div>');
-  const mobile = getAppLayout();
-  const arrangePanels = () => {
-    $('#journal-filter-panel').open = !mobile.matches;
-    $('#journal-trend-panel').open = !mobile.matches;
-  };
-  arrangePanels();
-  mobile.subscribe(arrangePanels);
-  $('#journal-reset').addEventListener('click', () => {
+  $('#journal-filter-panel').open = false;
+  const standardInputs = new Map(standardMetricKinds.map(kind => {
+    const { label, unit } = METRICS[kind];
+    const wrapper = node('label', '', `${label} (${unit})`);
+    const input = node('input');
+    input.type = 'text';
+    input.inputMode = 'decimal';
+    input.id = `entry-${kind}`;
+    input.setAttribute('aria-describedby', 'entry-decimal-hint');
+    wrapper.append(input);
+    $('#entry-standard-metrics').append(wrapper);
+    return [kind, input];
+  }));
+  function clearFilters() {
     for (const id of ['journal-search', 'journal-tag', 'journal-symptom', 'journal-type', 'journal-from', 'journal-to']) $('#' + id).value = '';
     $('#journal-archived').checked = false;
     render();
-  });
+  }
+  $('#journal-reset').addEventListener('click', clearFilters);
+  $('#journal-clear-context').addEventListener('click', clearFilters);
 
   function refreshSymptoms() {
     const selected = parseLabels($('#entry-symptoms').value).map(s => s.toLocaleLowerCase('de'));
@@ -45,56 +52,76 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     });
     $('#symptom-suggestions').append(button);
   }
-  function addMetric(metric = null, kind = 'weight') {
+  function addMetric(metric = null) {
     if (rows.length >= 12) { notify('Maximal zwölf Messwerte pro Eintrag.'); return; }
     const row = node('div', 'metric-input-row');
     const selectLabel = node('label', 'metric-kind-label', 'Messgröße');
     const select = document.createElement('select');
     for (const [id, definition] of Object.entries(METRICS)) {
+      if (standardInputs.has(id)) continue;
       const option = document.createElement('option'); option.value = id; option.textContent = `${definition.label} (${definition.unit})`; select.append(option);
     }
     const custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = 'Eigener Messwert'; select.append(custom);
-    select.value = metric?.kind || kind; selectLabel.append(select);
+    select.value = metric?.kind || 'temperature'; selectLabel.append(select);
     const customFields = node('div', 'custom-metric-fields');
     const nameLabel = node('label', '', 'Bezeichnung'); const name = document.createElement('input'); name.type = 'text'; name.maxLength = 50; name.placeholder = 'z. B. Schlafdauer'; name.value = metric?.kind === 'custom' ? metric.label : ''; nameLabel.append(name);
     const unitLabel = node('label', '', 'Einheit'); const unit = document.createElement('input'); unit.type = 'text'; unit.maxLength = 16; unit.placeholder = 'z. B. h'; unit.value = metric?.kind === 'custom' ? metric.unit : ''; unitLabel.append(unit); customFields.append(nameLabel, unitLabel);
-    const valueLabel = node('label', 'metric-value-label', 'Wert'); const value = document.createElement('input'); value.type = 'text'; value.inputMode = 'decimal'; value.placeholder = 'z. B. 65,5'; value.value = metric ? String(metric.value).replace('.', ',') : ''; valueLabel.append(value);
+    const valueLabel = node('label', 'metric-value-label', 'Wert'); const value = document.createElement('input'); value.type = 'text'; value.inputMode = 'decimal'; value.placeholder = 'z. B. 36,5'; value.value = metric ? formatMeasurementInput(metric.value) : ''; valueLabel.append(value);
     const remove = node('button', 'metric-remove', '×'); remove.type = 'button'; remove.setAttribute('aria-label', 'Messwertzeile entfernen');
     const record = { row, select, name, unit, value };
     const update = () => { customFields.hidden = select.value !== 'custom'; };
     select.addEventListener('change', () => { dirty = true; update(); });
     remove.addEventListener('click', () => { rows = rows.filter(item => item !== record); row.remove(); dirty = true; });
     row.append(selectLabel, valueLabel, remove, customFields); rows.push(record); $('#entry-metrics').append(row); update();
+    return value;
   }
-  function open(entry = null, date = todayISO(), checkin = false) {
+  function open(entry = null, date = todayISO(), start = 'note') {
+    const dialog = $('#journal-dialog');
+    if (dialog.open) return;
     if (!canEdit()) { onSetup(); return; }
     editing = entry;
-    checkinMode = entry ? isCheckinEntry(entry) : checkin;
     const now = new Date();
-    $('#entry-title').textContent = checkinMode ? 'Wie geht es dir gerade?' : entry ? 'Dein Eintrag. Weitergedacht.' : 'Ein Moment für dich.';
-    $('#entry-checkin').hidden = !checkinMode; $('#entry-checkin').disabled = !checkinMode;
     const data = entry ? readCheckin(entry) : null;
-    for (const key of Object.keys(CHECKIN_FIELDS)) $('#checkin-' + key).value = data?.values[key] ?? '';
+    const metricsFirst = start === 'metrics' || Boolean(entry?.metrics.length && !entry.text && !entry.symptoms.length && !data);
+    $('#entry-title').textContent = entry ? 'Eintrag bearbeiten' : metricsFirst ? 'Messwerte eintragen' : date === todayISO() ? 'Heute festhalten' : 'Eintrag festhalten';
+    $('#entry-checkin').hidden = Boolean(entry && !data);
+    $('#entry-checkin').disabled = Boolean(entry && !data);
+    for (const key of Object.keys(CHECKIN_FIELDS)) {
+      const value = data?.values[key];
+      $('#checkin-' + key).value = value === undefined ? '' : key === 'sleep' ? formatMeasurementInput(value) : value;
+    }
     $('#checkin-invalid').hidden = !data?.invalid.length;
     $('#entry-date').value = entry?.date || date; $('#entry-date').max = todayISO();
     $('#entry-time').value = entry?.time ?? `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     $('#entry-text').value = entry?.text || ''; $('#entry-symptoms').value = entry?.symptoms.join(', ') || ''; $('#entry-tags').value = entry?.tags.join(', ') || '';
     $('#entry-error').hidden = true;
+    for (const field of $('#journal-form').querySelectorAll('[aria-invalid]')) field.removeAttribute('aria-invalid');
     rows = []; $('#entry-metrics').replaceChildren();
-    if (entry?.metrics.length) for (const metric of entry.metrics) {
-      if (!isCheckinMetric(entry, metric) || data?.invalid.includes(checkinField(metric))) addMetric(metric);
+    for (const input of standardInputs.values()) input.value = '';
+    for (const metric of entry?.metrics ?? []) {
+      if (isCheckinMetric(entry, metric) && !data.invalid.includes(checkinField(metric))) continue;
+      const input = standardInputs.get(metric.kind);
+      if (input) input.value = formatMeasurementInput(metric.value);
+      else addMetric(metric);
     }
-    else if (!checkinMode) { addMetric(null, 'weight'); addMetric(null, 'belly'); }
-    $('#entry-extra-fields').open = !checkinMode || Boolean(data?.invalid.length);
+    const body = $('#entry-body-panel');
+    const observations = $('#entry-observations');
+    $('#capture-fields').prepend(metricsFirst ? body : observations);
+    body.open = metricsFirst || [...standardInputs.values()].some(input => input.value);
+    observations.open = !metricsFirst;
+    $('#entry-extra-fields').open = Boolean(rows.length || entry?.tags.length);
     refreshSymptoms(); dirty = false;
-    $('#journal-dialog').showModal();
+    dialog.showModal();
+    $('#entry-title').focus({ preventScroll: true });
+    dialog.scrollTop = 0;
   }
   function close() {
     if (dirty && !window.confirm('Ungespeicherten Entwurf verwerfen?')) return;
     dirty = false; $('#journal-dialog').close();
   }
-  $('#journal-new').addEventListener('click', () => { onOpen(); open(); });
-  for (const button of document.querySelectorAll('[data-checkin-new]')) button.addEventListener('click', () => open(null, todayISO(), true));
+  for (const button of document.querySelectorAll('[data-entry-start]')) {
+    button.addEventListener('click', () => open(null, todayISO(), button.dataset.entryStart));
+  }
   $('#journal-close').addEventListener('click', close);
   $('#journal-dialog').addEventListener('cancel', event => { event.preventDefault(); close(); });
   $('#journal-dialog').addEventListener('click', event => {
@@ -102,26 +129,48 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     const r = event.target.getBoundingClientRect();
     if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) close();
   });
-  $('#entry-add-metric').addEventListener('click', () => { addMetric(null, 'custom'); dirty = true; });
-  $('#journal-form').addEventListener('input', () => { dirty = true; refreshSymptoms(); });
+  $('#entry-add-metric').addEventListener('click', () => { addMetric()?.focus(); dirty = true; });
+  $('#journal-form').addEventListener('input', event => {
+    dirty = true;
+    event.target.removeAttribute('aria-invalid');
+    refreshSymptoms();
+  });
+
+  function readField(input, label, parse) {
+    try { return parse(input.value); }
+    catch (error) {
+      const group = input.closest('details');
+      if (group) group.open = true;
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-errormessage', 'entry-error');
+      input.focus();
+      throw new Error(`${label}: ${error.message}`);
+    }
+  }
   $('#journal-form').addEventListener('submit', event => {
     event.preventDefault(); $('#entry-error').hidden = true;
     try {
       if (!canEdit()) throw new Error('Einträge können nur am aktiven Master bearbeitet werden. Dein Entwurf bleibt geöffnet.');
       const metrics = [];
+      for (const [kind, input] of standardInputs) {
+        if (input.value.trim()) metrics.push(readField(input, METRICS[kind].label, raw => normalizeMetric({ kind, value: parseMeasurement(raw) })));
+      }
       for (const row of rows) {
         if (!row.value.value.trim()) {
           if (row.select.value === 'custom' && (row.name.value.trim() || row.unit.value.trim())) throw new Error('Bitte auch einen Wert für deine eigene Messgröße eingeben.');
           continue;
         }
-        metrics.push(normalizeMetric({ kind: row.select.value, label: row.name.value, unit: row.unit.value, value: parseMeasurement(row.value.value) }));
+        const kind = row.select.value;
+        metrics.push(readField(row.value, METRICS[kind]?.label ?? 'Eigener Messwert', raw => normalizeMetric({ kind, label: row.name.value, unit: row.unit.value, value: parseMeasurement(raw) })));
       }
       const entries = getJournal();
       if (editing && !entries.some(entry => entry.id === editing.id && entry.updatedAt === editing.updatedAt)) throw new Error('Dieser Eintrag wurde inzwischen geändert. Kopiere deinen Entwurf und öffne die aktuelle Fassung erneut.');
       const draft = { date: $('#entry-date').value, time: $('#entry-time').value, text: $('#entry-text').value, symptoms: parseLabels($('#entry-symptoms').value), tags: parseLabels($('#entry-tags').value), metrics };
-      const values = Object.fromEntries(Object.keys(CHECKIN_FIELDS).map(key => [key, $('#checkin-' + key).value]));
-      saveJournal(checkinMode ? upsertCheckin(entries, draft, values, editing) : upsertEntry(entries, draft, editing));
-      dirty = false; $('#journal-dialog').close(); render(); notify(checkinMode ? 'Dein Check-in ist lokal im Journal gespeichert.' : 'Dein Journaleintrag ist lokal gespeichert.');
+      const values = $('#entry-checkin').disabled ? {} : Object.fromEntries(Object.keys(CHECKIN_FIELDS).map(key => [key, $('#checkin-' + key).value]));
+      if (values.sleep?.trim()) readField($('#checkin-sleep'), 'Schlaf', sleep => checkinMetrics({ sleep }));
+      const structured = editing ? isCheckinEntry(editing) : Object.values(values).some(value => value.trim());
+      saveJournal(structured ? upsertCheckin(entries, draft, values, editing) : upsertEntry(entries, draft, editing));
+      dirty = false; $('#journal-dialog').close(); render(); notify('Dein Eintrag ist lokal gespeichert.');
     } catch (error) { $('#entry-error').textContent = error.message; $('#entry-error').hidden = false; }
   });
 
@@ -181,8 +230,6 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   }
   function render() {
     const entries = getJournal();
-    const todays = filterEntries(entries, { type: 'checkin', from: todayISO(), to: todayISO() });
-    $('#checkin-today-status').textContent = todays.length ? `Heute ${todays.length} ${todays.length === 1 ? 'Check-in' : 'Check-ins'}${todays[0].time ? ` · zuletzt ${todays[0].time} Uhr` : ''}. Du kannst jederzeit eine weitere Beobachtung ergänzen.` : 'Stimmung, Energie, Schlaf und Beschwerden – du entscheidest, was du festhältst.';
     const tags = [...new Set(entries.filter(e => !e.deletedAt || $('#journal-archived').checked).flatMap(e => e.tags))].sort((a, b) => a.localeCompare(b, 'de'));
     const currentTag = $('#journal-tag').value;
     $('#journal-tag').replaceChildren();
@@ -197,14 +244,28 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     const allSymptoms = document.createElement('option'); allSymptoms.value = ''; allSymptoms.textContent = 'Alle Symptome'; $('#journal-symptom').append(allSymptoms);
     for (const option of options) { const item = document.createElement('option'); item.value = option.key; item.textContent = option.label; $('#journal-symptom').append(item); }
     $('#journal-symptom').value = currentSymptom;
-    filtered = filterEntries(entries, { search: $('#journal-search').value, tag: $('#journal-tag').value, symptom: currentSymptom, type: $('#journal-type').value, from: $('#journal-from').value, to: $('#journal-to').value, archived: $('#journal-archived').checked });
+    const filters = { search: $('#journal-search').value.trim(), tag: $('#journal-tag').value, symptom: currentSymptom, type: $('#journal-type').value, from: $('#journal-from').value, to: $('#journal-to').value, archived: $('#journal-archived').checked };
+    filtered = filterEntries(entries, filters);
     const filterCount = ['journal-search', 'journal-tag', 'journal-symptom', 'journal-type', 'journal-from', 'journal-to'].filter(id => $('#' + id).value.trim()).length + Number($('#journal-archived').checked);
     $('#journal-filter-count').textContent = filterCount ? String(filterCount) + " aktiv" : '';
     $('#journal-reset').disabled = !filterCount;
     $('#journal-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'Eintrag' : 'Einträge'}`;
     $('#journal-permission').textContent = canEdit() ? 'Deine Einträge werden auf diesem Gerät gespeichert.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls den aktiven Master. Vorhandene Einträge bleiben lesbar.';
+    $('#journal-permission').hidden = canEdit();
     $('#entry-save').disabled = !canEdit();
     $('#journal-export').disabled = !filtered.length;
+    const { from, to, symptom, type, tag, search, archived } = filters;
+    const dateLabel = value => /^\d{4}-\d{2}-\d{2}$/.test(value) ? formatDate(value) : value;
+    const range = from && to ? (from === to ? dateLabel(from) : `${dateLabel(from)} – ${dateLabel(to)}`) : from ? `Ab ${dateLabel(from)}` : to ? `Bis ${dateLabel(to)}` : '';
+    const context = [range, symptom ? $('#journal-symptom').selectedOptions[0]?.textContent : '', type ? 'Befinden' : '', tag ? `#${tag}` : '', search ? `Suche „${search}“` : '', archived ? 'Mit Archiv' : ''].filter(Boolean).join(' · ');
+    $('#journal-filter-context').textContent = context;
+    $('#journal-active-filters').hidden = !context;
+    const trendContext = $('#journal-trend-filter-context');
+    trendContext.replaceChildren(); trendContext.hidden = !context;
+    if (context) {
+      const reset = node('button', 'text-link', 'Filter zurücksetzen'); reset.type = 'button'; reset.addEventListener('click', clearFilters);
+      trendContext.append(node('p', '', context), reset);
+    }
     const list = $('#journal-entries'); list.replaceChildren();
     if (!filtered.length) list.append(node('div', 'journal-empty', entries.length ? 'Keine Einträge für diese Filter. Probiere einen anderen Zeitraum oder zeige archivierte Einträge an.' : 'Dein Journal beginnt mit deinem ersten Eintrag. Halte fest, was dich bewegt – mit Worten, Symptomen oder Messwerten.'));
     for (const entry of filtered) {
@@ -212,7 +273,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
       const header = node('div', 'journal-entry-header');
       const date = node('div'); const title = node('h3', '', formatDate(entry.date)); date.append(title);
       const week = weekOnDate(entry.date);
-      date.append(node('p', 'journal-entry-meta', [isCheckinEntry(entry) ? 'Tages-Check-in' : '', entry.time ? `${entry.time} Uhr` : '', week, entry.deletedAt ? 'Archiviert' : ''].filter(Boolean).join(' · ')));
+      date.append(node('p', 'journal-entry-meta', [isCheckinEntry(entry) ? 'Befinden' : '', entry.time ? `${entry.time} Uhr` : '', week, entry.deletedAt ? 'Archiviert' : ''].filter(Boolean).join(' · ')));
       const actions = node('div', 'journal-entry-actions');
       if (canEdit()) {
         if (!entry.deletedAt) { const edit = node('button', 'text-link', 'Bearbeiten'); edit.type = 'button'; edit.addEventListener('click', () => open(entry)); actions.append(edit); }
@@ -227,8 +288,11 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
       const data = readCheckin(entry);
       if (data) {
         const observations = node('dl', 'entry-measurements checkin-values');
-        for (const [key, field] of Object.entries(CHECKIN_FIELDS)) { const group = node('div'); group.append(node('dt', '', field.label), node('dd', '', data.invalid.includes(key) ? 'Angabe nicht auswertbar' : Object.hasOwn(data.values, key) ? checkinValue(key, data.values[key]) : 'Nicht angegeben')); observations.append(group); }
-        card.append(observations);
+        for (const [key, field] of Object.entries(CHECKIN_FIELDS)) {
+          if (!data.invalid.includes(key) && !Object.hasOwn(data.values, key)) continue;
+          const group = node('div'); group.append(node('dt', '', field.label), node('dd', '', data.invalid.includes(key) ? 'Angabe nicht auswertbar' : checkinValue(key, data.values[key]))); observations.append(group);
+        }
+        if (observations.children.length) card.append(observations);
       }
       const otherMetrics = entry.metrics.filter(metric => !isCheckinMetric(entry, metric));
       if (otherMetrics.length) { const measurements = node('dl', 'entry-measurements'); for (const metric of otherMetrics) { const group = node('div'); group.append(node('dt', '', metric.label), node('dd', '', `${number(metric.value)} ${metric.unit}`.trim())); measurements.append(group); } card.append(measurements); }
@@ -251,12 +315,11 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     }
     $('#journal-symptom').value = symptom;
     $('#journal-type').value = type;
-    $('#journal-from').value = from; $('#journal-to').value = to; $('#journal-filter-panel').open = true; render();
+    $('#journal-from').value = from; $('#journal-to').value = to; $('#journal-filter-panel').open = false; render();
   }
   return {
     render,
-    openForDate: date => open(null, date),
-    checkinForDate: date => open(null, date, true),
+    openForDate: (date, start) => open(null, date, start),
     editEntry: id => { const entry = getJournal().find(item => item.id === id && !item.deletedAt); if (entry) open(entry); },
     filterDate: date => filterRange(date, date),
     filterRange,

@@ -6,7 +6,7 @@ Stand: **20.11.2026**. Arbeitsübersicht für die nächsten Erweiterungen von ba
 
 Checkboxen markieren abgeschlossene Features. **P1** = zuerst, **P2** = danach, **P3** = spätere Erweiterung. Die Kennungen bleiben bei einer Umpriorisierung erhalten. Ein Feature wird erst abgehakt, wenn seine Abschlusskriterien und die gemeinsamen Kriterien erfüllt sind; ein begonnener Eintrag erhält den Zusatz „In Arbeit“.
 
-**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0050 abgeglichen:** F01–F06, F09, F12–F16 und F18–F23 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F08, F10 und F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs. „Umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
+**Aktueller Umsetzungsstand, mit Code und AgDRs bis 0053 abgeglichen:** F01–F06, F09, F12–F16 und F18–F23 sind umgesetzt. F07 und F17 sind teilweise umgesetzt und bleiben offen. F08, F10 und F11 sind noch nicht umgesetzt. Verbleibende Geräte-/Browserprüfungen und Veröffentlichungsgrenzen stehen in den jeweiligen AgDRs. „Umgesetzt“ beschreibt keine bestätigte Veröffentlichung oder Nutzerfreigabe.
 
 ## Geklärt und bereits vorhanden
 
@@ -157,3 +157,5 @@ Ungenutzte alte Illustrationen und Server-Sync-Oberfläche entfernt; aktuelle Bi
 Umfang, Quellen, PDF-Prüfung und verbleibende Geräteprüfungen: [AgDR-0042](agdr/0042-termin-pdf-und-kompakter-vorsorgekalender.md).
 
 Kalender und Journal: Eine Wochenansicht verbindet die SSW mit ihrem Zeitraum, den Tagesdaten, Symptomen und Messwerten. Der Monat, der gewählte Tag und der Vorsorge-Vorausblick haben eine kompakte Anordnung. Die Illustration steht in der verlinkten Wochenreise. [AgDR-0044](agdr/0044-kalender-mit-gemeinsamer-wochenansicht.md)
+
+Mobile Neuordnung: „Für dich“ ist der Hauptbereich für Einträge, Messwerte, Wochenrückblick und Körperinfos. Vier feste Messfelder und freiwillige Angaben zum Befinden stehen im gemeinsamen Formular. Der Kalender bietet Monat und Woche an, die Vorsorge beginnt beim nächsten eigenen Termin. [AgDR-0053](agdr/0053-mobile-neuordnung-und-gemeinsame-erfassung.md)

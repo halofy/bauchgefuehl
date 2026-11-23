@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLabels, parseMeasurement, normalizeMetric, normalizeEntry, normalizeJournal, upsertEntry, archiveEntry, assertJournalContinuity, filterEntries, metricKey, metricSeries, journalCsv } from '../src/journal.js';
+import { parseLabels, parseMeasurement, formatMeasurementInput, normalizeMetric, normalizeEntry, normalizeJournal, upsertEntry, archiveEntry, assertJournalContinuity, filterEntries, metricKey, metricSeries, journalCsv } from '../src/journal.js';
 import { writeLocal, readLocal, STORAGE_KEY, HISTORY_KEY, encodeShare, decodeShare } from '../src/pregnancy.js';
 import { snapshot } from '../src/sync.js';
 
@@ -23,6 +23,8 @@ test('symptoms and tags accept free labels and normalize hashes and duplicates',
 test('measurements accept decimal commas and dots, including custom units', () => {
   assert.equal(parseMeasurement(' 65,5 '), 65.5);
   assert.equal(parseMeasurement('0.75'), .75);
+  assert.equal(formatMeasurementInput(1234.56789), '1234,56789');
+  for (const value of [0, 65.55, 0.000000123, 1234.56789]) assert.equal(parseMeasurement(formatMeasurementInput(value)), value);
   assert.equal(normalizeMetric({ kind: 'weight', value: 65, unit: 'lb', label: 'fremd' }).unit, 'kg');
   assert.deepEqual(normalizeMetric({ kind: 'custom', value: -2, label: 'Differenz', unit: 'cm' }), { kind: 'custom', value: -2, label: 'Differenz', unit: 'cm' });
   for (const value of ['', '1,2,3', '65kg', 'NaN', 'Infinity', '1e9', '1000001']) assert.throws(() => parseMeasurement(value));

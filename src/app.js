@@ -42,6 +42,7 @@ let guideUi = null;
 let reportUi = null;
 let birthUi = null;
 let motherUi = null;
+let motherWeek = null;
 let careUi = null;
 let companionUi = null;
 
@@ -201,18 +202,27 @@ function renderWeeks(center = false) {
   const content = getWeekContent(selectedWeek);
   $('#development-title').textContent = content.title;
   $('#baby-description').textContent = content.baby;
-  motherUi?.render(selectedWeek);
+  $('#journey-week-range').textContent = weekDateRange(selectedWeek, calculated.dueDate);
   $('#phase-size').textContent = content.size;
   $('#phase-comparison').textContent = content.comparison;
   companionUi?.renderGrowth(selectedWeek, calculated.gestationalDays);
   $('#development-source').href = content.source;
   $('#development-source').textContent = `Entwicklung in dieser Phase · ${selectedWeek <= 40 ? 'BIÖG' : 'NHS'} ↗`;
-  if (center) {
-    const chosen = $(`.week-button[data-week="${selectedWeek}"]`);
-    const list = $('#week-list');
-    // Scroll only the week strip; never move the document during data entry.
-    list.scrollTo({ left: chosen.offsetLeft - list.offsetLeft - list.clientWidth / 2 + chosen.clientWidth / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  }
+  if (center) centerWeekStrip();
+}
+
+function weekDateRange(week, dueDate = calculatePregnancy(state.profile, today).dueDate) {
+  const start = addDays(dueDate, (week - 1) * 7 - 280);
+  const end = addDays(start, 6);
+  return `${formatDate(start, { month: 'short', year: start.slice(0, 4) === end.slice(0, 4) ? undefined : 'numeric' })} – ${formatDate(end, { month: 'short' })}`;
+}
+
+function centerWeekStrip() {
+  const chosen = $(`.week-button[data-week="${selectedWeek}"]`);
+  const list = $('#week-list');
+  if (!chosen || !list.clientWidth) return;
+  const offset = chosen.getBoundingClientRect().left - list.getBoundingClientRect().left;
+  list.scrollTo({ left: list.scrollLeft + offset - (list.clientWidth - chosen.clientWidth) / 2, behavior: 'instant' });
 }
 
 function selectWeek(week) {
@@ -279,6 +289,7 @@ function render(center = false) {
   renderMode();
   renderSummary();
   renderWeeks(center);
+  if (motherWeek !== null) motherUi?.render(motherWeek, weekDateRange(motherWeek));
   renderCare();
   journalUi?.render();
   calendarUi?.render();
@@ -590,7 +601,7 @@ careUi = setupPersonalCare({ storage, getMode: () => state.mode,
   onRefresh() { calendarUi?.render(); reportUi?.refreshIfOpen(); companionUi?.render(); companionUi?.refreshConversation(); },
   notify: toast,
   openConversation: id => companionUi?.openConversation(id),
-  openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); $('#calendar-selected-date').scrollIntoView({ behavior: 'instant' }); },
+  openCalendar(date) { showAppPanel('kalender', true); calendarUi.showDate(date); $('#calendar-selected-date').scrollIntoView({ behavior: 'instant' }); },
 });
 function refreshPersonalContext() {
   if(!['shared','session'].includes(state.mode)) {
@@ -616,7 +627,6 @@ guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mod
 reportUi = setupReport({ getJournal: () => state.journal, getCare: () => careUi.getData(), getToday: () => today, notify: toast });
 journalUi = setupJournal({
   getJournal: () => state.journal,
-  onOpen: () => calendarUi?.showJournal(),
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
   saveJournal: saveJournalEntries,
@@ -641,11 +651,14 @@ calendarUi = setupCalendar({
   openAppointmentNotes(id) { showAppPanel('vorsorge', true); careUi.openNote(id); },
   openCare() { showAppPanel('vorsorge', true); $('#personal-care-panel').scrollIntoView({ behavior: 'instant' }); },
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
-  addEntry: date => journalUi.openForDate(date),
-  addCheckin: date => journalUi.checkinForDate(date),
+  addEntry: (date, start) => journalUi.openForDate(date, start),
   editEntry: id => journalUi.editEntry(id),
-  showEntries: date => journalUi.filterDate(date),
-  showEntriesRange: (from, to, symptom, type) => journalUi.filterRange(from, to, symptom, type),
+  openAppointment: id => companionUi.openConversation(id),
+  showEntries(from, to, symptom, type) {
+    journalUi.filterRange(from, to, symptom, type);
+    openPersonalView('entries');
+  },
+  showReflection: () => openPersonalView('reflection'),
   showGuide(date) {
     guideUi.setDate(date); showAppPanel('wissen', true);
     $('#everyday-guide').scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -653,7 +666,6 @@ calendarUi = setupCalendar({
   },
   showWeek(week) {
     showAppPanel('wochenreise', true); selectWeek(week);
-    motherUi.show('baby');
     $('#wochenreise').scrollIntoView({ behavior: 'instant', block: 'start' });
   },
 });
@@ -684,8 +696,34 @@ birthUi = setupBirth({
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
   isPostpartum: () => companionUi?.isPostpartum(),
   saveJournal: saveJournalEntries, notify: toast,
-  openCalendar(date) { showAppPanel('journal', true); calendarUi.showDate(date); document.getElementById('calendar-view').scrollIntoView({ behavior: 'instant' }); },
+  openCalendar(date) { showAppPanel('kalender', true); calendarUi.showDate(date); document.getElementById('calendar-view').scrollIntoView({ behavior: 'instant' }); },
 });
-motherUi = setupMother({ openCurrentWeek() { showAppPanel('wochenreise', true); selectWeek(currentWeek()); } });
+motherUi = setupMother();
+function openPersonalView(view, week = currentWeek(), focusPane = true) {
+  if (view === 'mother') {
+    motherWeek = week;
+    motherUi.render(week, weekDateRange(week));
+  }
+  for (const pane of $$('[data-personal-pane]')) pane.hidden = pane.dataset.personalPane !== view;
+  for (const button of $$('[data-personal-view]')) button.setAttribute('aria-pressed', String(button.dataset.personalView === view));
+  showAppPanel('fuer-dich', true);
+  if (focusPane) {
+    const heading = $(`[data-personal-pane="${view}"] h3`);
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
+}
+for (const button of $$('[data-personal-view]')) button.addEventListener('click', () => openPersonalView(button.dataset.personalView, currentWeek(), false));
+$('#journey-mother-link').addEventListener('click', () => openPersonalView('mother', selectedWeek));
+$('[data-scroll="wochenreise"]').addEventListener('click', centerWeekStrip);
+for (const link of $$('[data-care-area]')) link.addEventListener('click', event => {
+  event.preventDefault();
+  const destination = document.getElementById(link.dataset.careArea);
+  if (!destination || !destination.getClientRects().length) return;
+  destination.tabIndex = -1;
+  destination.focus({ preventScroll: true });
+  destination.scrollIntoView({ behavior: 'instant', block: 'start' });
+});
 readIncomingLink();
 render(true);

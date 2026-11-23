@@ -3,7 +3,7 @@ import { symptomKey } from './journal.js';
 import { weeklySummary, symptomMentions } from './reflection.js';
 import { checkinValue } from './checkin.js';
 
-export function setupReflection({ getSelected, getToday, getJournal, getSymptom, getPeriod, chooseDate, openDay, openEntries }) {
+export function setupReflection({ getSelected, getToday, getJournal, getSymptom, getPeriod, chooseDate, openDay, openEntries, dayLabels }) {
   const $ = id => document.getElementById(id);
   const node = (tag, className = '', text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
   const count = (value, one, many) => `${value} ${value === 1 ? one : many}`;
@@ -29,6 +29,7 @@ export function setupReflection({ getSelected, getToday, getJournal, getSymptom,
     const sameYear = summary.from.slice(0, 4) === summary.to.slice(0, 4);
     const from = sameYear ? formatDate(summary.from, { month: 'short', year: undefined }) : shortDate(summary.from);
     $('reflection-period').textContent = summary.from === summary.to ? shortDate(summary.to) : `${from} – ${shortDate(summary.to)}`;
+    $('personal-reflection-period').textContent = `${$('reflection-title').textContent} · ${$('reflection-period').textContent}`;
     $('reflection-prev').disabled = !dateAllowed(step(-1));
     $('reflection-next').disabled = !dateAllowed(step(1));
     const coverage = summary.entries.length
@@ -42,21 +43,28 @@ export function setupReflection({ getSelected, getToday, getJournal, getSymptom,
     for (const day of summary.days) {
       const matches = symptomMentions(day.entries, symptom);
       const item = button('', () => openDay(day.date), `reflection-day reflection-${day.state}${matches ? ' has-symptom' : ''}`);
+      item.dataset.calendarDate = day.date;
       item.classList.toggle('selected', day.date === getSelected());
       item.setAttribute('aria-pressed', String(day.date === getSelected()));
       item.disabled = !dateAllowed(day.date);
       item.append(node('span', '', formatDate(day.date, { weekday: 'short', day: undefined, month: undefined, year: undefined })));
       item.append(node('strong', 'reflection-day-date', String(Number(day.date.slice(-2)))));
       const state = day.state === 'future' ? 'Zukünftig' : day.state === 'missing' ? 'Kein Eintrag' : count(day.entries.length, 'Eintrag', 'Einträge');
+      const labels = dayLabels(day.date);
       item.append(node('span', 'reflection-day-count', day.entries.length ? String(day.entries.length) : '–'));
-      item.setAttribute('aria-label', `${formatDate(day.date, { weekday: 'long' })}: ${state}${matches ? `, ${matches} Beobachtungen ${symptom ? 'zum gewählten Symptom' : 'mit Symptomen'}` : ''}. Tagesdetails öffnen.`);
+      if (labels.length) {
+        const markers = node('span', 'reflection-day-events'); markers.setAttribute('aria-hidden', 'true');
+        for (const mark of new Map(labels.map(mark => [mark.type, mark])).values()) markers.append(node('span', `calendar-mark calendar-mark-${mark.type}`, mark.marker));
+        item.append(markers);
+      }
+      item.setAttribute('aria-label', `${formatDate(day.date, { weekday: 'long' })}: ${[state, ...labels.map(mark => mark.label)].join(' · ')}${matches ? `, ${matches} Beobachtungen ${symptom ? 'zum gewählten Symptom' : 'mit Symptomen'}` : ''}. Tagesdetails öffnen.`);
       days.append(item);
     }
     $('reflection-open-entries').hidden = !summary.entries.length;
     $('reflection-open-entries').onclick = () => openEntries(summary.from, summary.to, '');
     const checkins = summary.checkins;
     $('reflection-checkin-panel').hidden = !checkins.count;
-    $('reflection-checkin-title').textContent = count(checkins.count, 'Check-in', 'Check-ins');
+    $('reflection-checkin-title').textContent = `Befinden · ${count(checkins.count, 'Eintrag', 'Einträge')}`;
     $('reflection-checkin-coverage').textContent = `${count(checkins.count, 'Check-in', 'Check-ins')} an ${count(checkins.dayCount, 'Tag', 'Tagen')} · ${count(checkins.missingDays, 'verstrichener Tag ohne Check-in', 'verstrichene Tage ohne Check-in')}${checkins.futureDays ? ` · ${checkins.futureDays} Tage liegen noch vor dir` : ''}. Leere Felder bleiben fehlend. Schlafangaben können sich auf überlappende 24 Stunden beziehen; sie werden nicht addiert. Die Symptomauswahl ändert diese Übersicht nicht.`;
     const checkinList = $('reflection-checkins'); checkinList.replaceChildren();
     for (const field of checkins.fields) {

@@ -29,6 +29,8 @@
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.7 5.3a5.5 5.5 0 0 0-7.8 0l-.9.9-.9-.9a5.5 5.5 0 0 0-7.8 7.8L12 22l8.7-8.9a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14l-1 7Z"/></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></symbol>
+    <symbol id="i-care" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3h6v2m-6 6 2 2 4-4m-6 8h6"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol>
@@ -39,11 +41,11 @@
     <div class="header-inner"><button id="app-back" class="icon-button app-back" type="button" aria-label="Zurück" hidden>‹</button>
       <a class="brand" href="./" aria-label="bauchgefühl – Startseite"><span class="brand-mark"><svg><use href="#i-leaf"/></svg></span>bauchgefühl<span class="brand-dot">.</span></a>
       <nav class="main-nav" aria-label="Hauptnavigation">
-        <button type="button" class="nav-link active" data-scroll="ueberblick" aria-current="location"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>Überblick</span></button>
+        <button type="button" class="nav-link active" data-scroll="ueberblick" aria-current="location"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>Heute</span></button>
         <button type="button" class="nav-link" data-scroll="wochenreise"><svg aria-hidden="true"><use href="#i-leaf"/></svg><span>Wochenreise</span></button>
-        <button type="button" class="nav-link" data-scroll="journal"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Kalender</span></button>
-        <button type="button" class="nav-link" data-scroll="vorsorge"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Vorsorge</span></button>
-        <button type="button" class="nav-link" data-scroll="wissen"><svg aria-hidden="true"><use href="#i-book"/></svg><span>Wissen</span></button>
+        <button type="button" class="nav-link" data-scroll="fuer-dich"><svg aria-hidden="true"><use href="#i-person"/></svg><span>Für dich</span></button>
+        <button type="button" class="nav-link" data-scroll="kalender"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Kalender</span></button>
+        <button type="button" class="nav-link" data-scroll="vorsorge"><svg aria-hidden="true"><use href="#i-care"/></svg><span>Vorsorge</span></button>
       </nav>
       <button id="open-app" type="button" class="icon-button app-settings" aria-label="App installieren und Offline-Status"><svg aria-hidden="true"><use href="#i-info"/></svg></button>
       <button type="button" class="button button-outline header-share" data-action="share"><svg><use href="#i-share"/></svg><span>Reise teilen</span></button>
@@ -72,50 +74,48 @@
       <p id="medical-status" class="medical-status" role="status" hidden></p>
     </section>
 
-    <article data-mobile-panel="ueberblick" class="checkin-prompt card"><div><p class="eyebrow">EIN MOMENT FÜR DICH</p><h2>Wie geht es dir gerade?</h2><button type="button" class="text-link" data-mother-open>Wocheninfos für dich ansehen ↗</button><p id="checkin-today-status">Stimmung, Energie, Schlaf und Beschwerden – du entscheidest, was du festhältst.</p></div><button type="button" class="button button-primary" data-checkin-new>Tages-Check-in</button></article>
+    <div data-mobile-panel="ueberblick" class="today-knowledge"><button type="button" class="text-link" data-section-link="wissen">Wissen nachschlagen <span aria-hidden="true">›</span></button></div>
     <div data-mobile-panel="ueberblick" class="quick-help"><button type="button" class="button button-outline" data-action="birth">Hilfe &amp; Kontakte</button><button type="button" class="button button-outline" data-action="birth" data-birth-view="tracker">Wehen messen</button></div>
     <aside data-mobile-panel="ueberblick" class="sync-strip" aria-label="Geräteverbindung"><div><strong id="sync-role">Geräte verbinden</strong><p id="sync-status" role="status">Alles lokal. Stand bei Bedarf verschlüsselt weitergeben.</p></div><button id="open-sync" type="button" class="button button-outline"><svg><use href="#i-share"/></svg>Daten &amp; Backup</button></aside>
 
     <section id="wochenreise" class="journey section" aria-labelledby="journey-title">
-      <div class="section-heading"><div><p class="eyebrow">WOCHE FÜR WOCHE</p><h2 id="journey-title">Für dich. Und dein Baby.</h2></div><button id="today-week" class="text-link">Zur aktuellen Woche <svg><use href="#i-arrow"/></svg></button></div>
+      <div class="section-heading"><div><h2 id="journey-title">Wochenreise</h2></div><button id="today-week" class="text-link">Zur aktuellen Woche <svg><use href="#i-arrow"/></svg></button></div>
       <div class="week-browser"><button id="week-prev" class="icon-button week-arrow previous" aria-label="Vorherige Schwangerschaftswoche"><svg><use href="#i-chevron"/></svg></button><div id="week-list" class="week-list" role="group" aria-label="Schwangerschaftswoche auswählen"></div><button id="week-next" class="icon-button week-arrow" aria-label="Nächste Schwangerschaftswoche"><svg><use href="#i-chevron"/></svg></button></div>
-      <div id="journey-week-context" class="journey-week-context"><span id="selected-week-label" class="pill pill-sage">19. SSW</span><span id="selected-current" class="current-label">Deine aktuelle Woche</span></div>
-      <div class="journey-tabs" role="tablist" aria-label="Wocheninfos für dein Baby oder für dich"><button id="journey-baby-tab" type="button" role="tab" aria-selected="true" aria-controls="journey-baby-panel">Dein Baby</button><button id="journey-mother-tab" type="button" role="tab" aria-selected="false" aria-controls="journey-mother-panel" tabindex="-1">Für dich</button></div>
+      <div id="journey-week-context" class="journey-week-context"><span id="selected-week-label" class="pill pill-sage">19. SSW</span><span id="selected-current" class="current-label">Deine aktuelle Woche</span><span id="journey-week-range" class="field-hint"></span><button type="button" class="text-link" id="journey-mother-link">Für dich in dieser Woche <span aria-hidden="true">›</span></button></div>
       <div class="journey-panels">
-        <section id="journey-baby-panel" class="development card" role="tabpanel" aria-labelledby="journey-baby-tab" tabindex="0"><p class="eyebrow">DEIN BABY</p><h3 id="development-title">Kleine Bewegungen, großes Gefühl</h3><p id="baby-description" class="baby-description"></p><div class="development-bottom"><div class="size-badge"><svg><use href="#i-leaf"/></svg></div><div><strong id="phase-size"></strong><p id="phase-comparison"></p></div></div><a id="development-source" class="source-link" href="https://www.familienplanung.de/schwangerschaft/schwangerschaftswochen/" target="_blank" rel="noopener noreferrer">Entwicklung in dieser Phase · BIÖG ↗</a></section>
-        <section id="journey-mother-panel" class="body-card mother-card card" role="tabpanel" aria-labelledby="journey-mother-tab" tabindex="0" hidden><p class="eyebrow">FÜR DICH</p><h3 id="mother-title">Dein eigenes Tempo.</h3><p id="mother-phase" class="mother-phase"></p><p id="body-description"></p><div class="gentle-tip"><svg><use href="#i-spark"/></svg><div><strong>Ein kleiner Wochenimpuls</strong><p id="week-tip"></p></div></div><a id="mother-body-source" class="source-link" href="https://www.familienplanung.de/schwangerschaft/schwangerschaftswochen/" target="_blank" rel="noopener noreferrer">Quelle zum Körpertext ↗</a><div id="mother-topics" class="mother-topics"></div><div class="mother-reflection"><p class="eyebrow">EINE FRAGE FÜR DICH</p><p id="mother-prompt"></p><button type="button" class="button button-outline" data-checkin-new>Check-in für heute öffnen</button></div><p id="mother-reviewed" class="content-note"></p></section>
+        <section id="journey-baby-panel" class="development card" aria-labelledby="development-title"><p class="eyebrow">DEIN BABY</p><h3 id="development-title">Kleine Bewegungen, großes Gefühl</h3><p id="baby-description" class="baby-description"></p><div class="development-bottom"><div class="size-badge"><svg><use href="#i-leaf"/></svg></div><div><strong id="phase-size"></strong><p id="phase-comparison"></p></div></div><a id="development-source" class="source-link" href="https://www.familienplanung.de/schwangerschaft/schwangerschaftswochen/" target="_blank" rel="noopener noreferrer">Entwicklung in dieser Phase · BIÖG ↗</a></section>
       </div>
       <p class="content-note">Die Wocheninfos beschreiben typische Entwicklungen innerhalb einer Phase. Jedes Baby wächst individuell; Größenvergleiche sind ungefähre Orientierung, keine Messwerte deines Babys.</p>
     </section>
 
-    <section id="journal" class="section journal-section" aria-labelledby="journal-title">
+    <section id="kalender" class="section journal-section" aria-labelledby="calendar-title">
       <div class="calendar-page-header">
-        <h2 id="journal-title">Kalender &amp; Journal</h2>
+        <h2 id="calendar-title">Kalender</h2>
         <div class="journal-view-switch" role="group" aria-label="Ansicht wechseln">
-          <button id="calendar-view-toggle" type="button" class="selected" aria-pressed="true" aria-controls="calendar-view">Kalender</button>
-          <button id="journal-view-toggle" type="button" aria-pressed="false" aria-controls="journal-list-view">Journal</button>
+          <button id="calendar-view-toggle" type="button" class="selected" aria-pressed="true" aria-controls="calendar-month-view">Monat</button>
+          <button id="week-view-toggle" type="button" aria-pressed="false" aria-controls="reflection">Woche</button>
         </div>
       </div>
       <div id="calendar-view">
-        <div class="calendar-layout card">
+            <div class="calendar-month-actions">
+              <button id="calendar-today" type="button" class="text-link">Heute</button>
+              <button id="calendar-due" type="button" class="text-link">Zum ET</button>
+              <button id="calendar-options-open" type="button" class="text-link" aria-haspopup="dialog">Datum oder SSW finden</button>
+            </div>
+            <p id="calendar-dating-short" class="field-hint" hidden></p>
+            <p id="calendar-care-error" class="form-error" role="status" hidden>Termindaten gerade nicht lesbar. Bitte sichere deine Daten und prüfe den Bereich „Vorsorge“.</p>
+        <div class="calendar-layout card" id="calendar-month-view">
           <section class="calendar-month-card" aria-labelledby="calendar-month-title">
             <div class="calendar-month-header">
               <button id="calendar-prev" type="button" class="icon-button" aria-label="Vorheriger Monat">‹</button>
               <h3 id="calendar-month-title" aria-live="polite"></h3>
               <button id="calendar-next" type="button" class="icon-button" aria-label="Nächster Monat">›</button>
             </div>
-            <div class="calendar-month-actions">
-              <button id="calendar-today" type="button" class="text-link">Heute</button>
-              <button id="calendar-due" type="button" class="text-link">Zum ET</button>
-              <button id="calendar-options-open" type="button" class="text-link" aria-haspopup="dialog">Suche &amp; Optionen</button>
-            </div>
-            <p id="calendar-dating-short" class="field-hint" hidden></p>
-            <p id="calendar-care-error" class="form-error" role="status" hidden>Termindaten gerade nicht lesbar. Bitte sichere deine Daten und prüfe den Bereich „Vorsorge“.</p>
             <div class="calendar-weekdays" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
             <div id="calendar-days" class="calendar-days" role="group" aria-labelledby="calendar-month-title"></div>
             <p class="calendar-legend">
-              <span><b class="calendar-mark-appointment">T</b> Termin</span>
-              <span><b class="calendar-mark-journal">J</b> Journal</span>
+              <span><b class="calendar-mark-appointment">T</b> Eigener Termin</span>
+              <span><b class="calendar-mark-journal">J</b> Eintrag</span>
               <span><b class="calendar-mark-care">V</b> Vorsorgebeginn</span>
               <span><b class="calendar-mark-point">◆</b> Meilenstein</span>
             </p>
@@ -132,10 +132,9 @@
             </div>
           </section>
         </div>
-        <section id="reflection" class="calendar-week-section" aria-labelledby="reflection-title">
+        <section id="reflection" class="calendar-week-section" aria-labelledby="reflection-title" hidden>
           <div class="calendar-week-hero">
             <div class="calendar-week-heading">
-              <p class="eyebrow">WOCHENANSICHT</p>
               <h3 id="reflection-title" tabindex="-1"></h3>
               <p id="reflection-period"></p>
               <div class="calendar-week-navigation" role="group" aria-label="Woche wechseln">
@@ -146,12 +145,52 @@
                 </label>
                 <button id="reflection-next" type="button" class="icon-button" aria-label="Nächste Woche">›</button>
               </div>
-              <button id="calendar-week-info" type="button" class="text-link">Zur Entwicklung</button>
+              <button id="calendar-week-info" type="button" class="text-link">Entwicklung dieser SSW</button>
             </div>
           </div>
           <div id="reflection-days" class="reflection-days" role="group" aria-label="Tage dieser Woche im Kalender öffnen"></div>
+          <p class="calendar-legend"><span><b class="calendar-mark-appointment">T</b> Eigener Termin</span><span><b class="calendar-mark-care">V</b> Vorsorgebeginn</span><span><b class="calendar-mark-point">◆</b> Meilenstein</span></p>
+          <button id="calendar-open-reflection" type="button" class="button button-outline">Wochenrückblick ansehen</button>
+        </section>
+        <details class="calendar-agenda" aria-labelledby="calendar-agenda-title">
+          <summary id="calendar-agenda-title">Vorausblick ab diesem Tag</summary>
+          <button id="calendar-open-care" type="button" class="text-link">Eigene Termine &amp; Fragen</button>
+          <p id="calendar-upcoming-from" class="content-note"></p>
+          <div id="calendar-upcoming" class="calendar-upcoming"></div>
+        </details>
+      </div>
+    </section>
+
+    <section id="fuer-dich" class="section personal-page" aria-labelledby="personal-title">
+      <h2 id="personal-title">Für dich</h2>
+      <div class="capture-actions">
+        <button type="button" class="button button-primary" data-entry-start="metrics">Messwerte eintragen</button>
+        <button type="button" class="button button-outline" data-entry-start="note">Heute festhalten</button>
+      </div>
+      <div class="personal-views" role="group" aria-label="Deine persönlichen Angaben">
+        <button type="button" class="text-link" data-personal-view="entries" aria-pressed="true" aria-controls="journal-list-view">Deine Einträge</button>
+        <button type="button" class="text-link" data-personal-view="metrics" aria-pressed="false" aria-controls="journal-trend-panel">Deine Messwerte</button>
+        <button type="button" class="text-link" data-personal-view="reflection" aria-pressed="false" aria-controls="personal-reflection">Wochenrückblick</button>
+        <button type="button" class="text-link" data-personal-view="mother" aria-pressed="false" aria-controls="journey-mother-panel">Dein Körper in dieser Woche</button>
+      </div>
+      <section id="journal-list-view" data-personal-pane="entries" aria-labelledby="journal-title">
+      <h3 id="journal-title">Deine Einträge</h3>
+      <div id="journal-active-filters" class="journal-active-filters" hidden><p id="journal-filter-context"></p><button id="journal-clear-context" class="text-link" type="button">Filter zurücksetzen</button></div>
+      <p id="journal-permission" class="content-note"></p>
+      <details id="journal-filter-panel" class="journal-filter-panel card" open><summary>Suchen &amp; filtern <span id="journal-filter-count"></span><span class="detail-plus" aria-hidden="true">+</span></summary><div class="journal-filters"><label class="journal-search-label" for="journal-search">Suchen<input id="journal-search" type="search" placeholder="Notiz, Symptom, Tag oder Messgröße …"></label><label for="journal-type">Eintragsart<select id="journal-type"><option value="">Alle Einträge</option><option value="checkin">Einträge zum Befinden</option></select></label><label for="journal-tag">Tag<select id="journal-tag"><option value="">Alle Tags</option></select></label><label for="journal-symptom">Symptom<select id="journal-symptom"><option value="">Alle Symptome</option></select></label><label for="journal-from">Von<input id="journal-from" type="date"></label><label for="journal-to">Bis<input id="journal-to" type="date"></label><label class="checkbox-label journal-archive-toggle"><input id="journal-archived" type="checkbox">Archivierte anzeigen</label><button id="journal-reset" type="button" class="button button-outline">Filter zurücksetzen</button></div></details>
+      <p id="journal-count" class="field-hint" role="status">0 Einträge</p>
+      <div id="journal-entries" class="journal-entries"></div>
+      <details class="more-panel journal-export-panel"><summary>Export &amp; Teilen</summary><div class="journal-export-actions"><button type="button" class="text-link" data-action="report">Ausgewählte Bereiche teilen ↗</button><button id="journal-export" type="button" class="text-link">Gefilterte Einträge als CSV exportieren ↗</button></div></details>
+      <p class="content-note">Einträge werden beim Archivieren ausgeblendet und bleiben wiederherstellbar. Die SSW-Zuordnung folgt deiner aktuellen Berechnungsgrundlage. Der Verlauf zeigt persönliche Messungen ohne Normalbereiche oder medizinische Bewertung.</p>
+      </section>
+      <section id="journal-trend-panel" class="journal-trend-panel card" data-personal-pane="metrics" aria-labelledby="journal-trend-title" hidden>
+        <h3 id="journal-trend-title">Deine Messwerte</h3>
+        <div class="journal-active-filters" id="journal-trend-filter-context" hidden></div>
+        <aside class="journal-trend"><label for="journal-metric">Messgröße<select id="journal-metric"></select></label><h3 id="journal-latest-value">Noch kein Messwert</h3><div id="journal-chart" class="journal-chart"></div><p id="journal-chart-caption"></p><details id="journal-metric-table" hidden><summary>Messwerte als Tabelle ansehen</summary><table><caption>Messwerte der gefilterten, nicht archivierten Einträge</caption><thead><tr><th scope="col">Datum</th><th scope="col">Zeit</th><th scope="col">Wert</th></tr></thead><tbody id="journal-metric-table-body"></tbody></table></details></aside>
+      </section>
+      <section id="personal-reflection" class="calendar-week-section" data-personal-pane="reflection" aria-labelledby="personal-reflection-title" hidden>
           <header class="calendar-week-records">
-            <h4>Journal &amp; Messwerte</h4>
+            <h3 id="personal-reflection-title">Wochenrückblick</h3><p id="personal-reflection-period" class="field-hint"></p>
             <p id="reflection-coverage" class="reflection-coverage" role="status"></p>
           </header>
           <div class="reflection-columns">
@@ -162,30 +201,47 @@
             <summary id="reflection-checkin-title">Check-ins</summary>
             <p id="reflection-checkin-coverage" class="content-note"></p>
             <div id="reflection-checkins" class="reflection-checkins"></div>
-            <button id="reflection-open-checkins" type="button" class="text-link">Check-ins im Journal öffnen</button>
+            <button id="reflection-open-checkins" type="button" class="text-link">Einträge zum Befinden öffnen</button>
           </details>
-          <button id="reflection-open-entries" class="text-link" type="button">Einträge dieser Woche im Journal öffnen</button>
-        </section>
-        <section class="calendar-agenda" aria-labelledby="calendar-agenda-title">
-          <header><h3 id="calendar-agenda-title">Vorsorge im Voraus</h3><button id="calendar-open-care" type="button" class="text-link">Termine &amp; Fragen</button></header>
-          <p id="calendar-upcoming-from" class="content-note"></p>
-          <div id="calendar-upcoming" class="calendar-upcoming"></div>
-        </section>
-      </div>
-      <div id="journal-list-view" hidden>
-      <div class="journal-list-actions">
-        <button id="journal-new" class="button button-primary" type="button">Eintrag hinzufügen</button>
-        <button type="button" class="button button-outline" data-checkin-new>Check-in erfassen</button>
-      </div>
-      <p id="journal-permission" class="content-note"></p>
-      <details id="journal-filter-panel" class="journal-filter-panel card" open><summary>Suchen &amp; filtern <span id="journal-filter-count"></span><span class="detail-plus" aria-hidden="true">+</span></summary><div class="journal-filters"><label class="journal-search-label" for="journal-search">Suchen<input id="journal-search" type="search" placeholder="Notiz, Symptom, Tag oder Messgröße …"></label><label for="journal-type">Eintragsart<select id="journal-type"><option value="">Alle Einträge</option><option value="checkin">Tages-Check-ins</option></select></label><label for="journal-tag">Tag<select id="journal-tag"><option value="">Alle Tags</option></select></label><label for="journal-symptom">Symptom<select id="journal-symptom"><option value="">Alle Symptome</option></select></label><label for="journal-from">Von<input id="journal-from" type="date"></label><label for="journal-to">Bis<input id="journal-to" type="date"></label><label class="checkbox-label journal-archive-toggle"><input id="journal-archived" type="checkbox">Archivierte anzeigen</label><button id="journal-reset" type="button" class="button button-outline">Filter zurücksetzen</button></div></details>
-      <div class="journal-toolbar"><span id="journal-count" role="status">0 Einträge</span><div class="journal-export-actions"><button type="button" class="text-link" data-action="report">Ausgewählte Bereiche teilen ↗</button><button id="journal-export" type="button" class="text-link">Gefilterte Einträge als CSV exportieren ↗</button></div></div>
-      <div class="journal-layout"><div id="journal-entries" class="journal-entries"></div><details id="journal-trend-panel" class="journal-trend-panel card" open><summary>Messwertverlauf<span class="detail-plus" aria-hidden="true">+</span></summary><aside class="journal-trend"><p class="eyebrow">DEIN MESSWERTVERLAUF</p><label for="journal-metric">Messgröße<select id="journal-metric"></select></label><h3 id="journal-latest-value">Noch kein Messwert</h3><div id="journal-chart" class="journal-chart"></div><p id="journal-chart-caption"></p><details id="journal-metric-table" hidden><summary>Messwerte als Tabelle ansehen</summary><table><caption>Messwerte der gefilterten, nicht archivierten Einträge</caption><thead><tr><th scope="col">Datum</th><th scope="col">Zeit</th><th scope="col">Wert</th></tr></thead><tbody id="journal-metric-table-body"></tbody></table></details></aside></details></div>
-      <p class="content-note">Einträge werden beim Archivieren ausgeblendet und bleiben wiederherstellbar. Die SSW-Zuordnung folgt deiner aktuellen Berechnungsgrundlage. Der Verlauf zeigt persönliche Messungen ohne Normalbereiche oder medizinische Bewertung.</p>
-      </div>
+          <button id="reflection-open-entries" class="text-link" type="button">Einträge dieser Woche öffnen</button>
+      </section>
+      <section id="journey-mother-panel" class="body-card mother-card card" data-personal-pane="mother" aria-labelledby="mother-panel-title" hidden><h3 id="mother-panel-title">Dein Körper in dieser Woche</h3><p id="personal-mother-week" class="field-hint"></p><h4 id="mother-title">Dein eigenes Tempo.</h4><p id="mother-phase" class="mother-phase"></p><p id="body-description"></p><div class="gentle-tip"><svg><use href="#i-spark"/></svg><div><strong>Ein kleiner Wochenimpuls</strong><p id="week-tip"></p></div></div><a id="mother-body-source" class="source-link" href="https://www.familienplanung.de/schwangerschaft/schwangerschaftswochen/" target="_blank" rel="noopener noreferrer">Quelle zum Körpertext ↗</a><div id="mother-topics" class="mother-topics"></div><div class="mother-reflection"><p class="eyebrow">EINE FRAGE FÜR DICH</p><p id="mother-prompt"></p><button type="button" class="button button-outline" data-entry-start="note">Heute festhalten</button></div><p id="mother-reviewed" class="content-note"></p></section>
     </section>
 
-    <section id="vorsorge" class="section care-section" aria-labelledby="care-title"><section id="personal-care-panel" class="personal-care" aria-labelledby="personal-care-title"><div class="section-heading"><div><p class="eyebrow">DEINE GESPRÄCHE GUT VORBEREITET</p><h2 id="personal-care-title">Termine, Notizen &amp; Fragen.</h2></div></div><p class="section-description">Bei Hebamme oder Gynäkologie: Fragen vorher sammeln, Antworten und nächste Schritte danach festhalten. Notizen am Termin und in der Sammlung zeigen denselben Eintrag.</p><div class="care-toolbar"><button id="care-new-appointment" type="button" class="button button-primary">Termin planen</button><button id="care-new-note" type="button" class="button button-outline">Notiz / Frage sammeln</button><button type="button" class="text-link" data-action="report">Ausgewählte Bereiche teilen ↗</button></div><p id="personal-care-error" class="form-error" role="alert" hidden></p><h3>Deine nächsten Termine</h3><div id="personal-appointments" class="personal-appointments"></div><details id="personal-older-panel" class="more-panel" hidden><summary>Ältere und weitere Termine</summary><div id="personal-appointments-older"></div></details><h3>Deine Notiz- &amp; Fragensammlung</h3><div class="care-filters card"><label for="care-search">Sammlung durchsuchen<input id="care-search" type="search" placeholder="Frage, Antwort, nächste Schritte oder Termin …"></label><label class="checkbox-label"><input id="care-open-only" type="checkbox">Nur offene Fragen</label><label class="checkbox-label"><input id="care-show-archived" type="checkbox">Archivierte Termine / Notizen zeigen</label></div><p id="care-collection-count" class="content-note" role="status"></p><div id="care-collection" class="care-collection"></div><p class="content-note">Quelle: deine eigenen Angaben. Antworten werden von dir eingetragen, nicht automatisch erzeugt. Archivieren bleibt umkehrbar; Notizen bleiben auch bei archiviertem Termin in der Sammlung auffindbar.</p></section><div class="care-tools card"><div><p class="eyebrow">SCHNELL ERREICHBAR</p><h3>Kontakte &amp; Wehen</h3><p>Deine drei Anrufkontakte und selbst gemessene Zeiten an einem Ort.</p></div><button type="button" data-action="birth" class="button button-primary">Öffnen</button></div><div class="section-heading"><div><p class="eyebrow">GUT BEGLEITET</p><h2 id="care-title">Das kommt als Nächstes.</h2></div><span class="small-label">Vorsorge in Deutschland</span></div><p class="section-description">Ein Überblick zum Mitdenken. Deine tatsächlichen Termine vereinbarst du mit deiner Praxis oder Hebamme.</p><div id="milestones" class="milestones"></div><details class="past-care"><summary>Alle Vorsorgethemen ansehen</summary><div id="all-milestones" class="all-milestones"></div></details><p id="checklist-note" class="content-note">Deine Häkchen sind persönliche Merkhilfen und werden nicht mitgeteilt.</p></section>
+    <section id="vorsorge" class="section care-section" aria-labelledby="care-heading">
+      <h2 id="care-heading">Vorsorge</h2>
+      <section id="personal-care-panel" class="personal-care" aria-labelledby="personal-care-title">
+        <div class="care-entry-header">
+          <h3 id="personal-care-title">Dein nächster Termin</h3>
+          <button id="care-new-appointment" type="button" class="button button-primary">Termin planen</button>
+        </div>
+        <p id="personal-care-error" class="form-error" role="alert" hidden></p>
+        <div id="personal-appointments" class="personal-appointments"></div>
+        <details id="personal-older-panel" class="more-panel" hidden>
+          <summary>Weitere und vergangene Termine</summary>
+          <div id="personal-appointments-older"></div>
+        </details>
+        <nav class="care-shortcuts" aria-label="Vorsorgebereiche">
+          <a href="#care-questions" data-care-area="care-questions">Fragen &amp; Notizen <span aria-hidden="true">›</span></a>
+          <a href="#care-title" data-care-area="care-title">Vorsorgefenster <span aria-hidden="true">›</span></a>
+          <a href="#personal-plan" data-care-area="personal-plan">Geburt &amp; Wochenbett <span aria-hidden="true">›</span></a>
+        </nav>
+        <div id="care-questions" class="care-entry-header" tabindex="-1">
+          <h3>Fragen &amp; Notizen</h3>
+          <button id="care-new-note" type="button" class="button button-outline">Frage oder Notiz hinzufügen</button>
+        </div>
+        <details class="care-filters card">
+          <summary>Sammlung suchen &amp; filtern</summary>
+          <label for="care-search">Sammlung durchsuchen<input id="care-search" type="search" placeholder="Frage, Antwort, nächste Schritte oder Termin …"></label>
+          <label class="checkbox-label"><input id="care-open-only" type="checkbox">Nur offene Fragen</label>
+          <label class="checkbox-label"><input id="care-show-archived" type="checkbox">Archivierte Termine / Notizen zeigen</label>
+        </details>
+        <p id="care-collection-count" class="content-note" role="status"></p>
+        <div id="care-collection" class="care-collection"></div>
+        <button type="button" class="text-link" data-action="report">Ausgewählte Bereiche teilen ↗</button>
+        <p class="content-note">Archivierte Notizen können wiederhergestellt werden. Notizen zu archivierten Terminen bleiben in dieser Sammlung auffindbar.</p>
+      </section>
+      <div class="care-tools card"><div><p class="eyebrow">SCHNELL ERREICHBAR</p><h3>Kontakte &amp; Wehen</h3><p>Deine drei Anrufkontakte und selbst gemessene Zeiten an einem Ort.</p></div><button type="button" data-action="birth" class="button button-primary">Öffnen</button></div><div class="section-heading"><div><p class="eyebrow">GUT BEGLEITET</p><h2 id="care-title">Vorsorgefenster</h2></div><span class="small-label">Vorsorge in Deutschland</span></div><p class="section-description">Ein Überblick zum Mitdenken. Deine tatsächlichen Termine vereinbarst du mit deiner Praxis oder Hebamme.</p><div id="milestones" class="milestones"></div><details class="past-care"><summary>Alle Vorsorgethemen ansehen</summary><div id="all-milestones" class="all-milestones"></div></details><p id="checklist-note" class="content-note">Deine Häkchen sind persönliche Merkhilfen und werden nicht mitgeteilt.</p></section>
 
     <section id="wissen" class="section knowledge-section" aria-labelledby="knowledge-title"><div class="section-heading"><div><p class="eyebrow">RAUM FÜR DEINE FRAGEN</p><h2 id="knowledge-title">Gut zu wissen.</h2></div><svg class="section-icon"><use href="#i-book"/></svg></div><section id="everyday-guide" class="everyday-guide" aria-labelledby="guide-title">
         <div class="guide-heading"><div><p class="eyebrow">DEIN ALLTAG · OFFLINE NACHSCHLAGEN</p><h3 id="guide-title">Was passt gerade zu mir?</h3></div></div>
@@ -242,25 +298,37 @@
 
   <dialog id="delete-dialog" aria-labelledby="delete-title"><div class="dialog-heading"><span class="icon-box rose"><svg><use href="#i-lock"/></svg></span><button class="icon-button" data-close="delete-dialog" aria-label="Schließen"><svg><use href="#i-close"/></svg></button></div><h2 id="delete-title">Deine Daten löschen?</h2><p>Deine Schwangerschaftsangaben, dein Journal, Kontakte, eigene Termine und Terminnotizen, offene Wehenmessung, Geräteschlüssel und lokale Sicherungsverläufe werden aus diesem Browser entfernt. Eine Gerätezuordnung muss vorher nach einem Backup gelöst werden. Früher auf Server oder andere Geräte übertragene Daten werden dabei nicht gelöscht. Bereits geteilte Links bleiben gültig.</p><p id="delete-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button class="button button-outline" data-close="delete-dialog">Behalten</button><button id="confirm-delete" class="button button-danger">Lokal löschen</button></div></dialog>
   <dialog id="journal-dialog" class="journal-dialog" aria-labelledby="entry-title">
-    <div class="dialog-heading"><span class="icon-box sage"><svg><use href="#i-edit"/></svg></span><button id="journal-close" class="icon-button" type="button" aria-label="Journaleintrag schließen"><svg><use href="#i-close"/></svg></button></div>
-    <p class="eyebrow">DEIN PERSÖNLICHES JOURNAL</p><h2 id="entry-title">Ein Moment für dich.</h2><p>Halte fest, was du bemerkst. Du kannst Symptome, Text, Tags und Messwerte beliebig kombinieren.</p>
+    <div class="dialog-heading"><h2 id="entry-title" tabindex="-1">Heute festhalten</h2><button id="journal-close" class="icon-button" type="button" aria-label="Eintrag schließen"><svg><use href="#i-close"/></svg></button></div>
     <form id="journal-form" novalidate>
       <div class="journal-date-row"><label for="entry-date">Datum<input id="entry-date" type="date" min="1900-01-01" required></label><label for="entry-time">Uhrzeit · optional<input id="entry-time" type="time"></label></div>
-      <fieldset id="entry-checkin" class="checkin-fieldset" hidden disabled><legend>Dein Tages-Check-in · alles optional</legend>
+      <div id="capture-fields">
+        <details id="entry-body-panel" class="capture-panel" open>
+          <summary>Messwerte</summary>
+          <div id="entry-standard-metrics" class="standard-metrics"></div>
+          <p id="entry-decimal-hint" class="field-hint">Komma oder Punkt geht, z. B. 65,5 oder 65.5. Nur ausgefüllte Felder werden gespeichert.</p>
+        </details>
+        <details id="entry-observations" class="capture-panel" open>
+          <summary>Notiz, Symptome &amp; Befinden</summary>
+          <label for="entry-symptoms">Symptome · optional</label><div id="symptom-suggestions" class="symptom-suggestions" role="group" aria-label="Häufige Symptombezeichnungen auswählen"></div><input id="entry-symptoms" type="text" maxlength="1040" placeholder="Eigene Symptome mit Komma trennen" aria-describedby="entry-symptoms-hint"><p id="entry-symptoms-hint" class="field-hint">Bezeichnungen auswählen oder selbst eintragen. Du kannst auch nur eine Notiz oder Messung speichern.</p>
+      <label for="entry-text">Deine Notiz · optional</label><textarea id="entry-text" rows="4" maxlength="4000" placeholder="Wie geht es dir? Was möchtest du festhalten?"></textarea>
+          <fieldset id="entry-checkin" class="checkin-fieldset"><legend>Wie geht es dir?</legend>
         <p class="field-hint">Stimmung, Energie und Beschwerden beschreiben jetzt. Schlaf meint insgesamt die letzten 24 Stunden inklusive Nickerchen. Du kannst am selben Tag mehrmals eintragen; jede Beobachtung bleibt einzeln erhalten.</p>
         <div class="checkin-inputs"><label for="checkin-mood">Stimmung<select id="checkin-mood"><option value="">Nicht angegeben</option><option value="1">1 · Sehr belastet</option><option value="2">2 · Eher belastet</option><option value="3">3 · Gemischt / neutral</option><option value="4">4 · Eher gut</option><option value="5">5 · Sehr gut</option></select></label>
         <label for="checkin-energy">Energie<select id="checkin-energy"><option value="">Nicht angegeben</option><option value="1">1 · Kaum Energie</option><option value="2">2 · Wenig Energie</option><option value="3">3 · Mittlere Energie</option><option value="4">4 · Viel Energie</option><option value="5">5 · Sehr viel Energie</option></select></label>
         <label for="checkin-sleep">Schlaf · letzte 24 Stunden (h)<input id="checkin-sleep" type="text" inputmode="decimal" maxlength="12" placeholder="z. B. 6,5" aria-describedby="checkin-scales-hint"></label>
         <label for="checkin-intensity">Stärkste Beschwerden · jetzt<select id="checkin-intensity"><option value="">Nicht angegeben</option><option value="0">0 · Keine Beschwerden</option><option value="1">1 / 10</option><option value="2">2 / 10</option><option value="3">3 / 10</option><option value="4">4 / 10</option><option value="5">5 / 10</option><option value="6">6 / 10</option><option value="7">7 / 10</option><option value="8">8 / 10</option><option value="9">9 / 10</option><option value="10">10 · Maximal vorstellbar</option></select></label></div>
-        <p id="checkin-scales-hint" class="field-hint">Schlaf: 0 bis 24 Stunden, auch mit Komma. Leere Felder bleiben fehlende Angaben. Die Skalen sind persönliche Merkhilfen, keine medizinischen Tests oder gesundheitlichen Bewertungen. Quelle der Beobachtungen: deine eigenen Angaben.</p><p id="checkin-invalid" class="form-error" hidden>Dieser Check-in enthält nicht auswertbare Angaben. Die ursprünglichen Messwertzeilen stehen unten. Bitte vor dem Speichern bewusst korrigieren oder entfernen und die passenden strukturierten Felder verwenden.</p>
+        <p id="checkin-scales-hint" class="field-hint">Schlaf: 0 bis 24 Stunden. Komma oder Punkt geht, z. B. 6,5 oder 6.5. Leere Felder bleiben fehlende Angaben. Die Skalen sind persönliche Merkhilfen, keine medizinischen Tests oder gesundheitlichen Bewertungen. Quelle der Beobachtungen: deine eigenen Angaben.</p><p id="checkin-invalid" class="form-error" hidden>Dieser Eintrag enthält nicht auswertbare Angaben. Die ursprünglichen Messwertzeilen stehen unten. Bitte vor dem Speichern bewusst korrigieren oder entfernen und die passenden strukturierten Felder verwenden.</p>
       </fieldset>
-      <details id="entry-extra-fields" class="entry-extra-fields" open><summary>Notiz, Symptome &amp; weitere Messwerte</summary>
-      <label for="entry-symptoms">Symptome · optional</label><div id="symptom-suggestions" class="symptom-suggestions" role="group" aria-label="Häufige Symptombezeichnungen auswählen"></div><input id="entry-symptoms" type="text" maxlength="1040" placeholder="Eigene Symptome mit Komma trennen" aria-describedby="entry-symptoms-hint"><p id="entry-symptoms-hint" class="field-hint">Bezeichnungen auswählen oder selbst eintragen. Du kannst auch nur eine Notiz oder Messung speichern.</p>
-      <label for="entry-text">Deine Notiz · optional</label><textarea id="entry-text" rows="4" maxlength="4000" placeholder="Wie geht es dir? Was möchtest du festhalten?"></textarea>
-      <label for="entry-tags">Tags · optional</label><input id="entry-tags" type="text" maxlength="1040" placeholder="z. B. Bewegung, Termin, Wohlbefinden"><p class="field-hint">Mit Komma trennen. Tags helfen dir, Einträge später wiederzufinden.</p>
-      <fieldset class="journal-metric-fieldset"><legend>Messwerte · optional</legend><p class="field-hint">Zum Beispiel Gewicht und Bauchumfang. Leere Standardzeilen werden nicht gespeichert.</p><div id="entry-metrics"></div><button id="entry-add-metric" class="text-link" type="button">+ Weitere oder eigene Messgröße</button></fieldset>
+        </details>
+      </div>
+      <details id="entry-extra-fields" class="capture-panel">
+        <summary>Weitere Angaben</summary>
+        <label for="entry-tags">Tags · optional</label><input id="entry-tags" type="text" maxlength="1040" placeholder="z. B. Bewegung, Termin, Wohlbefinden"><p class="field-hint">Mit Komma trennen. Tags helfen dir, Einträge später wiederzufinden.</p>
+        <fieldset class="journal-metric-fieldset"><legend>Weitere Messwerte</legend><div id="entry-metrics"></div><button id="entry-add-metric" class="text-link" type="button">Temperatur oder eigenen Messwert hinzufügen</button></fieldset>
       </details>
-      <p id="entry-error" class="form-error" role="alert" hidden></p><button id="entry-save" class="button button-primary full-width" type="submit">Eintrag speichern <svg><use href="#i-check"/></svg></button><p class="form-privacy"><svg><use href="#i-lock"/></svg>Lokal gesichert. Geräte-Stände enthalten das vollständige Journal, wenn du sie bewusst weitergibst.</p>
+      <p id="entry-error" class="form-error" role="alert" tabindex="-1" hidden></p>
+      <button id="entry-save" class="button button-primary full-width" type="submit">Speichern</button>
+      <p class="form-privacy"><svg><use href="#i-lock"/></svg>Deine Angaben werden lokal gespeichert.</p>
     </form>
   </dialog>
   <button id="contraction-fab" class="contraction-fab" type="button" hidden>◷ Wehen messen</button>
@@ -275,9 +343,9 @@
       <h3 id="calendar-day-care-title">Vorsorge &amp; Meilensteine</h3><div id="calendar-day-events"></div>
     </section>
     <section class="calendar-dialog-section" aria-labelledby="calendar-entry-count">
-      <header><h3 id="calendar-entry-count">Journal</h3><button id="calendar-add-entry" type="button" class="text-link">Eintrag hinzufügen</button></header>
+      <header><h3 id="calendar-entry-count">Einträge</h3><button id="calendar-add-entry" type="button" class="text-link">Eintrag hinzufügen</button></header>
       <div id="calendar-day-journal"></div>
-      <div class="calendar-dialog-links"><button id="calendar-add-checkin" type="button" class="text-link">Check-in erfassen</button><button id="calendar-open-journal" type="button" class="text-link">Im Journal öffnen</button></div>
+      <div class="calendar-dialog-links"><button id="calendar-add-measurements" type="button" class="text-link">Messwerte eintragen</button><button id="calendar-open-journal" type="button" class="text-link">Einträge dieses Tages ansehen</button></div>
     </section>
     <button id="calendar-open-guide" type="button" class="text-link">Lebensmittel &amp; Aktivitäten an diesem Tag</button>
   </dialog>

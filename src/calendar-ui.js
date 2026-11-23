@@ -9,12 +9,12 @@ import { symptomMentions } from './reflection.js';
 import { setupReflection } from './reflection-ui.js';
 import { normalizeCare, appointmentsOnDate, PROVIDERS, careCollection } from './care.js';
 
-export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, getBirthDate = () => null, getCare = normalizeCare, addAppointment, openAppointmentNotes, openCare, canEdit, addEntry, addCheckin, editEntry, showEntries, showEntriesRange, showWeek, showGuide }) {
+export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJournal, getChecks, getBirthDate = () => null, getCare = normalizeCare, addAppointment, openAppointmentNotes, openAppointment, openCare, canEdit, addEntry, editEntry, showEntries, showReflection, showWeek, showGuide }) {
   const $ = id => document.getElementById(id);
   const node = (tag, className = '', text = '') => { const element = document.createElement(tag); element.className = className; element.textContent = text; return element; };
   let selected = getToday();
   let month = selected.slice(0, 7);
-  let view = 'calendar';
+  let view = 'month';
   let timeline;
   let events = [];
   let symptom = '';
@@ -32,18 +32,16 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   };
   function switchView(next) {
     view = next;
-    $('calendar-view').hidden = next !== 'calendar'; $('journal-list-view').hidden = next !== 'journal';
-    for (const name of ['calendar', 'journal']) {
-      const toggle = $(name + '-view-toggle'); toggle.setAttribute('aria-pressed', String(name === next)); toggle.classList.toggle('selected', name === next);
-    }
+    $('calendar-month-view').hidden = next !== 'month';
+    $('reflection').hidden = next !== 'week';
+    $('calendar-view-toggle').setAttribute('aria-pressed', String(next === 'month'));
+    $('calendar-view-toggle').classList.toggle('selected', next === 'month');
+    $('week-view-toggle').setAttribute('aria-pressed', String(next === 'week'));
+    $('week-view-toggle').classList.toggle('selected', next === 'week');
   }
-  function openList() {
-    switchView('journal');
-    $('journal-list-view').scrollIntoView({ behavior: 'instant', block: 'start' });
-    $('journal-filter-panel').querySelector('summary').focus({ preventScroll: true });
-  }
-  $('calendar-view-toggle').addEventListener('click', () => switchView('calendar'));
-  $('journal-view-toggle').addEventListener('click', () => switchView('journal'));
+  $('calendar-view-toggle').addEventListener('click', () => switchView('month'));
+  $('week-view-toggle').addEventListener('click', () => switchView('week'));
+  $('calendar-open-reflection').addEventListener('click', showReflection);
   $('calendar-symptom').addEventListener('change', event => { symptom = event.target.value; render(); });
   $('calendar-show-care').addEventListener('change', event => { showCare = event.target.checked; render(); });
   $('calendar-show-symptoms').addEventListener('change', event => { showSymptoms = event.target.checked; render(); });
@@ -51,12 +49,22 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   const reflection = setupReflection({
     getSelected: () => selected, getToday, getJournal, getSymptom: () => showSymptoms ? symptom : '',
     getPeriod, chooseDate: date => choose(date), openDay,
-    openEntries(from, to, selectedSymptom, type) { showEntriesRange(from, to, selectedSymptom, type); openList(); },
+    openEntries: showEntries,
+    dayLabels(date) {
+      const care = getCare();
+      const appointments = care ? appointmentsOnDate(care, date) : [];
+      const labels = appointments.map(item => ({ label: `Termin: ${item.title}`, marker: 'T', type: 'appointment' }));
+      for (const event of eventsOnDate(events, date)) {
+        if (event.type === 'point') labels.push({ label: `Meilenstein: ${event.title}`, marker: '◆', type: 'point' });
+        else if (event.date === date) labels.push({ label: `Beginn Vorsorgefenster: ${event.title}`, marker: 'V', type: 'care' });
+      }
+      return labels;
+    },
   });
   function choose(date, focus = false) {
     dayNumber(date); monthStart(date.slice(0, 7));
     selected = date; month = date.slice(0, 7); $('calendar-error').hidden = true;
-    switchView('calendar'); render();
+    render();
     if (focus) focusDay();
   }
   const dayDialog = $('calendar-day-dialog');
@@ -68,23 +76,25 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     $('calendar-day-close').focus();
   }
   function focusDay() {
-    document.querySelector(`[data-calendar-date="${selected}"]`)?.focus({ preventScroll: true });
+    const container = view === 'month' ? $('calendar-days') : $('reflection-days');
+    container.querySelector(`[data-calendar-date="${selected}"]`)?.focus({ preventScroll: true });
   }
   $('calendar-day-open').addEventListener('click', () => openDay());
   $('calendar-day-close').addEventListener('click', () => dayDialog.close());
   dayDialog.addEventListener('close', () => {
-    if (!document.querySelector('dialog[open]') && view === 'calendar' &&
+    if (!$('kalender').classList.contains('mobile-inactive') && !document.querySelector('dialog[open]') &&
         !document.activeElement?.closest('button, summary')) focusDay();
   });
-  dayDialog.addEventListener('click', event => {
-    if (event.target.closest('button:not(#calendar-day-close)')) dayDialog.close();
-  }, true);
+  function fromDay(action) {
+    return () => { dayDialog.close(); action(); };
+  }
   $('calendar-options-open').addEventListener('click', () => {
     $('calendar-error').hidden = true;
     optionsDialog.showModal();
   });
   $('calendar-options-close').addEventListener('click', () => optionsDialog.close());
   $('calendar-week-open').addEventListener('click', () => {
+    switchView('week');
     $('reflection').scrollIntoView({ block: 'start' });
     $('reflection-title').focus({ preventScroll: true });
   });
@@ -101,6 +111,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
   $('calendar-due').addEventListener('click', () => choose(timeline.dueDate));
   function error(cause) { $('calendar-error').textContent = cause.message; $('calendar-error').hidden = false; }
   function lookup(date) {
+    switchView('month');
     choose(date);
     optionsDialog.close();
     $('calendar-month-title').scrollIntoView({ block: 'nearest' });
@@ -153,7 +164,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     }
     if (event.extraSource) { const link=node('a','source-link','G-BA · Voraussetzungen und Kassenleistung');link.href=event.extraSource;link.target='_blank';link.rel='noopener noreferrer';card.append(link); }
     if(event.reviewed)card.append(node('p','care-item-meta',`Redaktionell geprüft: ${shortDate(event.reviewed)}`));
-    if (event.date !== date && event.date >= getToday()) card.append(button('Im Kalender ansehen', () => choose(event.date, true)));
+    if (event.date !== date && event.date >= getToday()) card.append(button('Im Kalender ansehen', fromDay(() => choose(event.date, true))));
     return card;
   }
 
@@ -172,7 +183,7 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     if (!afterBirth(selected) && age.status === 'ongoing' && age.days === 0) eventList.append(node('p', 'calendar-week-start', `Eine neue Woche beginnt: ${age.weekNumber}. SSW (${age.weeks}+0).`));
     for (const event of dayEvents) eventList.append(eventCard(event, selected));
     if (!dayEvents.length) eventList.append(node('p', 'calendar-empty', 'Für diesen Tag ist kein Vorsorgefenster oder Meilenstein hinterlegt.'));
-    $('calendar-open-guide').onclick = () => showGuide(selected);
+    $('calendar-open-guide').onclick = fromDay(() => showGuide(selected));
     const care = getCare();
     const appointments = care ? appointmentsOnDate(care, selected) : [];
     const apptList = $('calendar-day-appointments'); apptList.replaceChildren();
@@ -186,12 +197,12 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
         for (const note of notes) { const block = node('div', 'calendar-appointment-note'); block.append(formatted(note.text)); if (note.answer) block.append(formatted('Antwort:\n' + note.answer)); if (note.nextSteps) block.append(formatted('Nächste Schritte:\n' + note.nextSteps)); block.append(node('p', 'care-item-meta', note.discussed ? 'Besprochen' : 'Noch nicht als besprochen markiert')); details.append(block); }
         card.append(details);
       }
-      if (canEdit()) card.append(button('Notiz / Frage ergänzen', () => openAppointmentNotes(appointment.id)));
-      card.append(button('Termin & Sammlung verwalten', openCare)); apptList.append(card);
+      if (canEdit()) card.append(button('Notiz / Frage ergänzen', fromDay(() => openAppointmentNotes(appointment.id))));
+      card.append(button('Terminmappe öffnen', fromDay(() => openAppointment(appointment.id)))); apptList.append(card);
     }
     if (!appointments.length) apptList.append(node('p', 'calendar-empty', care ? 'Kein eigener Termin an diesem Tag.' : 'Termindaten nicht lesbar – bitte den Bereich Vorsorge prüfen.'));
     $('calendar-add-appointment').disabled = !canEdit() || !care;
-    $('calendar-add-appointment').onclick = () => addAppointment(selected);
+    $('calendar-add-appointment').onclick = fromDay(() => addAppointment(selected));
     const entries = entriesOnDate(getJournal(), selected);
     const items = [];
     if (appointments.length) {
@@ -211,25 +222,28 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     const list = $('calendar-day-journal'); list.replaceChildren();
     for (const entry of entries) {
       const card = node('article', 'calendar-journal-entry');
-      if (isCheckinEntry(entry)) card.append(node('p', 'eyebrow', 'TAGES-CHECK-IN'));
+      if (isCheckinEntry(entry)) card.append(node('p', 'calendar-entry-time', 'Befinden'));
       if (entry.time) card.append(node('p', 'calendar-entry-time', `${entry.time} Uhr`));
       if (entry.symptoms.length) card.append(node('p', 'calendar-entry-symptoms', entry.symptoms.join(' · ')));
       if (entry.text) card.append(node('p', 'journal-note', entry.text));
       const data = readCheckin(entry);
-      if (data) for (const [key, field] of Object.entries(CHECKIN_FIELDS)) card.append(node('p', 'calendar-entry-metrics', `${field.label}: ${data.invalid.includes(key) ? 'Nicht auswertbar' : Object.hasOwn(data.values, key) ? checkinValue(key, data.values[key]) : 'Nicht angegeben'}`));
+      if (data) for (const [key, field] of Object.entries(CHECKIN_FIELDS)) {
+        if (!data.invalid.includes(key) && !Object.hasOwn(data.values, key)) continue;
+        card.append(node('p', 'calendar-entry-metrics', `${field.label}: ${data.invalid.includes(key) ? 'Nicht auswertbar' : checkinValue(key, data.values[key])}`));
+      }
       const otherMetrics = entry.metrics.filter(metric => !isCheckinMetric(entry, metric));
       if (otherMetrics.length) card.append(node('p', 'calendar-entry-metrics', otherMetrics.map(m => `${m.label}: ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 }).format(m.value)} ${m.unit}`.trim()).join(' · ')));
       if (entry.tags.length) card.append(node('p', 'calendar-entry-tags', entry.tags.map(tag => '#' + tag).join(' ')));
-      if (canEdit()) card.append(button('Eintrag bearbeiten', () => editEntry(entry.id)));
+      if (canEdit()) card.append(button('Eintrag bearbeiten', fromDay(() => editEntry(entry.id))));
       list.append(card);
     }
     if (!entries.length) list.append(node('p', 'calendar-empty', selected > getToday() ? 'Dieser Tag liegt noch vor dir. Persönliche Beobachtungen kannst du bis einschließlich heute erfassen.' : 'Für diesen Tag gibt es noch keinen Journaleintrag.'));
     const add = $('calendar-add-entry');
-    add.hidden = selected > getToday(); add.disabled = !canEdit(); add.onclick = () => addEntry(selected);
-    const checkin = $('calendar-add-checkin');
-    checkin.hidden = selected > getToday(); checkin.disabled = !canEdit(); checkin.onclick = () => addCheckin(selected);
+    add.hidden = selected > getToday(); add.disabled = !canEdit(); add.onclick = fromDay(() => addEntry(selected));
+    const measurements = $('calendar-add-measurements');
+    measurements.hidden = selected > getToday(); measurements.disabled = !canEdit(); measurements.onclick = fromDay(() => addEntry(selected, 'metrics'));
     $('calendar-open-journal').hidden = !entries.length;
-    $('calendar-open-journal').onclick = () => { showEntries(selected); openList(); };
+    $('calendar-open-journal').onclick = fromDay(() => showEntries(selected, selected));
   }
 
   function render() {
@@ -322,5 +336,5 @@ export function setupCalendar({ getProfile, getToday = todayISO, getMode, getJou
     development.hidden = !period.weekNumber;
     development.onclick = () => showWeek(period.weekNumber);
   }
-  return { render, showJournal: () => switchView('journal'), showDate: date => choose(date, true) };
+  return { render, showDate: date => { switchView('month'); choose(date, true); } };
 }

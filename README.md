@@ -14,11 +14,11 @@ Ein kleiner, deutschsprachiger Schwangerschaftsbegleiter als installierbare PWA 
 - Wochenreise für die **1. bis 42. SSW** mit Entwicklungsinfos, körperlichen Veränderungen und kleinen Impulsen.
 - Vorsorgethemen für Deutschland mit exakten Wochenfenstern, Quellen und lokalen Merkhäkchen.
 - **Persönliches Journal:** datierte Notizen, auswählbare und eigene Symptome, freie Tags sowie Gewicht, Bauch-/Brust-/Hüftumfang, Temperatur und eigene Messgrößen mit Einheit.
-- **Kalender & Vorausblick:** SSW an jedem Datum, Suche in beide Richtungen, gemeinsame Wochenansicht mit Datumsbereich und Messwerten sowie markierte Vorsorgefenster, Trimesterwechsel, Halbzeit und ET. Journaleinträge erscheinen an ihrem Datum im Kalender.
+- **Kalender & Vorausblick:** Monat und Woche mit SSW, Datumssuche, Vorsorgefenstern und Meilensteinen. Einträge erscheinen an ihrem Datum und der Wochenrückblick übernimmt den Zeitraum ins Journal.
 - **Symptomkalender & Wochenrückblick:** einzelne Symptome hervorheben; Beobachtungen, erfasste Tage und Messwerte einer Kalenderwoche überblicken und passende Originaleinträge öffnen.
 - **Termine & Fragensammlung:** eigene Termine planen, Notizen und Fragen/Antworten zuordnen und zugleich gesammelt lesen. Ergebnisse, nächste Schritte und Gesprächsstatus selbst erfassen; bewusste Teilberichte.
-- **Für dich:** eigener Reiter neben „Dein Baby“ in der Wochenreise. Körpertexte, Alltag, Schlaf, Gefühle und Unterstützung folgen der ausgewählten Phase; Vertiefungen mit passenden Quellen und Prüfstand.
-- **Tages-Check-in:** Stimmung, Energie, Schlaf und Beschwerdestärke freiwillig erfassen; mehrere Beobachtungen pro Tag bleiben getrennt. Im Kalender und Wochenrückblick mit fehlenden Angaben und Originaleinträgen. Check-in-Werte sind beim Teilen gesondert auswählbar.
+- **Für dich:** eigener Hauptbereich mit Einträgen, Messwerten, Wochenrückblick und Körperinfos. Aus der Wochenreise öffnen sich die Körperinfos zur gewählten SSW.
+- **Heute festhalten:** Notiz, Symptome, Messwerte und freiwillige Angaben zu Stimmung, Energie, Schlaf und Beschwerdestärke in einem Formular. **Messwerte eintragen** öffnet die Felder für Gewicht, Bauch-, Brust- und Hüftumfang direkt. Komma und Punkt sind zulässig. Angaben zum Befinden sind beim Teilen gesondert auswählbar.
 - **Lebensmittel & Aktivitäten:** offline in 26 geprüften Einträgen suchen, Zubereitung beziehungsweise Sorte wählen und Bedingungen, Ampel, Quellen und Prüfstand nachlesen. Auch mit einem Tag aus dem Kalender verknüpft.
 - **Ausgewählte Journalbereiche weitergeben:** Zeitraum, Notizen, Symptome, Tags, Messwerte und Uhrzeiten einzeln wählen, einzelne Einträge auslassen und den tatsächlichen Dateiinhalt vorab ansehen. Selbstständige HTML-Datei ohne Upload; über den Browser druckbar.
 - Einträge bearbeiten, archivieren und wiederherstellen; Suche und Filter nach Tag, Symptom oder Zeitraum, Messwertverlauf mit Tabelle sowie CSV-Export der gefilterten Einträge.
@@ -44,7 +44,7 @@ Die veröffentlichte App auf beiden Geräten über HTTPS öffnen und vollständi
 
 **Überblick → Heute für mich** führt zur nächsten Terminmappe oder den offenen Fragen. **Vorsorge → Geburt und Wochenbett planen** verwaltet Wünsche, Aufgaben und Unterstützung. Dort lässt sich unter **Geburt eintragen / Phase ändern** der Wechsel bewusst speichern und zurücknehmen. Historische Schwangerschaftsdaten bleiben erhalten; Kalender und neue Journaleinträge zeigen nach Geburt Tage seit Geburt. Für die Journalbearbeitung wird weiterhin eine eigene gespeicherte Schwangerschaftsgrundlage benötigt.
 
-**Kalender → Journalliste & Verlauf → Messwertverlauf** bietet Zeitraum, Ausgangsmessung und Notizmarkierungen. **Wissen → Was kann mir helfen?** öffnet die Beschwerdenhilfe. In der **Wochenreise → Dein Baby** stehen Wochenillustration, Größenorientierung und eigene Untersuchungsmaße bereit.
+**Für dich → Deine Messwerte** bietet Zeitraum, Ausgangsmessung und Notizmarkierungen. **Heute → Wissen nachschlagen** führt zu Lebensmitteln, Aktivitäten und Beschwerdenhilfe. In der **Wochenreise** stehen Wochenillustration, Größenorientierung und die Untersuchungswerte des Babys bereit.
 
 **Überblick → Daten & Backup → Vollständiges Backup & Wiederherstellung:** Sicherungspasswort mit mindestens zwölf Zeichen zweimal eingeben und die verschlüsselte Datei herunterladen. Eine verfügbare Sitzungsfassung von Schwangerschaft/Journal wird zusätzlich mitgesichert und kann bei der Wiederherstellung bewusst bevorzugt werden; standardmäßig werden die gespeicherten Rohdaten wiederhergestellt. Datei und Passwort getrennt aufbewahren; ein vergessenes Passwort lässt sich nicht zurücksetzen. Für Wiederherstellung Datei auswählen, entschlüsseln, Vorschau prüfen und den bestehenden Stand zunächst ebenfalls sichern. Die App bestätigt den gestarteten Download und die interne Entschlüsselungsprüfung, kann den dauerhaften Speicherort aber nicht kontrollieren. Bei beschädigten Rohdaten ist Export zur Rettung möglich; automatische Wiederherstellung bleibt gesperrt, bis die Inhalte geprüft sind.
 
@@ -127,7 +127,7 @@ Im Kalender öffnet **Lebensmittel & Aktivitäten an diesem Tag** die Suche mit 
 
 **Reise teilen** startet mit **Nur ET und Zeitachse**: Periodenbeginn, Zykluslänge und Unregelmäßigkeit fehlen im erzeugten Link. Die SSW bleibt rechnerisch gleich; ein geschätzter ET bleibt eine Schätzung. Zyklusbezogene Unsicherheitshinweise werden nicht übertragen. Aus dem ET lässt sich die zeitliche Einordnung weiterhin ableiten. Wer die vollständige Grundlage weitergeben möchte, wählt dies ausdrücklich im Dialog. Beide Linkvarianten enthalten weder Journal noch Merkhäkchen, sind unverschlüsselt und lassen sich nicht zurückrufen. Alte Links behalten ihren damaligen Inhalt.
 
-Unter **Kalender → Journalliste & Verlauf → Ausgewählte Bereiche teilen** oder aus dem Teilen-Dialog öffnet sich der **Journalauszug**. Zunächst ist kein Bereich ausgewählt. Zeitraum und Bereiche wählen, unter **Einzelne Einträge auslassen** bei Bedarf Einträge abwählen und die Vorschau prüfen. Enthaltene Einträge haben immer ein Datum; Uhrzeiten sind separat wählbar. Archivierte Einträge bleiben ausgeschlossen. Ausgelassene Inhalte und interne IDs beziehungsweise Änderungsmetadaten stehen auch nicht versteckt in der Datei.
+Unter **Für dich → Deine Einträge → Export & Teilen** oder aus dem Teilen-Dialog öffnet sich der **Journalauszug**. Zunächst ist kein Bereich ausgewählt. Zeitraum und Bereiche wählen, unter **Einzelne Einträge auslassen** bei Bedarf Einträge abwählen und die Vorschau prüfen. Enthaltene Einträge haben immer ein Datum. Uhrzeiten sind separat wählbar. Archivierte Einträge bleiben ausgeschlossen. Ausgelassene Inhalte und interne IDs beziehungsweise Änderungsmetadaten stehen auch nicht versteckt in der Datei.
 
 **Auszug als HTML-Datei herunterladen** erzeugt die Datei vollständig lokal. Sie enthält keine Scripts, externen Ressourcen, Basisdaten, SSW oder Sync-Schlüssel. Sie ist offline lesbar; für ein PDF die Datei öffnen und im Browser-Druckdialog „Als PDF speichern“ wählen, sofern verfügbar. Die Klartextdatei wird erst weitergegeben, wenn du das selbst tust. Sie ist kein wiederherstellbares Backup. Messwerte und Angaben sind als persönliche Journalquelle bezeichnet, ohne medizinische Bewertung.
 
@@ -240,6 +240,7 @@ Die Dokumentation folgt **AgDRs (Agent Decision Records)**. Der [AgDR-Index](doc
 - [AgDR-0048: Wochenmotive im Überblick](docs/agdr/0048-wochenmotive-im-ueberblick.md)
 - [AgDR-0049: Aquarellmotive für die ersten beiden Wochen](docs/agdr/0049-aquarellmotive-fuer-die-ersten-beiden-wochen.md)
 - [AgDR-0050: Lokale Vorschau des aktuellen Builds](docs/agdr/0050-lokale-vorschau-des-aktuellen-builds.md)
+- [AgDR-0053: Für dich, gemeinsames Formular und direkter Kalender](docs/agdr/0053-mobile-neuordnung-und-gemeinsame-erfassung.md)
 
 Künftige wesentliche Entscheidungen werden mit dem [Template](docs/agdr/_template.md) fortgeschrieben. [AGENTS.md](AGENTS.md) hält diese Projektkonvention auch für weitere Agentenarbeit fest.
 

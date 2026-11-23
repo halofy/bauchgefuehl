@@ -1,5 +1,5 @@
 import { getAppLayout } from './layout.js';
-const sections = ['ueberblick', 'wochenreise', 'journal', 'vorsorge', 'wissen'];
+const sections = ['ueberblick', 'wochenreise', 'fuer-dich', 'kalender', 'vorsorge', 'wissen'];
 const mobile = getAppLayout();
 let active = 'ueberblick', started = false, traversing = false;
 const positions = new Map();
@@ -27,6 +27,7 @@ export function setupAppNavigation() {
   // One local root entry lets browser Back return to the overview instead of leaving immediately.
   put({ panel:'ueberblick',root:true },true); put({ panel:'ueberblick' });
   for (const button of document.querySelectorAll('[data-scroll]')) button.addEventListener('click', () => { showAppPanel(button.dataset.scroll,true); if(!mobile.matches) document.getElementById(active).scrollIntoView({behavior:'instant'}); });
+  for (const button of document.querySelectorAll('[data-section-link]')) button.addEventListener('click', () => showAppPanel(button.dataset.sectionLink, true));
   for(const brand of document.querySelectorAll('a.brand')) brand.addEventListener('click',event=>{event.preventDefault();showAppPanel('ueberblick',true);});
   document.getElementById('app-back')?.addEventListener('click', () => history.back());
   window.addEventListener('popstate', event => {

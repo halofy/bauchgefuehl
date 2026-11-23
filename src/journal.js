@@ -50,6 +50,8 @@ export function parseMeasurement(value) {
   if (!Number.isFinite(result) || Math.abs(result) > 1_000_000) throw new Error('Der Messwert liegt außerhalb des unterstützten Zahlenbereichs.');
   return result;
 }
+const editableMeasurement = new Intl.NumberFormat('de-DE', { maximumSignificantDigits: 21, useGrouping: false });
+export const formatMeasurementInput = value => editableMeasurement.format(value);
 export function normalizeMetric(value) {
   if (!value || (value.kind !== 'custom' && !Object.hasOwn(METRICS, value.kind))) throw new Error('Unbekannte Messgröße.');
   if (typeof value.value !== 'number' || !Number.isFinite(value.value) || Math.abs(value.value) > 1_000_000) throw new Error('Ungültiger Messwert.');

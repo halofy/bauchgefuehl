@@ -46,6 +46,9 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0048](0048-wochenmotive-im-ueberblick.md) | Wochenmotive auch auf der grünen SSW-Karte im Überblick | Umgesetzt |
 | [AgDR-0049](0049-aquarellmotive-fuer-die-ersten-beiden-wochen.md) | Symbolische Aquarelle für die 1. und 2. SSW in beiden Ansichten | Umgesetzt |
 | [AgDR-0050](0050-lokale-vorschau-des-aktuellen-builds.md) | Aktuellen lokalen Build unter `/vorschau/` mit demselben Datenspeicher anzeigen | Umgesetzt |
+| [AgDR-0051](0051-mobile-informationsarchitektur.md) | Mobile Neuordnung von Heute, Wochenreise, Kalender, Journal, Vorsorge und Wissen | Vorschlag zu persönlichen Funktionen weiterentwickelt in AgDR-0052 |
+| [AgDR-0052](0052-fuer-dich-und-schnelle-erfassung.md) | Für dich als Einstieg für persönliche Daten, ein gemeinsames Formular und verständliche Dezimaleingabe | Umsetzung in AgDR-0053 |
+| [AgDR-0053](0053-mobile-neuordnung-und-gemeinsame-erfassung.md) | Für dich, schnelles Eingabeformular, Kalenderansichten und Vorsorgeeinstieg | Umgesetzt |
 
 Die Nummern **0030–0039** sind in AgDR-0041 zusammengeführt; ihre vollständigen Texte und Prüfnachweise stehen dort im aufklappbaren Verlauf. Die Nummern bleiben reserviert.
 

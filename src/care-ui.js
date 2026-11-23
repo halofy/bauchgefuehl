@@ -120,7 +120,7 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     if (getMode() === 'shared') { error('Geteilte Reise: Eigene Termine werden hier nicht eingeblendet oder überschrieben.'); return; }
     const archived = $('care-show-archived').checked;
     const list = current.appointments.filter(item => archived || !item.deletedAt).sort((a,b) => Number(a.date < todayISO()) - Number(b.date < todayISO()) || a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-    const next = list.filter(item => !item.deletedAt && item.date >= todayISO()).slice(0, 6);
+    const next = list.filter(item => !item.deletedAt && item.date >= todayISO()).slice(0, 1);
     for (const item of next) appointments.append(appointmentCard(item));
     for (const item of list.filter(item => !next.includes(item))) older.append(appointmentCard(item));
     $('personal-older-panel').hidden = !older.children.length;
