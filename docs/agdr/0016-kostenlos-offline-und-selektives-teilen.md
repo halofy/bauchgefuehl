@@ -7,6 +7,8 @@
 - **Ersetzt teilweise:** [AgDR-0003](0003-lokale-daten-und-teilen.md) beim Standardumfang neuer Reise-Links; [AgDR-0012](0012-roadmap-und-ssw-pruefung.md) bei Premium-Einordnung und offenem Bezahlmodell. Lokale Speicherung, bewusste Übernahme und SSW-Berechnung gelten weiter.
 - **Erweitert:** [AgDR-0009](0009-persoenliches-journal.md), F07 um einen ersten Journalbericht
 
+**Fortschreibung vom 24.11.2026:** [AgDR-0055](0055-einheitliches-selektives-teilen.md) löst die getrennten Teileinstiege, den neuen unverschlüsselten Reise-Export und die bisherige QR-Grenze teilweise ab. Neue Standardweitergabe ist eine selektive verschlüsselte Kopie in Body-Version 4. UI-Begriffe sind Hauptgerät / Mitlesegerät; interne Rollen und bestehende Formate bleiben kompatibel. Die folgenden Angaben dokumentieren die damalige Entscheidung.
+
 ## Kontext und Herkunft
 
 **Fortschreibung vom 18.11.2026:** [AgDR-0020](0020-serverloser-geraeteabgleich.md) löst die nachfolgend historischen Annahmen über aktive Sync-Räume/Server ab. Vollständige Geräte-Stände werden nun bewusst ohne Datenserver übertragen; der ausgewählte Journalauszug und der ET-only-Reise-Link bleiben erhalten. Kostenlosigkeit und lokale Verarbeitung gelten unverändert.

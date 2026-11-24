@@ -8,6 +8,8 @@
 - **Betroffene Dateien:** [Übertragungsmodell](../../src/device-transfer.js), [Oberfläche](../../src/devices-ui.js), [App](../../src/app.js), [HTML/CSP](../../index.html), [Offline-Dateien](../../sw.js), [Tests](../../tests/device-transfer.test.js)
 - **Ersetzt:** [AgDR-0008](0008-master-sync-und-lokaler-betrieb.md) für die aktive Geräteverbindung; erweitert/ersetzt teilweise die Serverannahmen in [AgDR-0016](0016-kostenlos-offline-und-selektives-teilen.md)
 
+**Fortschreibung vom 24.11.2026:** [AgDR-0055](0055-einheitliches-selektives-teilen.md) löst die getrennten Teileinstiege, den neuen unverschlüsselten Reise-Export und die bisherige QR-Grenze teilweise ab. Neue Standardweitergabe ist eine selektive verschlüsselte Kopie in Body-Version 4. UI-Begriffe sind Hauptgerät / Mitlesegerät; interne Rollen und bestehende Formate bleiben kompatibel. Die folgenden Angaben dokumentieren die damalige Entscheidung.
+
 ## Kontext und Herkunft
 
 Der Nutzer will zwei Smartphones ohne eigenen Dev-/Sync-Server und ohne fremde Verbindungsdienste abgleichen. Bevorzugt ist eine performante moderne direkte Verbindung; notfalls werden QR/URL erlaubt, andernfalls soll die Sync-Option verschwinden. Die frühere Präferenz für lokalen Serverbetrieb ist damit abgelöst.

@@ -73,7 +73,7 @@ export function setupBirth({ storage, getProfile, getMode, getJournal, canEdit, 
     finally { working = false; render(); }
   }
   function open(view = 'contacts') {
-    for (const id of ['sync-dialog', 'share-dialog']) if ($(id).open) $(id).close();
+    for (const id of ['sync-dialog', 'share-dialog']) if ($(id)?.open) $(id).close();
     error(''); try { birth = readBirth(storage); } catch { damaged = true; }
     fillContacts(); render(); $('birth-dialog').showModal();
     $(view === 'tracker' ? 'birth-tracker' : 'birth-call-list').scrollIntoView({ behavior: 'instant', block: 'start' });

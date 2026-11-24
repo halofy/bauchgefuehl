@@ -15,7 +15,7 @@ const number = value => new Intl.NumberFormat('de-DE',{ maximumFractionDigits:1 
 const source = (url,label) => `<a class="source-link" href="${e(url)}" target="_blank" rel="noopener noreferrer">${e(label)} ↗</a>`;
 const button = (label,attrs='') => `<button type="button" class="button button-outline" ${attrs}>${label}</button>`;
 const dialog = (id,title,body) => `<dialog id="${id}" role="dialog" aria-modal="true" aria-labelledby="${id}-title"><div class="dialog-heading"><h2 id="${id}-title">${title}</h2><button type="button" class="icon-button" data-companion-close="${id}" aria-label="Schließen">×</button></div>${body}</dialog>`;
-export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, canEdit, onChange, onRefresh = () => {}, openPanel, openNote, editNote, openBirth, openJournal }) {
+export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, canEdit, onChange, onRefresh = () => {}, openPanel, openNote, editNote, openBirth, openJournal, knowledgeHints }) {
   const $ = id => document.getElementById(id);
   const layout = getAppLayout();
   const arrangeFocus = () => arrangeOverviewFocus(document, layout.matches);
@@ -43,7 +43,7 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
     busy = true; $('plan-fields').disabled=true;$('growth-fields').disabled=true;showError('');
     try {
       await navigator.locks.request('bauchgefuehl-local-write',()=>{
-        if (!canEdit()) throw new Error('Bitte am aktiven Master speichern.');
+        if (!canEdit()) throw new Error('Bitte am aktiven Hauptgerät speichern.');
         const fresh=readCompanion(storage); if (JSON.stringify(fresh)!==JSON.stringify(data)) { data=fresh; throw new Error('In einem anderen Tab geändert. Entwurf bitte sichern und erneut öffnen.'); }
         data=writeCompanion(storage,change(fresh));
       });
@@ -153,6 +153,12 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
   }
   function refreshConversation(){
     const care=getCare();if(!care)return;
+    let hints = $('conversation-knowledge');
+    if (!hints) {
+      hints = document.createElement('aside'); hints.id = 'conversation-knowledge'; hints.className = 'knowledge-hints';
+      $('conversation-context').after(hints);
+    }
+    knowledgeHints?.(hints, sessionAppointment);
     $('conversation-context').textContent=sessionAppointment?`${sessionAppointment.title} · ${formatDate(sessionAppointment.date)}${sessionAppointment.time?' · '+sessionAppointment.time+' Uhr':''}`:'Deine Gesprächsvorbereitung';
     $('conversation-notes').replaceChildren();$('conversation-entries').replaceChildren();
     const notes=care.notes.filter(x=>!x.deletedAt&&(!x.appointmentId||x.appointmentId===sessionAppointment?.id));
@@ -186,9 +192,9 @@ export function setupCompanion({ storage, getMode, getJournal, getCare, getAge, 
   function sharePlan(){planSelection=new Set();$('plan-share-options').replaceChildren();if(!own()||!data)return;for(const area of ['plans','growth'])for(const item of data[area].filter(x=>!x.deletedAt)){const label=area==='plans'?`${PLAN_AREAS[item.area]} · ${item.text}`:`${formatDate(item.date)} · ${GROWTH_KINDS[item.kind].label}: ${number(item.value)} ${GROWTH_KINDS[item.kind].unit}`;selectionRow($('plan-share-options'),label,false,checked=>{if(checked)planSelection.add(item.id);else planSelection.delete(item.id);previewPlan();});}previewPlan();$('plan-share-dialog').showModal();requestAnimationFrame(()=>($('plan-share-options').querySelector('input')||$('plan-share-download')).focus());}
   function planBody(){return own()&&data?companionBody(projectCompanion(data,[...planSelection])):'';}
   function previewPlan(){$('plan-share-preview').innerHTML=planBody();$('plan-share-download').disabled=!planSelection.size;}
-  $('plan-export').addEventListener('click',sharePlan);
+  $('plan-export').addEventListener('click',()=>document.querySelector('[data-action="share"]').click());
   $('plan-share-download').addEventListener('click',()=>{downloadHtml(companionDocument(projectCompanion(data,[...planSelection])),`bauchgefuehl-planung-${todayISO()}.html`);});
   window.addEventListener('storage',event=>{if(event.key===COMPANION_KEY||event.key===null)reload();});
   function reload(){read();render();onRefresh();}
-  return { render,renderGrowth,openConversation,openHelp,reload,getData:()=>own()?data:normalizeCompanion(),isPostpartum:()=>own()&&!!data?.birthDate,refreshConversation(){if($('conversation-dialog').open)refreshConversation();} };
+  return { sharePlan,render,renderGrowth,openConversation,openHelp,reload,getData:()=>own()?data:normalizeCompanion(),isPostpartum:()=>own()&&!!data?.birthDate,refreshConversation(){if($('conversation-dialog').open)refreshConversation();} };
 }

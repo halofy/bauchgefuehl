@@ -2,7 +2,7 @@ import { formatText } from './text-format.js';
 import { CARE_KEY, readCare, writeCare, normalizeCare, upsertCare, archiveCare, careCollection, PROVIDERS, NOTE_KINDS } from './care.js';
 import { todayISO, formatDate } from './dates.js';
 
-export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefresh = () => {}, notify, openCalendar, openConversation }) {
+export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefresh = () => {}, notify, openCalendar, openConversation, knowledgeHints }) {
   const $ = id => document.getElementById(id);
   const node = (tag, cls = '', text = '') => { const e = document.createElement(tag); e.className = cls; e.textContent = text; return e; };
   const button = (text, action, cls = 'text-link') => { const e = node('button', cls, text); e.type = 'button'; e.addEventListener('click', action); return e; };
@@ -24,7 +24,7 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     }
     dirty = false; $(`care-${type}-error`).hidden = true; $(`care-${type}-dialog`).showModal(); requestAnimationFrame(() => $(type === 'note' ? 'care-note-text' : 'care-appt-title').focus()); return true;
   }
-  function editable() { if (!canEdit() || !data || getMode() === 'shared') { notify(problem || 'Termine und Notizen bitte am aktiven Master mit eigenen Angaben bearbeiten.'); return false; } return true; }
+  function editable() { if (!canEdit() || !data || getMode() === 'shared') { notify(problem || 'Termine und Notizen bitte am aktiven Hauptgerät mit eigenen Angaben bearbeiten.'); return false; } return true; }
   function openAppointment(date = todayISO(), existing = null) {
     if (!editable() || busy || document.querySelector('dialog[open]')) return;
     editingAppointment = existing;
@@ -53,7 +53,7 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     try {
       if (!navigator.locks?.request) throw new Error('Bitte einen aktuellen Browser mit lokalen Schreibsperren verwenden.');
       await navigator.locks.request('bauchgefuehl-local-write', () => {
-        if (!canEdit()) throw new Error('Der Master ist inzwischen in einem anderen Tab aktiv.');
+        if (!canEdit()) throw new Error('Das Hauptgerät ist inzwischen in einem anderen Tab aktiv.');
         const fresh = readCare(storage);
         if (JSON.stringify(fresh) !== JSON.stringify(data)) { data = fresh; throw new Error('Termine wurden in einem anderen Tab geändert. Bitte den Entwurf sichern und neu öffnen.'); }
         data = writeCare(storage, action(fresh)); onChange();
@@ -107,6 +107,11 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
       actions.append(button(item.deletedAt ? 'Wiederherstellen' : 'Termin archivieren', () => void run(fresh => archiveCare(fresh, 'appointments', item.id, !item.deletedAt))));
     }
     card.append(actions);
+    if (!item.deletedAt) {
+      const hints = node('aside', 'knowledge-hints');
+      knowledgeHints?.(hints, item);
+      card.append(hints);
+    }
     if (notes.length) { const details = document.createElement('details'); details.className = 'appointment-notes'; details.append(node('summary', '', `Notizen & Antworten (${notes.length})`)); for (const note of notes) details.append(noteCard(note)); card.append(details); }
     return card;
   }
@@ -121,6 +126,9 @@ export function setupPersonalCare({ storage, canEdit, getMode, onChange, onRefre
     const archived = $('care-show-archived').checked;
     const list = current.appointments.filter(item => archived || !item.deletedAt).sort((a,b) => Number(a.date < todayISO()) - Number(b.date < todayISO()) || a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
     const next = list.filter(item => !item.deletedAt && item.date >= todayISO()).slice(0, 1);
+    const generalHints = $('care-knowledge-hints');
+    generalHints.replaceChildren(); generalHints.hidden = true;
+    if (!next.length) knowledgeHints?.(generalHints, null);
     for (const item of next) appointments.append(appointmentCard(item));
     for (const item of list.filter(item => !next.includes(item))) older.append(appointmentCard(item));
     $('personal-older-panel').hidden = !older.children.length;

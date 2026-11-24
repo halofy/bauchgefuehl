@@ -1,5 +1,6 @@
 import { COMPANION_KEY, COMPANION_HISTORY_KEY, normalizeCompanion, writeCompanion, companionContinuity } from './companion.js';
 import { snapshot } from './sync.js';
+import { normalizeScopes, selectTransferData } from './transfer-selection.js';
 import { normalizeBirth, writeBirth } from './birth.js';
 import { CARE_KEY, CARE_HISTORY_KEY, normalizeCare, careContinuity, writeCare } from './care.js';
 import { STORAGE_KEY, HISTORY_KEY, writeLocal } from './pregnancy.js';
@@ -30,10 +31,10 @@ export async function createIdentity() {
 export function normalizeDevice(value) {
   if (!value) return null;
   if (!['master', 'follower'].includes(value.role) || !/^[A-Za-z0-9_-]{43}$/.test(value.source) || !Number.isSafeInteger(value.revision) || value.revision < 0) throw new Error('Der lokale Geräte-Stand ist beschädigt. Bitte eine Sicherung erstellen.');
-  const result = { role: value.role, source: value.source, revision: value.revision, lastDigest: value.lastDigest || '' };
+  const result = { role: value.role, source: value.source, revision: value.revision, lastDigest: value.lastDigest || '', ...(value.scopes === undefined ? {} : { scopes: normalizeScopes(value.scopes) }) };
   if (value.role === 'master') {
     result.publicKey = publicKey(value.publicKey);
-    if (typeof value.privateKey?.d !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value.privateKey.d)) throw new Error('Master-Signaturschlüssel fehlt.');
+    if (typeof value.privateKey?.d !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value.privateKey.d)) throw new Error('Signaturschlüssel des Hauptgeräts fehlt.');
     result.privateKey = { ...publicKey(value.privateKey), d: value.privateKey.d };
   }
   return result;
@@ -57,14 +58,15 @@ async function readBounded(stream, max) {
   for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.length; }
   return result;
 }
-export async function sealTransfer(value, identity, password, { contacts = null, care, companion, today } = {}) {
+export async function sealTransfer(value, identity, password, { contacts = null, care, companion, scopes, today } = {}) {
   const device = normalizeDevice(identity);
-  if (device?.role !== 'master') throw new Error('Nur das Mastergerät kann einen Stand für Mitleser signieren.');
-  const data = { snapshot: snapshot(value, today), ...(contacts === null ? {} : { contacts: normalizeBirth({ contacts }).contacts }), ...(care === undefined ? {} : { care: normalizeCare(care, today) }) };
+  if (device?.role !== 'master') throw new Error('Nur das Hauptgerät kann einen Stand für Mitleser signieren.');
+  let data = { snapshot: snapshot(value, today), ...(contacts === null ? {} : { contacts: normalizeBirth({ contacts }).contacts }), ...(care === undefined ? {} : { care: normalizeCare(care, today) }) };
   if (companion !== undefined) { if(care===undefined)data.care=normalizeCare(); data.companion = normalizeCompanion(companion, today); }
+  if (scopes !== undefined) data = selectTransferData(value, { scopes, care, companion, today });
   const currentDigest = await digest(JSON.stringify(data));
   const revision = currentDigest === device.lastDigest ? device.revision : device.revision + 1;
-  const body = JSON.stringify({ v: companion !== undefined ? 3 : care === undefined ? 1 : 2, source: device.source, revision, data });
+  const body = JSON.stringify({ v: scopes !== undefined ? 4 : companion !== undefined ? 3 : care === undefined ? 1 : 2, source: device.source, revision, data });
   const key = await crypto.subtle.importKey('jwk', device.privateKey, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
   const signature = b64(new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(body))));
   let plain = bytes(JSON.stringify({ body, publicKey: device.publicKey, signature }));
@@ -91,14 +93,15 @@ export async function openTransfer(envelope, password, today) {
   if (plain.length > 650000) throw new Error('Der Datenstand ist zu groß.');
   const signed = JSON.parse(text(plain)); const pub = publicKey(signed.publicKey);
   const key = await crypto.subtle.importKey('jwk', pub, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-  if (typeof signed.body !== 'string' || !await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, un64(signed.signature, 100), bytes(signed.body))) throw new Error('Die Master-Signatur ist ungültig.');
+  if (typeof signed.body !== 'string' || !await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, un64(signed.signature, 100), bytes(signed.body))) throw new Error('Die Signatur des Hauptgeräts ist ungültig.');
   const body = JSON.parse(signed.body);
-  if (![1, 2, 3].includes(body.v) || (body.v >= 2 && body.data?.care === undefined) || (body.v === 1 && body.data?.care !== undefined) || (body.v === 3 && body.data?.companion === undefined) || (body.v < 3 && body.data?.companion !== undefined) || body.source !== await digest(JSON.stringify(pub)) || !Number.isSafeInteger(body.revision) || body.revision < 1) throw new Error('Ungültiger Master-Datenstand. Bitte beide Geräte aktualisieren.');
-  const data = { snapshot: snapshot(body.data?.snapshot, today), ...(body.data?.contacts === undefined ? {} : { contacts: normalizeBirth({ contacts: body.data.contacts }).contacts }), ...(body.v >= 2 ? { care: normalizeCare(body.data.care, today) } : {}), ...(body.v === 3 ? { companion: normalizeCompanion(body.data.companion, today) } : {}) };
+  if (![1, 2, 3, 4].includes(body.v) || (body.v >= 2 && body.data?.care === undefined) || (body.v === 1 && body.data?.care !== undefined) || (body.v >= 3 && body.data?.companion === undefined) || (body.v < 3 && body.data?.companion !== undefined) || body.source !== await digest(JSON.stringify(pub)) || !Number.isSafeInteger(body.revision) || body.revision < 1) throw new Error('Ungültiger Datenstand des Hauptgeräts. Bitte beide Geräte aktualisieren.');
+  let data = { snapshot: snapshot(body.data?.snapshot, today), ...(body.data?.contacts === undefined ? {} : { contacts: normalizeBirth({ contacts: body.data.contacts }).contacts }), ...(body.v >= 2 ? { care: normalizeCare(body.data.care, today) } : {}), ...(body.v >= 3 ? { companion: normalizeCompanion(body.data.companion, today) } : {}) };
+  if (body.v === 4) data = selectTransferData(data.snapshot, { scopes: body.data.scopes, care: data.care, companion: data.companion, today });
   return { source: body.source, revision: body.revision, data, digest: await digest(JSON.stringify(data)) };
 }
 // QR readability and URL transport are separate limits, not browser guarantees.
-export const MAX_TRANSFER_QR_LENGTH = 2200;
+export const MAX_TRANSFER_QR_LENGTH = 1500;
 export const MAX_TRANSFER_LINK_LENGTH = 65536;
 export function transferLink(envelope, base, { maxLength = MAX_TRANSFER_LINK_LENGTH } = {}) {
   if (envelope?.format !== 'bauchgefuehl-transfer' || envelope.v !== 1 || !['gzip', 'json'].includes(envelope.codec) ||
@@ -126,19 +129,22 @@ export function parseTransferInput(value) {
 }
 export function checkIncoming(packet, device, current, { replace = false } = {}) {
   const config = normalizeDevice(device);
-  if (config?.role === 'master') throw new Error('Ein Master übernimmt keinen fremden Stand. Sichere die Daten und löse den Master bei Bedarf bewusst ab.');
-  if (config && config.source !== packet.source) throw new Error('Dieser Stand gehört zu einem anderen Master. Die bestehende Zuordnung bleibt erhalten.');
+  if (config?.role === 'master') throw new Error('Ein Hauptgerät übernimmt keinen fremden Stand. Sichere die Daten und löse das Hauptgerät bei Bedarf bewusst ab.');
+  if (config && config.source !== packet.source) throw new Error('Dieser Stand gehört zu einem anderen Hauptgerät. Die bestehende Zuordnung bleibt erhalten.');
   if (config && packet.revision < config.revision) throw new Error('Dieser Stand ist älter als der bereits übernommene Stand.');
   if (config && packet.revision === config.revision && packet.digest !== config.lastDigest) throw new Error('Versionskonflikt: gleiche Version mit anderem Inhalt.');
+  const changedScope = config && JSON.stringify(config.scopes ?? null) !== JSON.stringify(packet.data.scopes ?? null);
+  if (changedScope && !replace) throw new Error('Der geteilte Umfang hat sich geändert. Bitte zuerst die bisherige Kopie unter „Sicherung & Wiederherstellung“ vollständig sichern und anschließend erneut übernehmen.');
+  const keepContinuity = config ? !changedScope : !replace;
   const localIds = new Set(current?.journal?.map(entry => entry.id) || []);
   const incomingIds = new Set(packet.data.snapshot.journal.map(entry => entry.id));
-  if ([...localIds].some(id => !incomingIds.has(id)) && (!replace || config)) throw new Error('Dieser Import würde vorhandene Journaleinträge entfernen. Bitte den lokalen Stand zuerst sichern; es wird nichts still überschrieben.');
-  if (config || !replace) for (const local of current?.journal || []) {
+  if ([...localIds].some(id => !incomingIds.has(id)) && keepContinuity) throw new Error('Dieser Import würde vorhandene Journaleinträge entfernen. Bitte den lokalen Stand zuerst sichern; es wird nichts still überschrieben.');
+  if (keepContinuity) for (const local of current?.journal || []) {
     const incoming = packet.data.snapshot.journal.find(entry => entry.id === local.id);
     if (incoming && (incoming.updatedAt < local.updatedAt || (incoming.updatedAt === local.updatedAt && JSON.stringify(incoming) !== JSON.stringify(local)))) throw new Error('Der eingehende Stand würde eine neuere oder abweichende Journalfassung überschreiben. Bitte die Sicherungen prüfen.');
   }
-  if (config || !replace) { careContinuity(packet.data.care, current?.care); companionContinuity(packet.data.companion, current?.companion); }
-  return { role: 'follower', source: packet.source, revision: packet.revision, lastDigest: packet.digest };
+  if (keepContinuity) { careContinuity(packet.data.care, current?.care); companionContinuity(packet.data.companion, current?.companion); }
+  return { role: 'follower', source: packet.source, revision: packet.revision, lastDigest: packet.digest, ...(packet.data.scopes ? { scopes: packet.data.scopes } : {}) };
 }
 
 // A durable recovery record precedes all multi-key changes. On restart, a partially written bundle is rolled back.

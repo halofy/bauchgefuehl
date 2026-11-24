@@ -7,7 +7,6 @@ import { setupAppNavigation, showAppPanel } from './navigation.js';
 import { isLocalPreview, setupPwa } from './pwa.js';
 import { STORAGE_KEY, HISTORY_KEY, todayISO, dayNumber, addDays, formatDate, calculatePregnancy, validateProfile, validateStoredProfile, demoProfile, decodeShare, readLocal, writeLocal } from './pregnancy.js';
 import { getWeekContent, milestones } from './content.js';
-import { createQrSvg } from './qr.js';
 import { setupDevices } from './devices-ui.js';
 import { setupBirth } from './birth-ui.js';
 import { BIRTH_KEY, BIRTH_HISTORY_KEY } from './birth.js';
@@ -17,11 +16,12 @@ import { setupCalendar } from './calendar-ui.js';
 import { normalizeJournal } from './journal.js';
 import { SYNC_KEY } from './sync.js';
 import { setupGuide } from './guide-ui.js';
+import { setupKnowledge } from './knowledge-ui.js';
+import { MILESTONE_ARTICLES } from './knowledge.js';
 import { setupReport } from './report-ui.js';
 import { setupMother } from './mother-ui.js';
 import { setupPersonalCare } from './care-ui.js';
 import { CARE_KEY, CARE_HISTORY_KEY } from './care.js';
-import { makeShareLink, shareProfile } from './report.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -39,6 +39,7 @@ let syncUi = null;
 let journalUi = null;
 let calendarUi = null;
 let guideUi = null;
+let knowledgeUi = null;
 let reportUi = null;
 let birthUi = null;
 let motherUi = null;
@@ -70,7 +71,7 @@ function currentWeek() {
 
 function readIncomingLink() {
   if (syncUi?.connection && location.hash.startsWith('#s=')) {
-    announce('Ein Reise-Link ersetzt keinen zugeordneten Masterstand. Löse die Gerätezuordnung nach einer Sicherung, bevor du eine andere Reise übernimmst.');
+    announce('Ein Reise-Link ersetzt keinen zugeordneten Stand des Hauptgeräts. Löse die Gerätezuordnung nach einer Sicherung, bevor du eine andere Reise übernimmst.');
     selectedWeek = currentWeek();
     return;
   }
@@ -270,6 +271,12 @@ function milestoneCard(item, suffix, gestationalDays) {
     for (const other of $$(`input[id^="${item.id}-"]`)) other.checked = input.checked;
   });
   article.append(time, title, text, source);
+  const knowledgeId = MILESTONE_ARTICLES[item.id];
+  if (knowledgeId) {
+    const read = document.createElement('button'); read.type = 'button'; read.className = 'text-link';
+    read.textContent = 'Im Wissen verständlich erklärt ›';
+    read.addEventListener('click', () => knowledgeUi?.openArticle(knowledgeId)); article.append(read);
+  }
   if(item.extraSource){const extra=document.createElement('a');extra.className='source-link';extra.href=item.extraSource;extra.target='_blank';extra.rel='noopener noreferrer';extra.textContent='G-BA · Voraussetzungen und Kassenleistung';article.append(extra);}
   if(item.reviewed){const reviewed=document.createElement('p');reviewed.className='care-item-meta';reviewed.textContent=`Redaktionell geprüft: ${formatDate(item.reviewed)}`;article.append(reviewed);}
   article.append(label);
@@ -282,7 +289,7 @@ function renderCare() {
   $('#milestones').replaceChildren(...upcoming.map(item => milestoneCard(item, 'next', days)));
   $('#all-milestones').replaceChildren(...milestones.map(item => milestoneCard(item, 'all', days)));
   $('#checklist-note').textContent = state.mode === 'demo' ? 'In der Vorschau sind die Merkhäkchen deaktiviert. Trage deine Daten ein, um sie lokal zu nutzen.' : state.mode === 'shared' ? 'Übernimm die Daten auf diesem Gerät, um eigene Merkhäkchen zu setzen. Häkchen werden nicht geteilt.' : 'Deine Häkchen sind persönliche Merkhilfen, keine medizinische Dokumentation. Sie werden nicht geteilt.';
-  if (syncUi?.connection) $('#checklist-note').textContent = syncUi.readOnly ? 'Merkhäkchen stammen aus dem zuletzt übernommenen Masterstand. Änderungen erfolgen am Master.' : 'Merkhäkchen sind im nächsten bewusst übertragenen Geräte-Stand enthalten.';
+  if (syncUi?.connection) $('#checklist-note').textContent = syncUi.readOnly ? 'Merkhäkchen stammen aus dem zuletzt übernommenen Stand des Hauptgeräts. Änderungen erfolgen am Hauptgerät.' : 'Merkhäkchen sind im nächsten bewusst übertragenen Geräte-Stand enthalten.';
 }
 
 function render(center = false) {
@@ -324,7 +331,7 @@ function persistChecks() {
 }
 
 function saveProfile(profile, checks) {
-  if (syncUi?.readOnly) throw new Error('Dieses Gerät liest nur mit. Bitte ändere die Angaben auf dem Master.');
+  if (syncUi?.readOnly) throw new Error('Dieses Gerät liest nur mit. Bitte ändere die Angaben auf dem Hauptgerät.');
   const replacing = state.mode === 'shared';
   state = { profile: validateProfile(profile, today), checks: { ...checks }, journal: replacing ? [] : state.journal, mode: 'local' };
   announce('');
@@ -352,7 +359,7 @@ function discardShared() {
 }
 
 function openProfile() {
-  if (syncUi?.readOnly) { toast('Änderungen sind nur am Master möglich.'); return; }
+  if (syncUi?.readOnly) { toast('Änderungen sind nur am Hauptgerät möglich.'); return; }
   const isDemo = state.mode === 'demo';
   $('#method').value = isDemo ? 'period' : state.profile.method;
   $('#lmp').value = isDemo ? '' : state.profile.lmp || '';
@@ -435,53 +442,11 @@ $('#profile-form').addEventListener('submit', event => {
   }
 });
 
-function renderShare() {
-  $('#share-qr-code').replaceChildren();
-  $('#share-qr-error').hidden = true;
-  try {
-    const mode = $('#share-scope').value;
-    const profile = shareProfile(state.profile, mode, today);
-    const url = new URL(makeShareLink(state.profile, mode, location.href, today));
-    $('#share-url').value = url.href; $('#copy-link').disabled = false;
-    try { $('#share-qr-code').innerHTML = createQrSvg(url.href); }
-    catch {
-      $('#share-qr-error').textContent = 'Für diese Adresse konnte kein QR-Code erstellt werden. Du kannst stattdessen den Link kopieren.';
-      $('#share-qr-error').hidden = false;
-    }
-    $('#share-local-warning').hidden = !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
-    $('#share-description').textContent = profile.method === 'due-date'
-      ? `Enthalten sind nur der ${state.profile.method === 'period' ? 'aus deinen Angaben geschätzte' : 'eingetragene'} ET (${formatDate(profile.dueDate)}) und die Methode „ET · 28-Tage-Basis“. Damit bleiben SSW und Zeitachse gleich. Periodenbeginn, Zykluslänge und Unregelmäßigkeit werden ausgelassen; aus dem ET ist die zeitliche Einordnung der Schwangerschaft weiterhin ableitbar. Ein geschätzter ET bleibt eine Schätzung; zyklusbezogene Unsicherheitshinweise werden nicht übertragen.`
-      : `Enthalten sind die Methode „Periode & Zyklus“, der Periodenbeginn (${formatDate(profile.lmp)}), die durchschnittliche Zykluslänge (${profile.cycle} Tage) und die Angabe, ob dein Zyklus unregelmäßig ist.`;
-  } catch (cause) {
-    $('#share-url').value = ''; $('#copy-link').disabled = true;
-    $('#share-description').textContent = `Dieser Umfang kann gerade nicht geteilt werden: ${cause.message} Prüfe deine Angaben oder wähle bewusst die vollständige Berechnungsgrundlage.`;
-  }
-  $('#copy-status').textContent = '';
-  $('#copy-link').innerHTML = `${icon('share')}Link kopieren`;
-}
-function openShare() {
-  if (state.mode === 'demo') { openProfile(); toast('Trage zuerst deine Daten ein, um deine Reise zu teilen.'); return; }
-  $('#share-scope').value = 'due-date'; renderShare();
-  $('#share-dialog').showModal();
-}
-
-$('#share-scope').addEventListener('change', renderShare);
-$('#share-url').addEventListener('click', event => event.target.select());
-$('#copy-link').addEventListener('click', async () => {
-  try {
-    if (!navigator.clipboard?.writeText) throw new Error();
-    await navigator.clipboard.writeText($('#share-url').value);
-    $('#copy-link').innerHTML = `${icon('check')}Link kopiert`;
-    $('#copy-status').textContent = 'Kopiert. Du kannst den Link jetzt selbst an eine vertraute Person senden.';
-  } catch {
-    $('#share-url').focus();
-    $('#share-url').select();
-    $('#copy-status').textContent = 'Automatisches Kopieren ist hier nicht möglich. Der Link ist markiert: Kopiere ihn mit Strg+C oder ⌘C oder über das Kontextmenü.';
-  }
-});
+function openShare() { syncUi?.open(); }
 
 function openDetail(selector) {
   const detail = $(selector);
+  knowledgeUi?.showCategory('basics');
   showAppPanel('wissen');
   detail.open = true;
   detail.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
@@ -494,7 +459,7 @@ const actions = {
   calculation: () => openDetail('#calculation-details'),
   privacy: () => openDetail('.accordions details:nth-child(4)'),
   sources: () => openDetail('#sources-details'),
-  report: () => reportUi?.open(),
+  report: openShare,
 };
 for (const element of $$('[data-action]')) if (actions[element.dataset.action]) element.addEventListener('click', () => actions[element.dataset.action]());
 for (const button of $$('[data-close]')) button.addEventListener('click', () => $(`#${button.dataset.close}`).close());
@@ -510,7 +475,7 @@ for (const dialog of $$('dialog')) {
 $('#delete-data').addEventListener('click', () => { $('#delete-error').hidden = true; $('#delete-dialog').showModal(); });
 $('#confirm-delete').addEventListener('click', () => {
   try {
-    if (syncUi?.connection) throw new Error('Bitte zuerst unter „Daten & Backup“ eine Sicherung herunterladen und die Gerätezuordnung lösen.');
+    if (syncUi?.connection) throw new Error('Bitte zuerst unter „Teilen → Sicherung & Wiederherstellung“ eine Sicherung herunterladen und die Gerätezuordnung lösen.');
     storage.removeItem(SYNC_KEY);
     storage.removeItem(HISTORY_KEY);
     storage.removeItem(STORAGE_KEY);
@@ -527,7 +492,7 @@ $('#confirm-delete').addEventListener('click', () => {
     announce('');
     toast('Deine lokalen Angaben, dein Journal und deine Merkhäkchen wurden gelöscht.');
   } catch {
-    $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Daten & Backup“ eine Sicherung herunterladen und die Gerätezuordnung lösen. Bereits weitergegebene Kopien bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
+    $('#delete-error').textContent = syncUi?.connection ? 'Bitte zuerst unter „Teilen → Sicherung & Wiederherstellung“ eine Sicherung herunterladen und die Gerätezuordnung lösen. Bereits weitergegebene Kopien bleiben davon unberührt.' : 'Der Browser lässt das Löschen gerade nicht zu. Entferne die Website-Daten bitte über die Browser-Einstellungen.';
     $('#delete-error').hidden = false;
   }
 });
@@ -601,6 +566,7 @@ careUi = setupPersonalCare({ storage, getMode: () => state.mode,
   onRefresh() { calendarUi?.render(); reportUi?.refreshIfOpen(); companionUi?.render(); companionUi?.refreshConversation(); },
   notify: toast,
   openConversation: id => companionUi?.openConversation(id),
+  knowledgeHints: (target, appointment) => knowledgeUi?.hints(target, appointment?.date ?? today, { provider: appointment?.provider ?? '', appointmentId: appointment?.id ?? null }),
   openCalendar(date) { showAppPanel('kalender', true); calendarUi.showDate(date); $('#calendar-selected-date').scrollIntoView({ behavior: 'instant' }); },
 });
 function refreshPersonalContext() {
@@ -619,16 +585,30 @@ companionUi = setupCompanion({ storage, getMode: () => state.mode, getJournal: (
   canEdit: () => state.mode !== 'shared' && !syncUi?.readOnly,
   onChange() { queueSync(); refreshPersonalContext(); },
   onRefresh: refreshPersonalContext,
-  openPanel(id, anchor) { showAppPanel(id,true); if(anchor) document.getElementById(anchor)?.scrollIntoView({behavior:'instant',block:'start'}); },
+  openPanel(id, anchor) { if (anchor === 'symptom-help') knowledgeUi?.showCategory('symptoms'); showAppPanel(id,true); if(anchor) document.getElementById(anchor)?.scrollIntoView({behavior:'instant',block:'start'}); },
   openNote: (id,text) => careUi.openNote(id,null,text), editNote: id => careUi.editNote(id),
   openBirth: () => birthUi?.open(), openJournal: () => journalUi?.openForDate(today),
+  knowledgeHints: (target, appointment) => knowledgeUi?.hints(target, appointment?.date ?? today, { provider: appointment?.provider ?? '', appointmentId: appointment?.id ?? null }),
 });
 guideUi = setupGuide({ getProfile: () => state.profile, getMode: () => state.mode, getToday: () => today });
+knowledgeUi = setupKnowledge({
+  guide: guideUi,
+  getAge: date => calculatePregnancy(state.profile, today).gestationalDays + dayNumber(date) - dayNumber(today),
+  isPostpartum: date => state.mode !== 'shared' && !!companionUi?.getData()?.birthDate && date >= companionUi.getData().birthDate,
+  canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
+  openQuestion(text, appointmentId) {
+    if ($('#conversation-dialog').open) {
+      $('#conversation-dialog').close();
+      setTimeout(() => careUi.openNote(appointmentId, null, text), 120);
+    } else careUi.openNote(appointmentId, null, text);
+  },
+});
+careUi.render();
 reportUi = setupReport({ getJournal: () => state.journal, getCare: () => careUi.getData(), getToday: () => today, notify: toast });
 journalUi = setupJournal({
   getJournal: () => state.journal,
   canEdit: () => ['local', 'session'].includes(state.mode) && !syncUi?.readOnly,
-  onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Master erfassen.'); else openProfile(); },
+  onSetup() { if (syncUi?.readOnly) toast('Bitte Einträge auf dem aktiven Hauptgerät erfassen.'); else openProfile(); },
   saveJournal: saveJournalEntries,
   symptomHelp: label => companionUi.openHelp(label),
   notify: toast,
@@ -660,9 +640,9 @@ calendarUi = setupCalendar({
   },
   showReflection: () => openPersonalView('reflection'),
   showGuide(date) {
-    guideUi.setDate(date); showAppPanel('wissen', true);
+    knowledgeUi.showCategory('food'); guideUi.setDate(date); showAppPanel('wissen', true);
     $('#everyday-guide').scrollIntoView({ behavior: 'instant', block: 'start' });
-    $('#guide-search').focus({ preventScroll: true });
+    $('#knowledge-search').focus({ preventScroll: true });
   },
   showWeek(week) {
     showAppPanel('wochenreise', true); selectWeek(week);
@@ -672,6 +652,8 @@ calendarUi = setupCalendar({
 let lastSyncRole = '';
 syncUi = setupDevices({
   storage,
+  openReport: () => reportUi?.open(),
+  openPlanReport: () => companionUi?.sharePlan(),
   getSnapshot() {
     if (state.mode === 'demo' || state.mode === 'shared') throw new Error('Bitte zuerst eigene Angaben auf diesem Gerät speichern.');
     return { profile: state.profile, checks: state.checks, journal: state.journal };

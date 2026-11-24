@@ -56,7 +56,7 @@ export function setupReport({ getJournal, getCare = normalizeCare, getToday = to
   }
   function open() {
     // Safari can leave a second modal outside its accessibility tree. Switch dialogs instead of stacking them.
-    for (const id of ['share-dialog', 'sync-dialog']) if ($(id).open) $(id).close();
+    for (const id of ['share-dialog', 'sync-dialog']) if ($(id)?.open) $(id).close();
     excluded = new Set();
     $('report-from').value = addDays(getToday(), -27); $('report-to').value = getToday();
     for (const input of $('report-fields').querySelectorAll('input')) input.checked = false;

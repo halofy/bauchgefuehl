@@ -49,6 +49,8 @@ Ein AgDR hält Kontext, Entscheidung, Herkunft, Alternativen, Folgen und überpr
 | [AgDR-0051](0051-mobile-informationsarchitektur.md) | Mobile Neuordnung von Heute, Wochenreise, Kalender, Journal, Vorsorge und Wissen | Vorschlag zu persönlichen Funktionen weiterentwickelt in AgDR-0052 |
 | [AgDR-0052](0052-fuer-dich-und-schnelle-erfassung.md) | Für dich als Einstieg für persönliche Daten, ein gemeinsames Formular und verständliche Dezimaleingabe | Umsetzung in AgDR-0053 |
 | [AgDR-0053](0053-mobile-neuordnung-und-gemeinsame-erfassung.md) | Für dich, schnelles Eingabeformular, Kalenderansichten und Vorsorgeeinstieg | Umgesetzt |
+| [AgDR-0054](0054-wissen-und-zeitbezogene-lesetipps.md) | Sichtbarer Wissenszugang, lokale Artikel und SSW-bezogene Lesetipps an Terminen | Umgesetzt, medizinische Fachabnahme offen |
+| [AgDR-0055](0055-einheitliches-selektives-teilen.md) | Ein Teileinstieg, vier Inhaltsgruppen, Haupt-/Mitlesegerät und geführter QR-Empfang | Umgesetzt, physischer Smartphone-Test offen |
 
 Die Nummern **0030–0039** sind in AgDR-0041 zusammengeführt; ihre vollständigen Texte und Prüfnachweise stehen dort im aufklappbaren Verlauf. Die Nummern bleiben reserviert.
 

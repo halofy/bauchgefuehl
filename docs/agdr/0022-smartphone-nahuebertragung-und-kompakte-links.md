@@ -6,6 +6,8 @@
 - **Betroffene Dateien:** [Übertragung](../../src/device-transfer.js), [Geräteoberfläche](../../src/devices-ui.js), [HTML](../../index.html), [Styles](../../styles.css), [Tests](../../tests/device-transfer.test.js), [Feature-Liste](../open.md)
 - **Ersetzt teilweise:** [AgDR-0020](0020-serverloser-geraeteabgleich.md), bisher gemeinsame 1.800-Zeichen-Grenze für QR und Links; alle Verschlüsselungs-, Master- und Importregeln bleiben erhalten
 
+**Fortschreibung vom 24.11.2026:** [AgDR-0055](0055-einheitliches-selektives-teilen.md) löst die getrennten Teileinstiege, den neuen unverschlüsselten Reise-Export und die bisherige QR-Grenze teilweise ab. Neue Standardweitergabe ist eine selektive verschlüsselte Kopie in Body-Version 4. UI-Begriffe sind Hauptgerät / Mitlesegerät; interne Rollen und bestehende Formate bleiben kompatibel. Die folgenden Angaben dokumentieren die damalige Entscheidung.
+
 ## Kontext und Herkunft
 
 Der Nutzer fragt ausdrücklich nach modernen Browser-Schnittstellen zum direkten Teilen zwischen nahen Smartphones, insbesondere UWB, und legt den Schwerpunkt auf iOS und Android zusammen. Alternativ soll möglichst viel in einer URL beziehungsweise einem QR-Code übertragen werden. Das ist keine Anforderung an eine native App oder eine Erlaubnis für externe Verbindungsdienste.

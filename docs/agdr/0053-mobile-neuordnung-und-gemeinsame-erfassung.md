@@ -6,6 +6,8 @@
 - **Betroffene Dateien:** [Ansichten](../../index.html), [Navigation](../../src/navigation.js), [Eingabe und Journal](../../src/journal-ui.js), [Kalender](../../src/calendar-ui.js), [Vorsorge](../../src/care-ui.js), [Dezimalwerte](../../src/journal.js)
 - **Ersetzt / ergänzt:** Setzt den überarbeiteten Entwurf aus [AgDR-0052](0052-fuer-dich-und-schnelle-erfassung.md) um. Übernimmt die Kalender- und Vorsorgeordnung aus [AgDR-0051](0051-mobile-informationsarchitektur.md) und löst die betroffenen Teile aus [AgDR-0021](0021-uebersichtliche-hauptbereiche.md), [AgDR-0024](0024-fuer-dich-und-mobile-layoutkorrekturen.md) und [AgDR-0044](0044-kalender-mit-gemeinsamer-wochenansicht.md) ab.
 
+> [AgDR-0054](0054-wissen-und-zeitbezogene-lesetipps.md) ergänzt einen dauerhaft sichtbaren Wissenszugang, zusätzliche Artikel und zeitbezogene Lesetipps.
+
 ## Kontext und Herkunft
 
 Der Nutzer erwartet Körpermesswerte unter „Für dich“. Vier häufige Werte sollen ohne Auswahl von Messarten eingegeben werden können. Die bisherige Wahl zwischen Journal und Check-in setzt Vorwissen voraus. Die Dezimaleingabe soll im Formular erklärt werden.

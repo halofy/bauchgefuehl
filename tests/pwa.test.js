@@ -54,6 +54,7 @@ test('offline navigation and modules work at a Pages subpath', async () => {
   }
   assert.ok([...w.entries.keys()].every(url => !url.includes('/images/development')));
   const { weeklyMotif } = await import('../src/development-art.js');
+  for (const file of ['knowledge.js', 'knowledge-ui.js', 'transfer-selection.js']) assert.equal((await w.fetch(`./src/${file}`)).url, `https://example.test/bauchgefuehl/src/${file}`);
   const weeklyImages = Array.from({ length: 42 }, (_, index) => weeklyMotif(index + 1).src);
   for (const image of weeklyImages) {
     assert.equal((await w.fetch(image)).url, new URL(image, 'https://example.test/bauchgefuehl/').href);

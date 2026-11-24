@@ -150,7 +150,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
   $('#journal-form').addEventListener('submit', event => {
     event.preventDefault(); $('#entry-error').hidden = true;
     try {
-      if (!canEdit()) throw new Error('Einträge können nur am aktiven Master bearbeitet werden. Dein Entwurf bleibt geöffnet.');
+      if (!canEdit()) throw new Error('Einträge können nur am aktiven Hauptgerät bearbeitet werden. Dein Entwurf bleibt geöffnet.');
       const metrics = [];
       for (const [kind, input] of standardInputs) {
         if (input.value.trim()) metrics.push(readField(input, METRICS[kind].label, raw => normalizeMetric({ kind, value: parseMeasurement(raw) })));
@@ -250,7 +250,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
     $('#journal-filter-count').textContent = filterCount ? String(filterCount) + " aktiv" : '';
     $('#journal-reset').disabled = !filterCount;
     $('#journal-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'Eintrag' : 'Einträge'}`;
-    $('#journal-permission').textContent = canEdit() ? 'Deine Einträge werden auf diesem Gerät gespeichert.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls den aktiven Master. Vorhandene Einträge bleiben lesbar.';
+    $('#journal-permission').textContent = canEdit() ? 'Deine Einträge werden auf diesem Gerät gespeichert.' : 'Zum Erfassen brauchst du gespeicherte Basisdaten und gegebenenfalls das aktive Hauptgerät. Vorhandene Einträge bleiben lesbar.';
     $('#journal-permission').hidden = canEdit();
     $('#entry-save').disabled = !canEdit();
     $('#journal-export').disabled = !filtered.length;
@@ -278,7 +278,7 @@ export function setupJournal({ getJournal, canEdit, saveJournal, onSetup, notify
       if (canEdit()) {
         if (!entry.deletedAt) { const edit = node('button', 'text-link', 'Bearbeiten'); edit.type = 'button'; edit.addEventListener('click', () => open(entry)); actions.append(edit); }
         const archive = node('button', 'text-link', entry.deletedAt ? 'Wiederherstellen' : 'Archivieren'); archive.type = 'button'; archive.addEventListener('click', () => {
-          try { if (!canEdit()) throw new Error('Nur der Master darf Einträge ändern.'); saveJournal(archiveEntry(getJournal(), entry.id, !entry.deletedAt)); render(); notify(entry.deletedAt ? 'Eintrag wiederhergestellt.' : 'Eintrag archiviert. Über „Archivierte anzeigen“ bleibt er erreichbar.'); }
+          try { if (!canEdit()) throw new Error('Nur das Hauptgerät darf Einträge ändern.'); saveJournal(archiveEntry(getJournal(), entry.id, !entry.deletedAt)); render(); notify(entry.deletedAt ? 'Eintrag wiederhergestellt.' : 'Eintrag archiviert. Über „Archivierte anzeigen“ bleibt er erreichbar.'); }
           catch (error) { notify(error.message); }
         }); actions.append(archive);
       }
